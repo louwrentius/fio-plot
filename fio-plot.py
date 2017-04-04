@@ -266,7 +266,7 @@ class benchmark(object):
 
 def set_arguments():
 
-    parser = argparse.ArgumentParser(description='Convert FIO JASON output \
+    parser = argparse.ArgumentParser(description='Convert FIO JSON output \
             to charts')
 
     ag = parser.add_argument_group(title="Generic Settings")
