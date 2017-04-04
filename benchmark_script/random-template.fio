@@ -1,0 +1,15 @@
+[random-io]
+rw=${RW}
+blocksize=${BLOCKSIZE}
+size=${SIZE}
+iodepth=${IODEPTH}
+directory=${DIRECTORY}
+filename=fio-test.bin
+ioengine=libaio
+direct=1
+invalidate=1
+runtime=${RUNTIME}
+write_bw_log=${RW}-${BLOCKSIZE}-${IODEPTH}
+write_lat_log=${RW}-${BLOCKSIZE}-${IODEPTH}
+write_iops_log=${RW}-${BLOCKSIZE}-${IODEPTH}
+log_avg_msec=500
