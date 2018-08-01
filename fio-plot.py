@@ -241,8 +241,15 @@ class benchmark(object):
     def getStats(self, mode):
         result = {}
         for record in self.data:
-            depth = record['jobs'][0]['job options']['iodepth'].lstrip("0")
-            if record['jobs'][0]['job options']['rw'] == 'rand' + str(mode):
+            try:
+                depth = record['jobs'][0]['job options']['iodepth'].lstrip("0")
+            except KeyError:
+                depth = record['global options']['iodepth'].lstrip("0")
+            try:
+                rw = record['jobs'][0]['job options']['rw']
+            except KeyError:
+                rw = record['global options']['rw']
+            if rw == 'rand' + str(mode):
                 row = {'iodepth': depth,
                        'iops': record['jobs'][0][mode]['iops'],
                        'lat': record['jobs'][0][mode]['lat']['mean'],
