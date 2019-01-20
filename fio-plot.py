@@ -131,6 +131,7 @@ class ThreeDee(Chart):
                             self.series['y_series1'].append(round(y['iops']))       #iops
                             self.series['y_series2'].append(round(int(y['numjobs'])))       #lat
 
+
     def plot_3d(self, mode, metric):
 
 
@@ -180,19 +181,21 @@ class ThreeDee(Chart):
         colors = cm.rainbow(values)
 
         self.ax1.bar3d(xpos_f,ypos_f,zpos, dx, dy, dz, color=colors)
-
+        
+        # color bar legend 
         norm = mpl.colors.Normalize(vmin=0,vmax=dz.max())
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
         sm.set_array([])
-        self.fig.colorbar(sm) 
+        res = self.fig.colorbar(sm, fraction=0.046, pad=0.04)
+        res.ax.set_title(metric)
 
+        # axis ticks and tick labels
 
         float_x = [float(x) for x in (xpos_orig)]
         float_y = [float(y) for y in (ypos_orig)]
 
         self.ax1.w_xaxis.set_ticks(float_x)
         self.ax1.w_yaxis.set_ticks(ypos_orig)
-        #self.ax1.tick_params(axis='y', direction='out', pad=5)
 
         self.ax1.w_xaxis.set_ticklabels(iodepth)
         self.ax1.w_yaxis.set_ticklabels(numjobs)
