@@ -1,6 +1,8 @@
 # fio-plot
 Create charts from FIO storage benchmark tool JSON output
 
+    >>>> This tool is not really productio ready (sorry) <<<< 
+
 FIO: https://github.com/axboe/fio
 
 Requires: numpy, matplotlib
