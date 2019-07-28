@@ -200,6 +200,11 @@ class ThreeDee(Chart):
         self.ax1.w_xaxis.set_ticklabels(iodepth)
         self.ax1.w_yaxis.set_ticklabels(numjobs)
 
+        #self.ax1.set_zlim3d(0,int(self.config['zmax']))
+
+        #zticks = np.arange(dz.min(), dz.max(), ((dz.max()/10)%1000))
+        #self.ax1.w_zaxis.set_ticks(zticks)
+
         # axis labels
         fontsize = 14
         self.ax1.set_xlabel('iodepth', fontsize=fontsize)
@@ -214,7 +219,7 @@ class ThreeDee(Chart):
         plt.suptitle(self.config['title'] + " | " + mode + " | " + metric, fontsize=16, horizontalalignment='center' )
 
         # watermark
-        max_z = (max(dz) * 0.18)
+        max_z = (max(dz) * 0.16)
         start_y = (len(self.config['source']) * 0.1)
         self.ax1.text(lx-0.7,start_y,max_z,self.config['source'], (1,1,max_z),color='b', )
 
@@ -613,7 +618,7 @@ class benchmark(object):
         config['fixed_metric'] = 'numjobs'
         config['fixed_value'] = 1
         config['x_series']  = 'iodepth'
-        config['x_series_label'] = 'I/O Depth'
+        config['x_series_label'] = 'I/O queue depth'
         config['y_series1'] = 'iops'
         config['y_series1_label'] = 'IOP/s'
         config['y_series2'] = 'lat'
@@ -621,6 +626,7 @@ class benchmark(object):
         config['y_series3'] = 'lat_stddev'
         config['maxjobs'] = self.settings['maxjobs']
         config['maxdepth'] = self.settings['maxdepth']
+        config['zmax'] = self.settings['max']
         c = ThreeDee(self.stats, config)
         c.plot_3d(config['mode'], metric)
 
@@ -666,7 +672,6 @@ def set_arguments():
 
     parser = argparse.ArgumentParser(description='Convert FIO JSON output \
             to charts')
-
     ag = parser.add_argument_group(title="Generic Settings")
     ag.add_argument("-i", "--input-directory", help="input directory where\
             JSON files can be found" )
@@ -681,16 +686,15 @@ def set_arguments():
     ag.add_argument("-J", "--maxjobs", help="\
             maximum numjobs to graph")
     ag.add_argument("-n", "--numjobs", help="\
-            species for which numjob parameter you want graphs to be generated")
+            specifies for which numjob parameter you want graphs to be generated")
+    ag.add_argument("-m", "--max", help="\ optional max value for z-axis")
 
     return parser
 
 
 def main():
     settings = {}
-
     parser = set_arguments()
-
     try:
         args = parser.parse_args()
     except OSError:
@@ -707,11 +711,11 @@ def main():
 
     if settings['latency_iops']:
         b.chart_3d_iops_numjobs('randread','iops')
-        #b.chart_3d_iops_numjobs('randwrite','iops')
-        #b.chart_3d_iops_numjobs('randread','lat')
-        #b.chart_3d_iops_numjobs('randwrite','lat')
-        #b.chart_iops_latency('randread')
-        #b.chart_iops_latency('randwrite')
+        b.chart_3d_iops_numjobs('randwrite','iops')
+        b.chart_3d_iops_numjobs('randread','lat')
+        b.chart_3d_iops_numjobs('randwrite','lat')
+    #    b.chart_iops_latency('randread')
+    #    b.chart_iops_latency('randwrite')
 
     if settings['histogram']:
         b.chart_latency_histogram('randread')
