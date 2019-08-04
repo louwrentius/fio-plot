@@ -6,10 +6,13 @@ Create charts from FIO storage benchmark tool JSON output
 FIO: https://github.com/axboe/fio
 
 ### 2d chart 
+![2d][2d]
+
+[2d]: https://github.com/louwrentius/fio-plot/blob/master/images/MX200/randread_iodepth_2019-08-04-20:22:53_1_iops_latency.png?raw=true 
 
 ### 3d chart
-
-
+![3d][3d]
+[3d]: https://github.com/louwrentius/fio-plot/blob/master/images/MX200/3d-iops-jobsRandom%20Read-2019-08-04-20:45:53.png?raw=true
 
 Requires: numpy, matplotlib
 
