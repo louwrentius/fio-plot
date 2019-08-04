@@ -40,7 +40,12 @@ Requires: numpy, matplotlib
                             specifies for which numjob parameter you want the 2d
                             graphs to be generated
       -m MAX, --max MAX     optional max value for z-axis
-        
+
+### Caveat
+
+I've made this tool on Mac OS, using brew. I have yet to test this on (a headless) Linux.
+Also, the code may leave a lot to be desired, I'm aware of that.
+
 
 [2d]: https://github.com/louwrentius/fio-plot/blob/master/images/MX200/randread_iodepth_2019-08-04-20:22:53_1_iops_latency.png?raw=true 
 [3d]: https://github.com/louwrentius/fio-plot/blob/master/images/MX200/3d-iops-jobsRandom%20Read-2019-08-04-20:45:53.png?raw=true
