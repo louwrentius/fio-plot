@@ -81,16 +81,16 @@ class Chart(object):
         d = {}
         d['Nanoseconds']  = { 
                 "Unit":"ns",
-                "Value": Value
+                "Value": value
                 }        
         d['Microseconds']  = { 
                 "Unit":"us",
-                "Value": Value / 1000
+                "Value": value / 1000
                 }
 
         d['Miliseconds']  = { 
                 "Unit":"ms",
-                "Value": Value / 1000000
+                "Value": value / 1000000
                 }        
 
         if d['Microseconds'] > 1:
@@ -133,7 +133,6 @@ class ThreeDee(Chart):
 
 
     def plot_3d(self, mode, metric):
-
 
         iodepth = self.return_unique_series('iodepth')
         numjobs = self.return_unique_series('numjobs')
@@ -218,16 +217,12 @@ class ThreeDee(Chart):
         # title
         plt.suptitle(self.config['title'] + " | " + mode + " | " + metric, fontsize=16, horizontalalignment='center' )
 
-        # watermark
-        max_z = (max(dz) * 0.16)
-        start_y = (len(self.config['source']) * 0.1)
-        self.ax1.text(lx-0.7,start_y,max_z,self.config['source'], (1,1,max_z),color='b', )
-
+        # source
+        self.fig.text(0.6,0.02,self.config['source'])
 
         plt.tight_layout()
         plt.savefig('3d-iops-jobs' + str(mode) + "-" + str(self.date) + '.png')
         plt.close('all')
-
 
 class barChart(Chart):
 
@@ -681,16 +676,16 @@ def set_arguments():
             generate latency + iops chart" )
     ag.add_argument("-H", "--histogram", action='store_true', help="\
             generate latency histogram per queue depth" )
-    ag.add_argument("-D", "--maxdepth", help="\
+    ag.add_argument("-D", "--maxdepth", nargs='?', default=64, type=int, help="\
             maximum queue depth to graph")
     ag.add_argument("-J", "--maxjobs", help="\
-            maximum numjobs to graph")
+            maximum numjobs to graph",nargs='?', default=64, type=int)
     ag.add_argument("-n", "--numjobs", help="\
-            specifies for which numjob parameter you want graphs to be generated")
-    ag.add_argument("-m", "--max", help="\ optional max value for z-axis")
+            specifies for which numjob parameter you want graphs to be generated",\
+                 nargs='?', default=64, type=int)
+    ag.add_argument("-m", "--max", help=" optional max value for z-axis")
 
     return parser
-
 
 def main():
     settings = {}
@@ -708,6 +703,8 @@ def main():
     settings = vars(args)
 
     b = benchmark(settings)
+
+    pprint.pprint(settings)
 
     if settings['latency_iops']:
         b.chart_3d_iops_numjobs('randread','iops')
