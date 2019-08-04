@@ -13,9 +13,6 @@ FIO: https://github.com/axboe/fio
 ![3d][3d]
 
 
-[2d]: "https://github.com/louwrentius/fio-plot/blob/master/images/MX200/randread_iodepth_2019-08-04-20:22:53_1_iops_latency.png?raw=true" 
-[3d]: "https://github.com/louwrentius/fio-plot/blob/master/images/MX200/3d-iops-jobsRandom%20Read-2019-08-04-20:45:53.png?raw=true"
-
 Requires: numpy, matplotlib
 
     usage: fio-plot.py [-h] [-i INPUT_DIRECTORY] [-t TITLE] [-s SOURCE] [-L] [-l]
@@ -47,3 +44,6 @@ Requires: numpy, matplotlib
                             graphs to be generated
       -m MAX, --max MAX     optional max value for z-axis
         
+
+[2d]: https://github.com/louwrentius/fio-plot/blob/master/images/MX200/randread_iodepth_2019-08-04-20:22:53_1_iops_latency.png?raw=true 
+[3d]: https://github.com/louwrentius/fio-plot/blob/master/images/MX200/3d-iops-jobsRandom%20Read-2019-08-04-20:45:53.png?raw=true
