@@ -704,8 +704,6 @@ def main():
 
     b = benchmark(settings)
 
-    pprint.pprint(settings)
-
     if settings['latency_iops']:
         b.chart_3d_iops_numjobs('randread','iops')
         b.chart_3d_iops_numjobs('randwrite','iops')
