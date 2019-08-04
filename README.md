@@ -1,6 +1,7 @@
 ### fio-plot
-Create charts from FIO storage benchmark tool JSON output
-
+Create charts from FIO storage benchmark tool JSON output.
+Just take a look at the images below to understand what can be expected.
+There are more examples in the 'images' folder.
 
 ### 2d chart 
 ![2d][2d]
