@@ -22,7 +22,6 @@ import math
 from collections import defaultdict
 
 
-
 class Chart(object):
 
     def __init__(self, data, config):
@@ -30,7 +29,14 @@ class Chart(object):
         self.config = config
         d = datetime.now()
         self.date = d.strftime('%Y-%m-%d-%H:%M:%S')
-
+        self.test_types = {
+            "randread": "Random Read",
+            "randwrite": "Random Write",
+            "numjobs": "Number of Jobs: ",
+            "iops": "IOPs",
+            "lat": "Latency"
+        }
+      
     def return_unique_series(self,key):
         l = []
         for record in self.data:
@@ -99,8 +105,7 @@ class Chart(object):
             d['Value'] = 'Miliseconds'
         
         return d
-
-
+    
 
 class ThreeDee(Chart):
 
@@ -215,10 +220,12 @@ class ThreeDee(Chart):
         self.ax1.zaxis.set_tick_params(pad = 10)
         
         # title
+        mode = self.test_types[mode]
+        metric = self.test_types[metric]
         plt.suptitle(self.config['title'] + " | " + mode + " | " + metric, fontsize=16, horizontalalignment='center' )
 
         # source
-        self.fig.text(0.6,0.02,self.config['source'])
+        self.fig.text(0.75,0.03,self.config['source'])
 
         plt.tight_layout()
         plt.savefig('3d-iops-jobs' + str(mode) + "-" + str(self.date) + '.png')
@@ -672,16 +679,18 @@ def set_arguments():
             JSON files can be found" )
     ag.add_argument("-t", "--title", help="specifies title to use in charts")
     ag.add_argument("-s", "--source", help="Author" )
-    ag.add_argument("-L", "--latency_iops", action='store_true', help="\
-            generate latency + iops chart" )
+    ag.add_argument("-L", "--latency_iops_3d", action='store_true', help="\
+            generate latency + iops 3d" )
+    ag.add_argument("-l", "--latency_iops_2d", action='store_true', help="\
+            generate latency + iops 2d graph" )
     ag.add_argument("-H", "--histogram", action='store_true', help="\
             generate latency histogram per queue depth" )
     ag.add_argument("-D", "--maxdepth", nargs='?', default=64, type=int, help="\
             maximum queue depth to graph")
     ag.add_argument("-J", "--maxjobs", help="\
-            maximum numjobs to graph",nargs='?', default=64, type=int)
+            maximum numjobs to graph in 3d graph",nargs='?', default=64, type=int)
     ag.add_argument("-n", "--numjobs", help="\
-            specifies for which numjob parameter you want graphs to be generated",\
+            specifies for which numjob parameter you want the 2d graphs to be generated",\
                  nargs='?', default=64, type=int)
     ag.add_argument("-m", "--max", help=" optional max value for z-axis")
 
@@ -704,21 +713,23 @@ def main():
 
     b = benchmark(settings)
 
-    if settings['latency_iops']:
+    if settings['latency_iops_3d']:
         b.chart_3d_iops_numjobs('randread','iops')
         b.chart_3d_iops_numjobs('randwrite','iops')
         b.chart_3d_iops_numjobs('randread','lat')
         b.chart_3d_iops_numjobs('randwrite','lat')
-    #    b.chart_iops_latency('randread')
-    #    b.chart_iops_latency('randwrite')
+    
+    if settings['latency_iops_2d']:
+        b.chart_iops_latency('randread')
+        b.chart_iops_latency('randwrite')
 
     if settings['histogram']:
         b.chart_latency_histogram('randread')
         b.chart_latency_histogram('randwrite')
 
-    if not settings['histogram'] and not settings['latency_iops']:
+    if not settings['histogram'] and not settings['latency_iops_2d'] and not settings['latency_iops_3d']:
         parser.print_help()
-        print("Specify -L, -H or both")
+        print("Specify -L -l, -H or all of them")
         exit(1)
 
 if __name__ == "__main__":
