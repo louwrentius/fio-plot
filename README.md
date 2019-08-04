@@ -1,18 +1,14 @@
-# fio-plot
+### fio-plot
 Create charts from FIO storage benchmark tool JSON output
 
-    >>>> The code is bad but it works <<<<< 
-
-FIO: https://github.com/axboe/fio
 
 ### 2d chart 
 ![2d][2d]
 
-
 ### 3d chart
 ![3d][3d]
 
-
+### Usage
 Requires: numpy, matplotlib
 
     usage: fio-plot.py [-h] [-i INPUT_DIRECTORY] [-t TITLE] [-s SOURCE] [-L] [-l]
