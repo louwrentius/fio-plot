@@ -544,6 +544,10 @@ class benchmark(object):
             if f.endswith(".json"):
                 json_files.append(os.path.join(absolute_dir, f))
 
+        if len(json_files) == 0:
+            print("Could not find any JSON files in the specified directory " + str(absolute_dir))
+            sys.exit(1)
+
         return json_files
 
     def getJSONFileStats(self, filename):
