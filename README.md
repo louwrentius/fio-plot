@@ -47,5 +47,5 @@ I've made this tool on Mac OS, using brew. I have yet to test this on (a headles
 Also, the code may leave a lot to be desired, I'm aware of that.
 
 
-[2d]: https://github.com/louwrentius/fio-plot/blob/master/images/MX200/randread_iodepth_2019-08-04-20:22:53_1_iops_latency.png?raw=true 
-[3d]: https://github.com/louwrentius/fio-plot/blob/master/images/MX200/3d-iops-jobsRandom%20Read-2019-08-04-20:45:53.png?raw=true
+[2d]: https://github.com/louwrentius/fio-plot/blob/master/images/HPDL380H420I/INTEL_D3-S4610/randread_iodepth_2019-08-09-20:12:51_1_iops_latency.png?raw=true
+[3d]: https://github.com/louwrentius/fio-plot/blob/master/images/HPDL380H420I/INTEL_D3-S4610/3d-iops-jobsRandom%20Read-2019-08-09-20:12:49.png?raw=true
