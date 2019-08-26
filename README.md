@@ -3,6 +3,8 @@ Create charts from FIO storage benchmark tool JSON output.
 Just take a look at the images below to understand what can be expected.
 There are more examples in the 'images' folder.
 
+The source data resideds in the benchmark_data folder.
+
 ### 2d chart 
 ![2d][2d]
 
@@ -45,6 +47,14 @@ Requires: numpy, matplotlib
 
 I've made this tool on Mac OS, using brew. I have yet to test this on (a headless) Linux.
 Also, the code may leave a lot to be desired, I'm aware of that.
+
+### Benchmark data
+
+I consider the benchmarks on the HP Proliant Gen8 with the P420i RAID controller not representative of the performance of the SSDs.
+The only think this data show is the relative performance of the SSDs and how they perform using this particular hardware. 
+
+The benchmarks with the HP Microsoerver Gen8 and Gen10 are mostly limited by the SATA300 interface (normally used to connect CDROM drives) so you will not see maximum possible IOPs.
+I do believe the difference between QD=1,2,4 and 8 can be informative even under this condition.
 
 
 [2d]: https://raw.githubusercontent.com/louwrentius/fio-plot/master/images/HPMICROSERVERG8/SATA300/SAMSUNG680PRO/randread_iodepth_2019-08-25-21%3A58%3A58_1_iops_latency.png
