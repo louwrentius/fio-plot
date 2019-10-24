@@ -1,9 +1,18 @@
 ### fio-plot
-Create charts from FIO storage benchmark tool JSON output.
-Just take a look at the images below to understand what can be expected.
-There are more examples in the 'images' folder.
+This tool is meant to create nice charts of FIO benchmark runs.
+Often you vary the queue depth and/or numjobs of your benchmarks, to gauge how your storage performs under those conditions.
 
-The source data resideds in the benchmark_data folder.
+fio-plot consists of a simple example benchmark script that executes multiple tests for you.
+You can customise this scripts to your content.
+
+fio-plot.py will generate the actual charts from the json output data.
+If you vary both queuedepth and numjobs values, you can even create 3d charts. 
+
+Please note that fio-plot is really geared for testing with variable queuedepth and numjobs values.
+It is not flexible enough to chart other values at this point. 
+
+A lot of example data can be found in the 'benchmark_data' folder. 
+For all raw benchmark_data input, 2d and 3d images have been generated in the 'images' folder.
 
 ### 2d chart 
 ![2d][2d]
