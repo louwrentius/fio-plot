@@ -2,8 +2,29 @@
 
 export BLOCKSIZE=4k 
 export RUNTIME=60
-export OUTPUT=/fio
-export FILE=$2
+
+export JOBFILE=$1
+export OUTPUT=$4
+export DIRECTORY=$2
+export FILE=$3
+
+if [ ! -e $JOBFILE ]
+then
+	echo "Fio job file $JOBFILE not found."
+	exit 1
+fi
+
+if [ ! -e $DIRECTORY ]
+then
+	echo "Directory $DIRECTORY not found."
+	exit 1
+fi
+
+if [ ! -e $OUTPUT ]
+then
+	echo "Directory for output $OUTPUT not found."
+	exit 1
+fi
 
 for x in randread randwrite
 do
