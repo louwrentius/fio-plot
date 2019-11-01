@@ -16,8 +16,9 @@ def chart_2d_log_data(config, data):
     cmap = plt.cm.tab20c
     rcParams['axes.prop_cycle'] = cycler(color=cmap(np.linspace(0, 1, len(data))))
     pprint.pprint(data)
-    for item in data:
-        lines = plt.plot((item['data'].keys()), (item['data'].values()))
+
+    unpacked = list(zip(*data))
+    lines = plt.plot(unpacked[0], unpacked[1])
     
     #fig.savefig('test.png')
     plt.show()
