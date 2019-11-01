@@ -6,17 +6,17 @@ from pathlib import Path
 def listFioLogFiles(directory):
     absolute_dir = os.path.abspath(directory)
     files = os.listdir(absolute_dir)
-    trace_files = []
+    fiologfiles = []
     for f in files:
         if f.endswith(".log"):
-            trace_files.append(os.path.join(absolute_dir, f))
+            fiologfiles.append(os.path.join(absolute_dir, f))
 
-    if len(trace_files) == 0:
+    if len(fiologfiles) == 0:
         print("Could not find any log \
              files in the specified directory " + str(absolute_dir))
         sys.exit(1)
 
-    return trace_files
+    return fiologfiles
 
 def listLogTypeFiles(type, fileList):
     types = ["clat","lat","iops","bw"]
