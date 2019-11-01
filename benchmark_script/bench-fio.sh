@@ -2,11 +2,11 @@
 
 export BLOCKSIZE=4k 
 export RUNTIME=60
-
 export JOBFILE=$1
-export OUTPUT=$4
-export DIRECTORY=$2
-export FILE=$3
+export OUTPUT=$2
+export DIRECTORY=$3
+export FILE=$4
+export SIZE=$5
 
 if [ ! -e $JOBFILE ]
 then
