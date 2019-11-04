@@ -4,6 +4,8 @@ import csv
 from pathlib import Path
 import pprint as pprint
 import statistics
+import itertools
+
 
 def listFioLogFiles(directory):
     absolute_dir = os.path.abspath(directory)
@@ -20,39 +22,98 @@ def listFioLogFiles(directory):
 
     return fiologfiles
 
-def returnFilenameFilterString(settings):
-    rw = settings['rw']
-    iodepth = settings['iodepth']
-    numjobs = settings['numjobs']
-    benchtype = settings['type']
 
-    searchstring = str(rw) + "-iodepth-" + str(iodepth) + "-numjobs-" + str(numjobs) + "_" + str(benchtype)
-    return str(searchstring)
+def returnFilenameFilterString(settings):
+    searchstrings = []
+
+    rw = settings['rw']
+    iodepths = settings['iodepth']
+    numjobs = settings['numjobs']
+    benchtypes = settings['type']
+
+    for benchtype in benchtypes:
+        for iodepth in iodepths:
+            for numjob in numjobs:
+                searchstring = str(rw) + "-iodepth-" + str(iodepth) + \
+                    "-numjobs-" + str(numjob) + "_" + str(benchtype)
+                attributes = {'rw': rw, 'iodepth': iodepth,
+                              'numjobs': numjob, 'type': benchtype, 'searchstring': searchstring}
+                searchstrings.append(attributes)
+    return searchstrings
+
 
 def filterLogFiles(settings, fileList):
-    searchstring = returnFilenameFilterString(settings)
-    #pprint.pprint(searchstring)
-    result = [ i for i in fileList if str(searchstring) in i ]
+    searchstrings = returnFilenameFilterString(settings)
+    # pprint.pprint(searchstrings)
+    result = []
+    for item in fileList:
+        for searchstring in searchstrings:
+            if searchstring['searchstring'] in item:
+                data = {'filename': item}
+                data.update(searchstring)
+                result.append(data)
+    pprint.pprint(result)
     return result
 
-def mergeSingleDataSet(dataset, datatype, operation):
-    mergedset = []
-    if operation in ['sum', 'mean']:
-        for recordset in dataset:
-            templist = []
-            for item in recordset['data']:
-                templist.append(item[datatype])
-            mergedset.append(templist)
-        if operation == 'sum':
-            merged = [sum(x) for x in zip(*mergedset)]
-        if operation == 'mean':
-            merged = [statistics.mean(x) for x in zip(*mergedset)]
-        return merged 
+
+def getValueSetsFromData(dataset):
+
+    result = {}
+    iodepth = []
+    numjobs = []
+    benchtype = []
+    pprint.pprint(dataset)
+    for item in dataset:
+        iodepth.append(item['iodepth'])
+        numjobs.append(item['numjobs'])
+        benchtype.append(item['type'])
+
+    result = {'iodepth': list(set(iodepth)),
+              'numjobs': list(set(numjobs)),
+              'type': list(set(benchtype))}
+    return result
+
+
+def mergeSingleDataSet(dataset, iodepths, numjobs, datatypes):
+
+    grouped = []
+
+    for iodepth in iodepths:
+        for numjob in numjobs:
+            for datatype in datatypes:
+                for item in dataset:
+                    if item['iodepth'] == iodepth and item['numjobs'] == numjob and item['datatype'] == datatype:
+                        grouped.append(item)
+
+    # for item in dataset:
+    #    for benchtype in
+
+    # if operation in ['sum', 'mean']:
+    #    templist = []
+    #    for item in dataset['data']:
+    #        templist.append(item[datatype])
+    #    mergedset.append(templist)
+    #    if operation == 'sum':
+    #        merged = [sum(x) for x in zip(*mergedset)]
+    #    if operation == 'mean':
+    #        merged = [statistics.mean(x) for x in zip(*mergedset)]
+    #    return merged
+
 
 def mergeDataSet(dataset):
-    timestamps = mergeSingleDataSet(dataset, 'timestamp', 'mean')
-    values = mergeSingleDataSet(dataset, 'value', 'sum')
-    return list(zip(timestamps, values))
+
+    mergedSets = []
+    result = getValueSetsFromData(dataset)
+
+    # for item in types:
+    #    for data in dataset:
+    #        # pprint.pprint(item)
+    #        timestamps = mergeSingleDataSet(item, 'timestamp', 'mean')
+    #        values = mergeSingleDataSet(item, 'value', 'sum')
+    #        mergedSets.append(list(zip(timestamps, values)))
+    # pprint.pprint(mergedSets)
+    # return mergedSets
+
 
 def readLogData(inputfile):
     dataset = []
@@ -69,9 +130,11 @@ def readLogData(inputfile):
 
 def readLogDataFromFiles(settings, inputfiles):
     data = []
+    # pprint.pprint(inputfiles)
     for inputfile in inputfiles:
-        filename = Path(inputfile).resolve().stem
-        logdata = readLogData(inputfile)
-        logdict = { "filename": filename, "data": logdata }
+        # filename = Path(inputfile['filename']).resolve().stem
+        logdata = readLogData(inputfile['filename'])
+        logdict = {"data": logdata}
+        logdict.update(inputfile)
         data.append(logdict)
     return data
