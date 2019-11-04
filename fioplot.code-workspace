@@ -6,5 +6,15 @@
 		{
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"python.linting.flake8Enabled": true,
+		"editor.formatOnType": true,
+		"editor.formatOnSave": true,
+		"editor.formatOnSaveTimeout": 2000,
+		"python.linting.banditEnabled": true,
+		"python.linting.flake8Args": [
+			"--max-line-length=120"
+		]
+	}
 }

@@ -6,22 +6,18 @@
 #
 # Requires matplotib and numpy.
 #
-import os
 import sys
-import json
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import matplotlib as mpl
-from mpl_toolkits.mplot3d import axes3d
 import numpy as np
 import argparse
 import pprint
 from datetime import datetime
-import math
 from collections import defaultdict
-import fiolib.benchmark as benchmark
 import fiolib.dataimport as logdata
 import fiolib.graph2d as graph
+
 
 class Chart(object):
 
@@ -37,19 +33,19 @@ class Chart(object):
             "iops": "IOPs",
             "lat": "Latency"
         }
-      
-    def return_unique_series(self,key):
-        l = []
-        for record in self.data:
-            l.append(record[key])
 
-        l = [int(x) for x in l]
-        l = sorted(set(l))
-        return l
+    def return_unique_series(self, key):
+        lala = []
+        for record in self.data:
+            lala.append(record[key])
+
+        lala = [int(x) for x in lala]
+        lala = sorted(set(lala))
+        return lala
 
     def strip_leading_zero(self, value):
         sanitized = value
-        if isinstance(value,str):
+        if isinstance(value, str):
             if value[0] == '0':
                 sanitized = value[1]
             else:
@@ -58,54 +54,54 @@ class Chart(object):
         return sanitized
 
     def return_record_set(self, dataset, key, value):
-        l = []
+        lala = []
         for record in dataset:
             v = self.strip_leading_zero(str(record[key]))
             if str(v) == str(value):
-                l.append(record)
-        return l
+                lala.append(record)
+        return lala
 
     def filter_record_set(self, dataset, key, value):
-        l = []
+        lala = []
         for record in dataset:
             if record[key] == value:
-                l.append(record)
-        return l
+                lala.append(record)
+        return lala
 
     def subselect_record_set(self, dataset, keys):
-        l = []
+        lala = []
         for record in dataset:
             d = dict.fromkeys(keys)
             for key in keys:
                 if record[key] is not float:
                     d[key] = self.strip_leading_zero(record[key])
-            l.append(d)
-        return l
+            lala.append(d)
+        return lala
 
     def return_latency_units(self, value):
 
         d = {}
-        d['Nanoseconds']  = { 
-                "Unit":"ns",
-                "Value": value
-                }        
-        d['Microseconds']  = { 
-                "Unit":"us",
-                "Value": value / 1000
-                }
+        d['Nanoseconds'] = {
+            "Unit": "ns",
+            "Value": value
+        }
+        d['Microseconds'] = {
+            "Unit": "us",
+            "Value": value / 1000
+        }
 
-        d['Miliseconds']  = { 
-                "Unit":"ms",
-                "Value": value / 1000000
-                }        
+        d['Miliseconds'] = {
+            "Unit": "ms",
+            "Value": value / 1000000
+        }
 
         if d['Microseconds'] > 1:
             d['Value'] = 'Microseconds'
         if d['Milisecond'] > 1:
             d['Value'] = 'Miliseconds'
-        
+
         return d
-    
+
 
 class ThreeDee(Chart):
 
@@ -117,38 +113,41 @@ class ThreeDee(Chart):
         self.fig.set_size_inches(15, 10)
         self.series = {}
 
-    def generate_series(self,key,value,mode):
+    def generate_series(self, key, value, mode):
 
         recordset = self.return_record_set(key, value)
-        self.series = { 'x_series': [],
-                        'y_series1': [],
-                        'y_series2': [],
-                        'y_series3': [],
-                      }
+        self.series = {'x_series': [],
+                       'y_series1': [],
+                       'y_series2': [],
+                       'y_series3': [],
+                       }
 
-        self.series['x_series'] = self.return_unique_series(self.config['x_series'])
+        self.series['x_series'] = self.return_unique_series(
+            self.config['x_series'])
 
         for x in self.series['x_series']:
             for y in recordset:
-                    if int(y[self.config['x_series']]) == int(x):
-                        if mode == y['rw']:
-                            self.series['y_series1'].append(round(y['iops']))       #iops
-                            self.series['y_series2'].append(round(int(y['numjobs'])))       #lat
-
+                if int(y[self.config['x_series']]) == int(x):
+                    if mode == y['rw']:
+                        self.series['y_series1'].append(
+                            round(y['iops']))  # iops
+                        self.series['y_series2'].append(
+                            round(int(y['numjobs'])))  # lat
 
     def plot_3d(self, mode, metric):
 
         iodepth = self.return_unique_series('iodepth')
         numjobs = self.return_unique_series('numjobs')
 
-        datatype=metric
+        datatype = metric
 
-        dataset = self.filter_record_set(self.data, 'rw',mode)
+        dataset = self.filter_record_set(self.data, 'rw', mode)
         mylist = []
         for x in numjobs:
             if x <= int(self.config['maxjobs']):
-                dx = self.return_record_set(dataset,'numjobs', x)
-                d = self.subselect_record_set(dx,['numjobs','iodepth',datatype])
+                dx = self.return_record_set(dataset, 'numjobs', x)
+                d = self.subselect_record_set(
+                    dx, ['numjobs', 'iodepth', datatype])
                 row = []
                 for y in iodepth:
                     if y <= int(self.config['maxdepth']):
@@ -156,20 +155,20 @@ class ThreeDee(Chart):
                             if int(record['iodepth']) == int(y):
                                 row.append(record[datatype])
                 mylist.append(row)
-        n = np.array(mylist,dtype=float)
+        n = np.array(mylist, dtype=float)
         if metric == 'lat':
             n = np.divide(n, 1000000)
 
         lx = len(n[0])
-        ly = len(n[:,0])
+        ly = len(n[:, 0])
 
-        size = lx * 0.05 # thickness of the bar
+        size = lx * 0.05  # thickness of the bar
 
-        xpos_orig = np.arange(0,lx,1)
-        ypos_orig = np.arange(0,ly,1)
-    
-        xpos = np.arange(0,lx,1)
-        ypos = np.arange(0,ly,1)
+        xpos_orig = np.arange(0, lx, 1)
+        ypos_orig = np.arange(0, ly, 1)
+
+        xpos = np.arange(0, lx, 1)
+        ypos = np.arange(0, ly, 1)
         xpos, ypos = np.meshgrid(xpos-(size/lx), ypos-(size))
 
         xpos_f = xpos.flatten()   # Convert positions to 1D array
@@ -180,13 +179,13 @@ class ThreeDee(Chart):
         dy = dx.copy()
         dz = n.flatten()
         values = dz / (dz.max()/1)
-        cmap = plt.get_cmap('rainbow',xpos.ravel().shape[0])
+        cmap = plt.get_cmap('rainbow', xpos.ravel().shape[0])
         colors = cm.rainbow(values)
 
-        self.ax1.bar3d(xpos_f,ypos_f,zpos, dx, dy, dz, color=colors)
-        
-        # color bar legend 
-        norm = mpl.colors.Normalize(vmin=0,vmax=dz.max())
+        self.ax1.bar3d(xpos_f, ypos_f, zpos, dx, dy, dz, color=colors)
+
+        # color bar legend
+        norm = mpl.colors.Normalize(vmin=0, vmax=dz.max())
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
         sm.set_array([])
         res = self.fig.colorbar(sm, fraction=0.046, pad=0.04)
@@ -195,7 +194,7 @@ class ThreeDee(Chart):
         # axis ticks and tick labels
 
         float_x = [float(x) for x in (xpos_orig)]
-        float_y = [float(y) for y in (ypos_orig)]
+        # unused? float_y = [float(y) for y in (ypos_orig)]
 
         self.ax1.w_xaxis.set_ticks(float_x)
         self.ax1.w_yaxis.set_ticks(ypos_orig)
@@ -203,10 +202,10 @@ class ThreeDee(Chart):
         self.ax1.w_xaxis.set_ticklabels(iodepth)
         self.ax1.w_yaxis.set_ticklabels(numjobs)
 
-        #self.ax1.set_zlim3d(0,int(self.config['zmax']))
+        # self.ax1.set_zlim3d(0,int(self.config['zmax']))
 
-        #zticks = np.arange(dz.min(), dz.max(), ((dz.max()/10)%1000))
-        #self.ax1.w_zaxis.set_ticks(zticks)
+        # zticks = np.arange(dz.min(), dz.max(), ((dz.max()/10)%1000))
+        # self.ax1.w_zaxis.set_ticks(zticks)
 
         # axis labels
         fontsize = 14
@@ -214,21 +213,23 @@ class ThreeDee(Chart):
         self.ax1.set_ylabel('numjobs', fontsize=fontsize)
         self.ax1.set_zlabel(datatype,  fontsize=fontsize)
 
-        self.ax1.xaxis.labelpad=10
-        self.ax1.zaxis.labelpad=20
-        self.ax1.zaxis.set_tick_params(pad = 10)
-        
+        self.ax1.xaxis.labelpad = 10
+        self.ax1.zaxis.labelpad = 20
+        self.ax1.zaxis.set_tick_params(pad=10)
+
         # title
         mode = self.test_types[mode]
         metric = self.test_types[metric]
-        plt.suptitle(self.config['title'] + " | " + mode + " | " + metric, fontsize=16, horizontalalignment='center' )
+        plt.suptitle(self.config['title'] + " | " + mode + " | " +
+                     metric, fontsize=16, horizontalalignment='center')
 
         # source
-        self.fig.text(0.75,0.03,self.config['source'])
+        self.fig.text(0.75, 0.03, self.config['source'])
 
         plt.tight_layout()
         plt.savefig('3d-iops-jobs' + str(mode) + "-" + str(self.date) + '.png')
         plt.close('all')
+
 
 class barChart(Chart):
 
@@ -240,17 +241,17 @@ class barChart(Chart):
         self.ax3 = self.ax1.twinx()
         self.fig.set_size_inches(10, 6)
 
-        self.series = { 'x_series': [],
-                        'y_series1': [],
-                        'y_series2': [],
-                        'y_series3': [],
-                      }
+        self.series = {'x_series': [],
+                       'y_series1': [],
+                       'y_series2': [],
+                       'y_series3': [],
+                       }
 
         self.config = config
 
         if self.config['source']:
-            plt.text(1,-0.08, str(self.config['source']), ha='right', va='top',
-                    transform=self.ax1.transAxes,fontsize=9)
+            plt.text(1, -0.08, str(self.config['source']), ha='right', va='top',
+                     transform=self.ax1.transAxes, fontsize=9)
 
         self.ax2.axis('off')
 
@@ -263,7 +264,6 @@ class barChart(Chart):
             std.append(str(p))
         self.series['y_series3'] = std
 
-
     def generate_series(self):
 
         dataset = self.filter_record_set(self.data, 'rw', self.config['mode'])
@@ -272,16 +272,17 @@ class barChart(Chart):
 
         self.series['x_series'] = self.return_unique_series('iodepth')
 
-
         for x in self.series['x_series']:
             for y in recordset:
-                    if int(y[self.config['x_series']]) == int(x):
-                        self.series['y_series1'].append(round(y[self.config['y_series1']]))       #iops
-                        self.series['y_series2'].append(round(y[self.config['y_series2']]))       #lat
-                        self.series['y_series3'].append(round(y[self.config['y_series3']])) #lat_stddev
+                if int(y[self.config['x_series']]) == int(x):
+                    self.series['y_series1'].append(
+                        round(y[self.config['y_series1']]))  # iops
+                    self.series['y_series2'].append(
+                        round(y[self.config['y_series2']]))  # lat
+                    self.series['y_series3'].append(
+                        round(y[self.config['y_series3']]))  # lat_stddev
 
         self.calculate_std()
-
 
     def autolabel(self, rects, axis):
         for rect in rects:
@@ -298,11 +299,11 @@ class barChart(Chart):
         table_vals = [self.series['x_series'], self.series['y_series3']]
         cols = len(self.series['x_series'])
         table = self.ax2.table(cellText=table_vals, loc='center right', rowLabels=[
-                          'IO queue depth', r'$Latency\ \sigma\ \%$'],
-                          colLoc='center right',
-                          cellLoc='center right', colWidths=[0.05] * cols,
-                          rasterized=False)
-        table.scale(1,1.2)
+            'IO queue depth', r'$Latency\ \sigma\ \%$'],
+            colLoc='center right',
+            cellLoc='center right', colWidths=[0.05] * cols,
+            rasterized=False)
+        table.scale(1, 1.2)
 
         for key, cell in table.get_celld().items():
             cell.set_linewidth(0)
@@ -313,7 +314,7 @@ class IOL_Chart(barChart):
     def __init__(self, data, config):
         super().__init__(data, config)
         self.generate_series()
-        #pprint.pprint(self.series)
+        # pprint.pprint(self.series)
 
     def plot_io_and_latency(self, mode, numjobs):
 
@@ -322,21 +323,22 @@ class IOL_Chart(barChart):
         x_pos = np.arange(0, len(self.series['x_series']) * 2, 2)
         width = 0.9
 
-        n = np.array(self.series['y_series2'],dtype=float)
+        n = np.array(self.series['y_series2'], dtype=float)
         n = np.divide(n, 1000000)
 
         rects1 = self.ax1.bar(x_pos, self.series['y_series1'], width,
-                color='#a8ed63')
-        #rects2 = self.ax3.bar(x_pos + width, self.series['y_series2'], width,
+                              color='#a8ed63')
+        # rects2 = self.ax3.bar(x_pos + width, self.series['y_series2'], width,
         rects2 = self.ax3.bar(x_pos + width, n, width,
-                        color='#34bafa')
+                              color='#34bafa')
 
         self.ax1.set_ylabel(self.config['y_series1_label'])
         self.ax1.set_xlabel(self.config['x_series_label'])
         self.ax3.set_ylabel(self.config['y_series2_label'])
 
         if self.config['title']:
-            self.ax1.set_title(str(self.config['title']) + " | " + str(mode) + " | numjobs: " + str(numjobs))
+            self.ax1.set_title(
+                str(self.config['title']) + " | " + str(mode) + " | numjobs: " + str(numjobs))
         else:
             self.ax1.set_title(str(mode) + ' performance')
 
@@ -344,17 +346,17 @@ class IOL_Chart(barChart):
         self.ax1.set_xticklabels(self.series['x_series'])
 
         self.ax2.legend((rects1[0], rects2[0]),
-                  (self.config['y_series1_label'],
-                      self.config['y_series2_label']), loc='upper left',frameon=False)
+                        (self.config['y_series1_label'],
+                         self.config['y_series2_label']), loc='upper left', frameon=False)
 
         self.create_stddev_table()
-
 
         self.autolabel(rects1, self.ax1)
         self.autolabel(rects2, self.ax3)
 
         plt.tight_layout()
-        plt.savefig(mode + '_iodepth_' + str(self.date) + '_' + str(numjobs) + '_iops_latency.png')
+        plt.savefig(mode + '_iodepth_' + str(self.date) +
+                    '_' + str(numjobs) + '_iops_latency.png')
         plt.close('all')
 
     def get_sorted_mixed_list(self, unsorted_list):
@@ -385,7 +387,7 @@ class IOL_Chart(barChart):
 
 class LH_Chart(Chart):
 
-    def sort_latency_keys(self,latency):
+    def sort_latency_keys(self, latency):
         placeholder = ""
         tmp = []
         for item in latency:
@@ -399,14 +401,14 @@ class LH_Chart(Chart):
             tmp.append(placeholder)
         return tmp
 
-    def sort_latency_data(self,latency_dict):
+    def sort_latency_data(self, latency_dict):
 
         keys = latency_dict.keys()
         values = []
         sorted_keys = self.sort_latency_keys(keys)
         for key in sorted_keys:
-           values.append(latency_dict[key])
-        return values 
+            values.append(latency_dict[key])
+        return values
 
     def generate_history_chart(self, chartdata):
 
@@ -422,7 +424,7 @@ class LH_Chart(Chart):
         # Creating actual graph
 
         fig, (ax1, ax2) = plt.subplots(
-        nrows=2, gridspec_kw={'height_ratios': [11, 1]})
+            nrows=2, gridspec_kw={'height_ratios': [11, 1]})
         fig.set_size_inches(10, 6)
 
         x_pos = np.arange(0, len(x_series) * 2, 2)
@@ -434,21 +436,20 @@ class LH_Chart(Chart):
         ax1.set_ylabel('Percentage of IO (ms)')
         ax1.set_xlabel(r'$Latency\ in\ ms\ or\ \mu$')
         ax1.set_title(str(self.config['title']) + " | "
-                + str(mode).title() +
-            ' latency histogram | IO depth ' +
-            str(depth))
+                      + str(mode).title() +
+                      ' latency histogram | IO depth ' +
+                      str(depth))
         ax1.set_xticks(x_pos + width / 2)
         ax1.set_xticklabels(x_series)
-
 
         if coverage_ms < 1 and coverage_ms > 0:
             coverage_ms = "<1"
         if coverage_us < 1 and coverage_us > 0:
             coverage_us = "<1"
 
-        legend = ax2.legend((rects1[0], rects2[0]),(
+        ax2.legend((rects1[0], rects2[0]), (
             'Latency in ms (' + str(coverage_ms) + '%)',
-            'Latency in us  (' + str(coverage_us) + '%)'),frameon=False,
+            'Latency in us  (' + str(coverage_us) + '%)'), frameon=False,
             loc='upper left')
         ax2.axis('off')
 
@@ -471,26 +472,26 @@ class LH_Chart(Chart):
         plt.savefig(mode + "_" + str(depth) + '_histogram.png')
         plt.close('all')
 
-
     def plot_latency_histogram(self, mode):
 
-        latency_data = self.data
+        # not used? latency_data = self.data
 
         iodepth = self.return_unique_series('iodepth')
-        #numjobs = self.return_unique_series('numjobs')
+        # numjobs = self.return_unique_series('numjobs')
         numjobs = ['1']
 
-        datatypes = ('latency_ms','latency_us','latency_ns')
+        datatypes = ('latency_ms', 'latency_us', 'latency_ns')
 
-        dataset = self.filter_record_set(self.data, 'rw',mode)
+        dataset = self.filter_record_set(self.data, 'rw', mode)
         mydict = defaultdict(dict)
 
-        #pprint.pprint(dataset)
+        # pprint.pprint(dataset)
 
         for datatype in datatypes:
             for x in numjobs:
-                dx = self.return_record_set(dataset,'numjobs', x)
-                d = self.subselect_record_set(dx,['numjobs','iodepth',datatype])
+                dx = self.return_record_set(dataset, 'numjobs', x)
+                d = self.subselect_record_set(
+                    dx, ['numjobs', 'iodepth', datatype])
                 for y in iodepth:
                     for record in d:
                         if int(record['iodepth']) == int(y):
@@ -510,54 +511,55 @@ class LH_Chart(Chart):
             y_series2.append(0)
             y_series2.append(0)
 
-
             chart_data = {
-                            'x_series': x_series, 
-                            'y_series1': y_series1,
-                            'y_series2': y_series2,
-                            'y_series3': y_series3,
-                            'iodepth': depth,
-                            'numjobs': 1,
-                            'mode': mode
-                    
-                    }
-            
+                'x_series': x_series,
+                'y_series1': y_series1,
+                'y_series2': y_series2,
+                'y_series3': y_series3,
+                'iodepth': depth,
+                'numjobs': 1,
+                'mode': mode
+
+            }
+
             self.generate_history_chart(chart_data)
 
+
 def set_arguments():
-                 
+
     parser = argparse.ArgumentParser(description="Convert FIO JSON output \
-            to charts")                       
+            to charts")
     ag = parser.add_argument_group(title="Generic Settings")
     ag.add_argument("-i", "--input-directory", help="input directory where\
-            JSON files can be found" )
+            JSON files can be found")
     ag.add_argument("-t", "--title", help="specifies title to use in charts")
-    ag.add_argument("-s", "--source", help="Author" )
+    ag.add_argument("-s", "--source", help="Author")
     ag.add_argument("-L", "--latency_iops_3d", action='store_true', help="\
-            generate latency + iops 3d" )
+            generate latency + iops 3d")
     ag.add_argument("-l", "--latency_iops_2d", action='store_true', help="\
-            generate latency + iops 2d graph" )
+            generate latency + iops 2d graph")
     ag.add_argument("-H", "--histogram", action='store_true', help="\
-            generate latency histogram per queue depth" )
-    ag.add_argument("-I", "--iodepth", type=int, default=1, help="\
-            iodepth to graph" )
+            generate latency histogram per queue depth")
+    ag.add_argument("-I", "--iodepth", type=int, nargs='+', default=1, help="\
+            iodepth to graph")
     ag.add_argument("-D", "--maxdepth", nargs='?', default=64, type=int, help="\
             maximum queue depth to graph")
     ag.add_argument("-J", "--maxjobs", help="\
-            maximum numjobs to graph in 3d graph",nargs='?', default=64, type=int)
-    ag.add_argument("-n", "--numjobs", help="\
-            specifies for which numjob parameter you want the 2d graphs to be generated",\
-                nargs='?', default=1, type=int)
-    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite'],\
-                help="read/write mode randread/randwrite")
+            maximum numjobs to graph in 3d graph", nargs='?', default=64, type=int)
+    ag.add_argument("-n", "--numjobs", nargs='+', help="\
+            specifies for which numjob parameter you want the 2d graphs to be\
+                 generated", default=1, type=int)
+    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite'],
+                    help="read/write mode randread/randwrite")
     ag.add_argument("-m", "--max", help=" optional max value for z-axis")
-    ag.add_argument("-g", "--loggraph", action='store_true',\
-                help="Create graph based on raw log data")
-    ag.add_argument("-T", "--type", help="\
-            type should be iops,bw,lat,clat,slat",nargs='?', type=str, choices=\
-                ['bw','iops','lat','slat','clat'])
+    ag.add_argument("--max-y", help=" optional max value for y-axis")
+    ag.add_argument("-g", "--loggraph", action='store_true',
+                    help="Create graph based on raw log data")
+    ag.add_argument("-T", "--type", nargs='+', help="\
+            type should be iops,bw,lat,clat,slat", type=str, choices=['bw', 'iops', 'lat', 'slat', 'clat'])
 
     return parser
+
 
 def main():
     settings = {}
@@ -574,22 +576,25 @@ def main():
 
     settings = vars(args)
     pprint.pprint(settings)
-    #b = benchmark.benchmark(settings)
+    # b = benchmark.benchmark(settings)
 
     if settings['loggraph']:
         benchmarkfiles = logdata.listFioLogFiles(settings['input_directory'])
         logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
+        # pprint.pprint(logfiles)
         rawdata = logdata.readLogDataFromFiles(settings, logfiles)
+        # pprint.pprint(rawdata)
         merged = logdata.mergeDataSet(rawdata)
-        graph.chart_2d_log_data(settings, merged)
+        # pprint.pprint(merged)
+        # graph.chart_2d_log_data(settings, merged)
 
-    #if settings['latency_iops_3d']:
+    # if settings['latency_iops_3d']:
     #    b.chart_3d_iops_numjobs('randread','iops')
     #    b.chart_3d_iops_numjobs('randwrite','iops')
     #    b.chart_3d_iops_numjobs('randread','lat')
     #    b.chart_3d_iops_numjobs('randwrite','lat')
-    
-    #if settings['latency_iops_2d']:
+
+    # if settings['latency_iops_2d']:
     #    config = b.chart_iops_latency('randread')
     #    c = IOL_Chart(config['stats'], config)
     #    c.plot_io_and_latency(config['mode'],config['settings']['numjobs'])
@@ -597,15 +602,15 @@ def main():
     #    c = IOL_Chart(config['stats'], config)
     #    c.plot_io_and_latency(config['mode'],config['settings']['numjobs'])
 
-    #if settings['histogram']:
+    # if settings['histogram']:
     #    b.chart_latency_histogram('randread')
     #    b.chart_latency_histogram('randwrite')
 
-    #if not settings['histogram'] and not settings['latency_iops_2d'] and not settings['latency_iops_3d']:
+    # if not settings['histogram'] and not settings['latency_iops_2d'] and not settings['latency_iops_3d']:
     #    parser.print_help()
     #    print("Specify -L -l, -H or all of them")
     #    exit(1)
 
+
 if __name__ == "__main__":
     main()
-
