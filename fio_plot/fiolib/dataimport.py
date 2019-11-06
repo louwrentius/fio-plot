@@ -1,7 +1,6 @@
 import os
 import sys
 import csv
-from pathlib import Path
 import pprint as pprint
 import statistics
 import itertools
@@ -34,10 +33,10 @@ def returnFilenameFilterString(settings):
     for benchtype in benchtypes:
         for iodepth in iodepths:
             for numjob in numjobs:
-                searchstring = str(rw) + "-iodepth-" + str(iodepth) + \
-                    "-numjobs-" + str(numjob) + "_" + str(benchtype)
+                searchstring = f"{rw}-iodepth-{iodepth}-numjobs-{numjob}_{benchtype}"
                 attributes = {'rw': rw, 'iodepth': iodepth,
-                              'numjobs': numjob, 'type': benchtype, 'searchstring': searchstring}
+                              'numjobs': numjob, 'type': benchtype,
+                              'searchstring': searchstring}
                 searchstrings.append(attributes)
     return searchstrings
 
@@ -52,17 +51,17 @@ def filterLogFiles(settings, fileList):
                 data = {'filename': item}
                 data.update(searchstring)
                 result.append(data)
-    pprint.pprint(result)
+    # pprint.pprint(result)
     return result
 
 
-def getValueSetsFromData(dataset):
+def getValueSetsFromData(settings, dataset):
 
     result = {}
     iodepth = []
     numjobs = []
     benchtype = []
-    pprint.pprint(dataset)
+    # pprint.pprint(dataset)
     for item in dataset:
         iodepth.append(item['iodepth'])
         numjobs.append(item['numjobs'])
@@ -71,68 +70,77 @@ def getValueSetsFromData(dataset):
     result = {'iodepth': list(set(iodepth)),
               'numjobs': list(set(numjobs)),
               'type': list(set(benchtype))}
+
     return result
 
 
-def mergeSingleDataSet(dataset, iodepths, numjobs, datatypes):
+def getMergeOperation(datatype):
 
-    grouped = []
+    operationMapping = {'iops': sum,
+                        'lat': statistics.mean,
+                        'clat': statistics.mean,
+                        'slat': statistics.mean,
+                        'bw': sum,
+                        'timestamp': statistics.mean}
 
-    for iodepth in iodepths:
-        for numjob in numjobs:
-            for datatype in datatypes:
-                for item in dataset:
-                    if item['iodepth'] == iodepth and item['numjobs'] == numjob and item['datatype'] == datatype:
-                        grouped.append(item)
-
-    # for item in dataset:
-    #    for benchtype in
-
-    # if operation in ['sum', 'mean']:
-    #    templist = []
-    #    for item in dataset['data']:
-    #        templist.append(item[datatype])
-    #    mergedset.append(templist)
-    #    if operation == 'sum':
-    #        merged = [sum(x) for x in zip(*mergedset)]
-    #    if operation == 'mean':
-    #        merged = [statistics.mean(x) for x in zip(*mergedset)]
-    #    return merged
+    opfunc = operationMapping[datatype]
+    return opfunc
 
 
-def mergeDataSet(dataset):
+def mergeSingleDataSet(data, datatype):
+    mergedSet = []
+    for column in ['timestamp', 'value']:
+        unmergedSet = []
+        for record in data:
+            templist = []
+            for row in record['data']:
+                templist.append(int(row[column]))
+            unmergedSet.append(templist)
+        if column == 'value':
+            oper = getMergeOperation(datatype)
+        else:
+            oper = getMergeOperation(column)
+        merged = [oper(x) for x in zip(*unmergedSet)]
+        mergedSet.append(merged)
+    return list(zip(*mergedSet))
 
+
+def mergeDataSet(settings, dataset):
     mergedSets = []
-    result = getValueSetsFromData(dataset)
-
-    # for item in types:
-    #    for data in dataset:
-    #        # pprint.pprint(item)
-    #        timestamps = mergeSingleDataSet(item, 'timestamp', 'mean')
-    #        values = mergeSingleDataSet(item, 'value', 'sum')
-    #        mergedSets.append(list(zip(timestamps, values)))
-    # pprint.pprint(mergedSets)
-    # return mergedSets
+    filterstrings = returnFilenameFilterString(settings)
+    # pprint.pprint(filterstrings)
+    for filterstring in filterstrings:
+        record = {'type': filterstring['type'],
+                  'iodepth': filterstring['iodepth'], 'numjobs': filterstring['numjobs']}
+        data = []
+        for item in dataset:
+            if filterstring['searchstring'] in item['searchstring']:
+                data.append(item)
+        # if len(data) > 1:
+            # pprint.pprint([name['filename'] for name in data])
+        data = mergeSingleDataSet(data, filterstring['type'])
+        record['data'] = data
+        mergedSets.append(record)
+    return mergedSets
 
 
 def readLogData(inputfile):
     dataset = []
     if os.path.exists(inputfile):
         with open(inputfile) as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
+            csv.register_dialect('CustomDialect', skipinitialspace=True,
+                                 strict=True)
+            csv_reader = csv.DictReader(
+                csv_file, dialect='CustomDialect', delimiter=',',
+                fieldnames=['timestamp', 'value', 'rwt', 'blocksize', 'offset'])
             for item in csv_reader:
-                data = {}
-                data['timestamp'] = (int(item[0].strip()))
-                data['value'] = (int(item[1].strip()))
-                dataset.append(data)
+                dataset.append(item)
     return dataset
 
 
 def readLogDataFromFiles(settings, inputfiles):
     data = []
-    # pprint.pprint(inputfiles)
     for inputfile in inputfiles:
-        # filename = Path(inputfile['filename']).resolve().stem
         logdata = readLogData(inputfile['filename'])
         logdict = {"data": logdata}
         logdict.update(inputfile)
