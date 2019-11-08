@@ -48,7 +48,9 @@ def get_colors():
 def get_label_position(axis):
     integer = int(axis[1])
     if integer % 3 == 0:
-        return - 50
+        return -50
+    elif integer % 2 == 0:
+        return 5
     else:
         return 0
 
