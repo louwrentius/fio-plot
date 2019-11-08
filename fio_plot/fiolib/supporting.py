@@ -25,16 +25,45 @@ def scaling(minimum):
         return {'scale_factor': 1000, 'metric': r'$Latency\ in\ ms\ $'}
 
 
+def get_colors():
+    return [
+        'tab:blue',
+        'tab:orange',
+        'tab:green',
+        'tab:red',
+        'tab:purple',
+        'tab:brown',
+        'tab:pink',
+        'tab:olive',
+        'tab:cyan',
+        'darkgreen',
+        'cornflowerblue',
+        'deepping',
+        'red',
+        'gold',
+        'darkcyan'
+    ]
+
+
+def get_label_position(axis):
+    positions = {"c1": 0, "c2": 0, "c3": -50}
+    return positions[axis]
+
+
 def lookupTable(metric):
 
-    lookup = [{'type': 'iops', 'ylabel': 'IOP/s', 'color': 'tab:blue'},
-              {'type': 'bw',
-                  'ylabel': 'Througput (KB/s)', 'color': 'tab:orange'},
-              {'type': 'lat',
-                  'ylabel': 'LAT Latency (ms)', 'color': 'tab:green'},
-              {'type': 'slat',
-                  'ylabel': 'SLAT Latency (ms)', 'color': 'tab:red'},
-              {'type': 'clat',
-                  'ylabel': 'CLAT Latency (ms)', 'color': 'tab:purple'},
-              ]
+    lookup = [
+        {'type': 'iops', 'ylabel': 'IOP/s', 'color': 'tab:blue',
+            'label_pos': 0, 'label_rot': 'vertical'},
+        {'type': 'bw', 'ylabel': 'Througput (KB/s)', 'color': 'tab:orange',
+         'label_pos': -50, 'label_rot': 'vertical'},
+        {'type': 'lat', 'ylabel': 'LAT Latency (ms)', 'color': 'tab:green',
+         'label_pos': 0, 'label_rot': 'vertical'},
+        {'type': 'slat',
+            'ylabel': 'SLAT Latency (ms)',
+            'color': 'tab:red', 'label_pos': 0, 'label_rot': 'vertical'},
+        {'type': 'clat', 'ylabel': 'CLAT Latency (ms)', 'color': 'tab:purple',
+         'label_pos': 0, 'label_rot': 'vertical'},
+
+    ]
     return [x for x in lookup if x['type'] == metric]
