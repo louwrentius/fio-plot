@@ -46,8 +46,14 @@ def get_colors():
 
 
 def get_label_position(axis):
-    positions = {"c1": 0, "c2": 0, "c3": -50}
-    return positions[axis]
+    integer = int(axis[1])
+    if integer % 3 == 0:
+        return - 50
+    else:
+        return 0
+
+    #positions = {"c1": 0, "c2": 0, "c3": -50}
+    # return positions[axis]
 
 
 def lookupTable(metric):
