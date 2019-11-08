@@ -33,16 +33,23 @@ def chart_2d_log_data(config, data):
     axes = {}
     lines = []
     labels = []
+
+    colors = supporting.get_colors()
+
     for item in data:
+        datalabel = f"{item['type']}_label"
+        axes[datalabel] = (supporting.lookupTable(item['type'])[0])
+
         if item['type'] not in axes.keys():
             if counter == 1:
                 axes[item['type']] = host
             else:
                 axes[item['type']] = host.twinx()
+            axes[f"{item['type']}_pos"] = f"c{counter}"
 
-            if counter == 2:
+            if counter == 3:
                 axes[item['type']].spines["right"].set_position(
-                    ("axes", -0.28))
+                    ("axes", -0.24))
 
         if counter % 3 == 0:
             make_patch_spines_invisible(axes[item['type']])
@@ -50,34 +57,42 @@ def chart_2d_log_data(config, data):
 
         datakey = f"{item['type']}_data"
         axes[datakey] = list(zip(*item['data']))
-        datalabel = f"{item['type']}_label"
-        axes[datalabel] = (supporting.lookupTable(item['type'])[0])
-
-        #[pprint.pprint(x['type']) for x in data]
 
         dataplot = f"{item['type']}_plot"
         unpacked = list(zip(*item['data']))
         xvalues = unpacked[0]
         yvalues = unpacked[1]
+
+        # Determine max / min values to scale graph axis
         if item['type'] == 'bw':
             maximum = max(yvalues) * 1.2
         else:
             maximum = max(yvalues) * 1.3
-        color = axes[datalabel]['color']
+
+        # PLOT
         axes[dataplot] = axes[item['type']].plot(
-            xvalues, yvalues, label=axes[datalabel]['ylabel'])[0]
+            xvalues, yvalues, colors.pop(0), label=axes[datalabel]['ylabel'])[0]
         pprint.pprint(axes[dataplot])
         axes[item['type']].set_ylim([0, maximum])
         host.set_xlabel('Time in miliseconds')
 
-        if counter % 3 == 0:
-            axes[item['type']].set_ylabel(
-                axes[datalabel]['ylabel'], rotation='vertical', labelpad=-50)
-        else:
-            axes[item['type']].set_ylabel(axes[datalabel]['ylabel'])
+        # Label Axis
+        # if counter % 3 == 0:
+        position = supporting.get_label_position(axes[f"{item['type']}_pos"])
+        axes[item['type']].set_ylabel(
+            axes[datalabel]['ylabel'],
+            rotation=axes[datalabel]['label_rot'],
+            labelpad=position)
+        # if counter % 4 == 0 or counter % 5 == 0:
+        #     axes[item['type']].set_ylabel(
+        #         axes[datalabel]['ylabel'], labelpad=0)
+        # else:
+        #     axes[item['type']].set_ylabel(axes[datalabel]['ylabel'])
 
+        # Get color from lines to use for legend
         axes[item['type']].yaxis.label.set_color(axes[dataplot].get_color())
 
+        # Set ticks
         tkw = dict(size=4, width=1.5)
         if counter == 0:
             host.tick_params(axis='x', **tkw)
@@ -85,6 +100,7 @@ def chart_2d_log_data(config, data):
             axes[item['type']].tick_params(
                 axis='y', colors=axes[dataplot].get_color(), **tkw)
 
+        # Create legend
         lines.append(axes[dataplot])
         labels.append(
             f"{axes[datalabel]['ylabel']} qd: {item['iodepth']} numjobs: {item['numjobs']}")
