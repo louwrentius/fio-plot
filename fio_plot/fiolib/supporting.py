@@ -54,7 +54,7 @@ def get_label_position(axis):
     else:
         return 0
 
-    #positions = {"c1": 0, "c2": 0, "c3": -50}
+    # positions = {"c1": 0, "c2": 0, "c3": -50}
     # return positions[axis]
 
 
@@ -75,3 +75,27 @@ def lookupTable(metric):
 
     ]
     return [x for x in lookup if x['type'] == metric]
+
+
+def generate_axes(ax, datatypes):
+
+    axes = {}
+
+    metrics = ['iops', 'lat', 'bw', 'clat', 'slat']
+
+    first_not_used = True
+    for item in metrics:
+        if item in datatypes:
+            if first_not_used:
+                value = ax
+                first_not_used = False
+            elif len(axes) <= 6:
+                value = ax.twinx()
+            axes[item] = value
+            axes[f"{item}_pos"] = f"c{(metrics.index(item)) + 1}"
+            if len(axes) == 6:
+                axes[item].spines["right"].set_position(("axes", -0.24))
+        pprint.pprint(len(axes))
+    pprint.pprint(f"datatypes-{datatypes}")
+    pprint.pprint(axes)
+    return axes
