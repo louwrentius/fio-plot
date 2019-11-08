@@ -555,10 +555,13 @@ def set_arguments():
     ag.add_argument("--max-y", help=" optional max value for y-axis")
     ag.add_argument("-g", "--loggraph", action='store_true',
                     help="Create graph based on raw log data")
-    ag.add_argument("-e", "--moving-average", default=4, type=int,
-                    help="Helps to smooth out graph, set to 1 to disable")
+    ag.add_argument("-e", "--moving-average", default=1, type=int,
+                    help="The moving average helps to smooth out graphs,\
+                         the argument is the size of the moving window\
+                              (default is 1 to disable)")
     ag.add_argument("-T", "--type", nargs='+', help="\
-            type should be iops,bw,lat,clat,slat", type=str, choices=['bw', 'iops', 'lat', 'slat', 'clat'])
+            type should be iops,bw,lat,clat,slat", type=str,
+                    choices=['bw', 'iops', 'lat', 'slat', 'clat'])
 
     return parser
 
