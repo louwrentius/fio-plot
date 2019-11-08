@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 from matplotlib import rcParams, cycler
 import numpy as np
 import pprint as pprint
@@ -17,6 +18,7 @@ def chart_2d_log_data(config, data):
 
     fig, host = plt.subplots()
     fig.subplots_adjust(left=0.22)
+    fig.subplots_adjust(bottom=0.22)
 
     fig.set_size_inches(8, 5)
 
@@ -51,9 +53,9 @@ def chart_2d_log_data(config, data):
                 axes[item['type']].spines["right"].set_position(
                     ("axes", -0.24))
 
-        if counter % 3 == 0:
-            make_patch_spines_invisible(axes[item['type']])
-            axes[item['type']].spines["right"].set_visible(True)
+        # if counter % 3 == 0:
+            # make_patch_spines_invisible(axes[item['type']])
+            # axes[item['type']].spines["right"].set_visible(True)
 
         datakey = f"{item['type']}_data"
         axes[datakey] = list(zip(*item['data']))
@@ -101,11 +103,14 @@ def chart_2d_log_data(config, data):
                 axis='y', colors=axes[dataplot].get_color(), **tkw)
 
         # Create legend
+        fontP = FontProperties()
+        fontP.set_size('xx-small')
         lines.append(axes[dataplot])
         labels.append(
             f"{axes[datalabel]['ylabel']} qd: {item['iodepth']} numjobs: {item['numjobs']}")
         counter += 1
-        host.legend(lines, labels)
+        host.legend(lines, labels, prop=fontP,
+                    bbox_to_anchor=(0.5, -0.30), loc='lower center', ncol=3)
 
     for item in data:
 
