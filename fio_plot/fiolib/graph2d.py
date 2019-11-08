@@ -32,10 +32,9 @@ def chart_2d_log_data(config, data):
         color=cmap(np.linspace(0, 1, len(data))))
 
     datatypes = list(set([x['type'] for x in data]))
-    ax = supporting.generate_axes(host, datatypes)
 
     counter = 1
-    axes = {}
+    axes = supporting.generate_axes(host, datatypes)
     lines = []
     labels = []
 
@@ -43,27 +42,8 @@ def chart_2d_log_data(config, data):
 
     for item in data:
 
-        # axes[item['type']] = ax[item['type']]
-        axes = ax
-        # axes[f"{item['type']}_pos"] =
-
         datalabel = f"{item['type']}_label"
         axes[datalabel] = (supporting.lookupTable(item['type'])[0])
-
-        # if item['type'] not in axes.keys():
-        #    if counter == 1:
-        #        axes[item['type']] = host
-        #    else:
-        #        axes[item['type']] = host.twinx()
-        #    axes[f"{item['type']}_pos"] = f"c{counter}"
-        #
-        #    if counter == 3:
-        #        axes[item['type']].spines["right"].set_position(
-        #            ("axes", -0.24))
-
-        # if counter % 3 == 0:
-        # make_patch_spines_invisible(axes[item['type']])
-        # axes[item['type']].spines["right"].set_visible(True)
 
         datakey = f"{item['type']}_data"
         axes[datakey] = list(zip(*item['data']))

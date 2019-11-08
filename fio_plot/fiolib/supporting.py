@@ -80,22 +80,18 @@ def lookupTable(metric):
 def generate_axes(ax, datatypes):
 
     axes = {}
-
     metrics = ['iops', 'lat', 'bw', 'clat', 'slat']
-
     first_not_used = True
+
     for item in metrics:
         if item in datatypes:
             if first_not_used:
                 value = ax
                 first_not_used = False
-            elif len(axes) <= 6:
+            else:
                 value = ax.twinx()
             axes[item] = value
             axes[f"{item}_pos"] = f"c{(metrics.index(item)) + 1}"
             if len(axes) == 6:
                 axes[item].spines["right"].set_position(("axes", -0.24))
-        pprint.pprint(len(axes))
-    pprint.pprint(f"datatypes-{datatypes}")
-    pprint.pprint(axes)
     return axes
