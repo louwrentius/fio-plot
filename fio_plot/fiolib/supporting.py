@@ -17,12 +17,15 @@ def running_mean(l, N):
     return result
 
 
-def scale_set(dataset):
-
-    if minimum < 1:
-        return {'scale_factor': 1.0, 'metric': r'$Latency\ in\ \mu$s'}
-    else:
-        return {'scale_factor': 1000, 'metric': r'$Latency\ in\ ms\ $'}
+def scale_yaxis_latency(dataset):
+    pprint.pprint(dataset)
+    result = {'format': r'$Latency\ in\ \mu$s', 'data': dataset}
+    minimum = min(dataset)
+    pprint.pprint("minimum " + str(minimum))
+    if minimum > 1000:
+        result['data'] = [x / 1000 for x in dataset]
+        result['format'] = r'$Latency\ in\ ms\ $'
+    return result
 
 
 def get_colors():
@@ -53,9 +56,6 @@ def get_label_position(axis):
         return 5
     else:
         return 0
-
-    # positions = {"c1": 0, "c2": 0, "c3": -50}
-    # return positions[axis]
 
 
 def lookupTable(metric):
