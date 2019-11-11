@@ -16,11 +16,17 @@ def make_patch_spines_invisible(ax):
 
 def chart_2d_log_data(config, data):
 
-    fig, host = plt.subplots()
-    fig.subplots_adjust(left=0.22)
-    fig.subplots_adjust(bottom=0.22)
+    datatypes = list(set([x['type'] for x in data]))
 
-    fig.set_size_inches(8, 5)
+    fig, host = plt.subplots()
+    if 'bw' in datatypes:
+        fig.subplots_adjust(left=0.21)
+        fig.subplots_adjust(bottom=0.22)
+    else:
+        fig.subplots_adjust()
+        fig.subplots_adjust(bottom=0.22)
+
+    fig.set_size_inches(9, 5)
 
     plt.suptitle(config['title'] + " | " + config['rw'] + " | iodepth " +
                  str(config['iodepth']) + " | numjobs " +
@@ -31,14 +37,11 @@ def chart_2d_log_data(config, data):
     rcParams['axes.prop_cycle'] = cycler(
         color=cmap(np.linspace(0, 1, len(data))))
 
-    datatypes = list(set([x['type'] for x in data]))
-
-    counter = 1
     axes = supporting.generate_axes(host, datatypes)
     lines = []
     labels = []
-
     colors = supporting.get_colors()
+    counter = 1
 
     for item in data:
 
@@ -74,43 +77,15 @@ def chart_2d_log_data(config, data):
             rotation=axes[datalabel]['label_rot'],
             labelpad=position)
 
-        # Configure axes
-        tkw = dict(size=4, width=1.5)
-        if counter == 0:
-            host.tick_params(axis='x', **tkw)
-        else:
-            axes[item['type']].tick_params(
-                axis='y', **tkw)
-
         # Create legend
-        fontP = FontProperties()
+        fontP = FontProperties(family='monospace')
         fontP.set_size('xx-small')
         lines.append(axes[dataplot])
         labels.append(
-            f"{axes[datalabel]['ylabel']} qd: {item['iodepth']} numjobs: {item['numjobs']}")
+            f"{axes[datalabel]['ylabel']} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} STDV: {round(np.std(yvalues), 2):>6}")
         counter += 1
         host.legend(lines, labels, prop=fontP,
-                    bbox_to_anchor=(0.5, -0.30), loc='lower center', ncol=3)
-
-    for item in data:
-
-        print(f"Plotting data for {item['type']}")
-        unpacked = list(zip(*item['data']))
-        # minimum = min(unpacked[1])
-        # pprint.pprint(minimum)
-        # result = supporting.scaling(minimum)
-        # scaled = [x / result['scale_factor'] for x in unpacked[1]]
-        running = supporting.running_mean(
-            unpacked[1], config['moving_average'])
-        # maximum = max(scaled) * 1.3
-        # axes[item['type']].plot(
-        #    unpacked[0], running, label=f"{item['type']} \
-        #        qd: {item['iodepth']} jobs: {item['numjobs']}")
-        #
-        # axes[item['type']].legend(loc=legend_position[axes[item['type']]])
-        # axes[item['type']].set_ylim([0, maximum])
-        # axes[item['type']].set_ylabel(axes_label[axes[item['type']]])
-    # if config['max_y']:
+                    bbox_to_anchor=(0.5, -0.25), loc='lower center', ncol=3)
 
     fig.savefig('test.png', dpi=200)
     # fig.tight_layout()

@@ -3,7 +3,6 @@ import sys
 import csv
 import pprint as pprint
 import statistics
-import itertools
 
 
 def listFioLogFiles(directory):
