@@ -56,6 +56,11 @@ def chart_2d_log_data(config, data):
         xvalues = unpacked[0]
         yvalues = unpacked[1]
 
+        if 'lat' in item['type']:
+            scaled_data = supporting.scale_yaxis_latency(yvalues)
+            axes['datalabel'] = scaled_data['format']
+            yvalues = scaled_data['data']
+
         # Determine max / min values to scale graph axis
         if item['type'] == 'bw':
             maximum = max(yvalues) * 1.2
@@ -65,7 +70,7 @@ def chart_2d_log_data(config, data):
         # PLOT
         axes[dataplot] = axes[item['type']].plot(
             xvalues, yvalues, colors.pop(0), label=axes[datalabel]['ylabel'])[0]
-        pprint.pprint(axes[dataplot])
+        # pprint.pprint(axes[dataplot])
         axes[item['type']].set_ylim([0, maximum])
         host.set_xlabel('Time in miliseconds')
 

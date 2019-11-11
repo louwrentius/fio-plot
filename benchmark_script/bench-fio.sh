@@ -8,15 +8,15 @@ export DIRECTORY=$3
 export FILE=$4
 export SIZE=$5
 
-if [ ! -e $JOBFILE ]
+if ! $(fio --version | grep -i fio-3)
 then
-	echo "Fio job file $JOBFILE not found."
+	echo "Fio version 3+ required because fio-plot expects nanosecond precision"
 	exit 1
 fi
 
-if [ ! -e $DIRECTORY ]
+if [ ! -e $JOBFILE ]
 then
-	echo "Directory $DIRECTORY not found."
+	echo "Fio job file $JOBFILE not found."
 	exit 1
 fi
 
