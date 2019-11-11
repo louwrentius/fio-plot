@@ -17,7 +17,7 @@ def running_mean(l, N):
     return result
 
 
-def scaling(minimum):
+def scale_set(dataset):
 
     if minimum < 1:
         return {'scale_factor': 1.0, 'metric': r'$Latency\ in\ \mu$s'}
@@ -81,15 +81,18 @@ def generate_axes(ax, datatypes):
 
     axes = {}
     metrics = ['iops', 'lat', 'bw', 'clat', 'slat']
+    tkw = dict(size=4, width=1.5)
     first_not_used = True
 
     for item in metrics:
         if item in datatypes:
             if first_not_used:
                 value = ax
+                value.tick_params(axis='x', **tkw)
                 first_not_used = False
             else:
                 value = ax.twinx()
+                value.tick_params(axis='y', **tkw)
             axes[item] = value
             axes[f"{item}_pos"] = f"c{(metrics.index(item)) + 1}"
             if len(axes) == 6:
