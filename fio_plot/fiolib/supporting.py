@@ -1,5 +1,6 @@
 #!/usr/local/bin env
 import pprint as pprint
+import statistics
 
 
 def running_mean(l, N):
@@ -18,12 +19,14 @@ def running_mean(l, N):
 
 
 def scale_yaxis_latency(dataset):
-    pprint.pprint(dataset)
-    result = {'format': r'$Latency\ in\ \mu$s', 'data': dataset}
-    minimum = min(dataset)
-    pprint.pprint("minimum " + str(minimum))
-    if minimum > 1000:
+    result = {'format': r'$Latency\ in\ ns\ $', 'data': dataset}
+    mean = statistics.mean(dataset)
+    print(mean)
+    if (mean > 1000) & (mean < 1000000):
         result['data'] = [x / 1000 for x in dataset]
+        result['format'] = r'$Latency\ in\ \mu$s'
+    if mean > 1000000:
+        result['data'] = [x / 1000000 for x in dataset]
         result['format'] = r'$Latency\ in\ ms\ $'
     return result
 

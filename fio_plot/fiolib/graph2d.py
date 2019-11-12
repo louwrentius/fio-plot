@@ -5,6 +5,7 @@ from matplotlib import rcParams, cycler
 import numpy as np
 import pprint as pprint
 import fiolib.supporting as supporting
+from datetime import datetime
 
 
 def make_patch_spines_invisible(ax):
@@ -57,8 +58,10 @@ def chart_2d_log_data(config, data):
         yvalues = unpacked[1]
 
         if 'lat' in item['type']:
+            print("scaling for latency")
             scaled_data = supporting.scale_yaxis_latency(yvalues)
-            axes['datalabel'] = scaled_data['format']
+            axes[datalabel]['ylabel'] = scaled_data['format']
+            pprint.pprint([axes[datalabel]])
             yvalues = scaled_data['data']
 
         # Determine max / min values to scale graph axis
@@ -87,11 +90,12 @@ def chart_2d_log_data(config, data):
         fontP.set_size('xx-small')
         lines.append(axes[dataplot])
         labels.append(
-            f"{axes[datalabel]['ylabel']} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} STDV: {round(np.std(yvalues), 2):>6}")
+            f"{axes[datalabel]['ylabel']} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} MEAN: {int(round(np.mean(yvalues))):>6} STDV: {round(np.std(yvalues), 2):>6}")
         counter += 1
         host.legend(lines, labels, prop=fontP,
                     bbox_to_anchor=(0.5, -0.25), loc='lower center', ncol=3)
-
-    fig.savefig('test.png', dpi=200)
+    axes[item['type']].grid(ls='dotted')
+    now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+    fig.savefig(f"{now}.png", dpi=config['dpi'])
     # fig.tight_layout()
     # plt.show()
