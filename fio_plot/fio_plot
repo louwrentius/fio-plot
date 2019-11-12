@@ -544,6 +544,8 @@ def set_arguments():
             iodepth to graph")
     ag.add_argument("-D", "--maxdepth", nargs='?', default=64, type=int, help="\
             maximum queue depth to graph")
+    ag.add_argument("-d", "--dpi", help="\
+            dpi of output png", nargs='?', default=200, type=int)
     ag.add_argument("-J", "--maxjobs", help="\
             maximum numjobs to graph in 3d graph", nargs='?', default=64, type=int)
     ag.add_argument("-n", "--numjobs", nargs='+', help="\
