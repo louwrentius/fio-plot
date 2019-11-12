@@ -540,6 +540,12 @@ def set_arguments():
             generate latency + iops 2d graph")
     ag.add_argument("-H", "--histogram", action='store_true', help="\
             generate latency histogram per queue depth")
+    ag.add_argument("--disable-grid", action='store_true', help="\
+            disable the dotted grid in the output png")
+    ag.add_argument("--enable-markers", action='store_true', help="\
+            enable markers for the plot lines")
+    ag.add_argument("--subtitle", help="\
+            specify your own subtitle or leave it blank with double quotes", type=str, default=None)
     ag.add_argument("-I", "--iodepth", type=int, nargs='+', default=1, help="\
             iodepth to graph")
     ag.add_argument("-D", "--maxdepth", nargs='?', default=64, type=int, help="\
