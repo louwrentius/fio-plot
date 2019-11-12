@@ -18,16 +18,32 @@ def running_mean(l, N):
     return result
 
 
-def scale_yaxis_latency(dataset):
-    result = {'format': r'$Latency\ in\ ns\ $', 'data': dataset}
+def scale_xaxis_time(dataset):
+    result = {'format': 'Time (ms)', 'data': dataset}
     mean = statistics.mean(dataset)
-    print(mean)
+
     if (mean > 1000) & (mean < 1000000):
         result['data'] = [x / 1000 for x in dataset]
-        result['format'] = r'$Latency\ in\ \mu$s'
+        result['format'] = 'Time (s)'
+    if mean > 1000000:
+        result['data'] = [x / 60000 for x in dataset]
+        result['format'] = 'Time (m)'
+    if mean > 36000000:  # only switch to hours with enough datapoints (+10)
+        result['data'] = [x / 3600000 for x in dataset]
+        result['format'] = 'Time (h)'
+    return result
+
+
+def scale_yaxis_latency(dataset):
+    result = {'format': 'Latency (ns)', 'data': dataset}
+    mean = statistics.mean(dataset)
+
+    if (mean > 1000) & (mean < 1000000):
+        result['data'] = [x / 1000 for x in dataset]
+        result['format'] = r'$Latency\ (\mu$s)'
     if mean > 1000000:
         result['data'] = [x / 1000000 for x in dataset]
-        result['format'] = r'$Latency\ in\ ms\ $'
+        result['format'] = 'Latency (ms)'
     return result
 
 
