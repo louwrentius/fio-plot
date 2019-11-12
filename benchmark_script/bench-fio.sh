@@ -8,7 +8,7 @@ export DIRECTORY=$3
 export FILE=$4
 export SIZE=$5
 
-if ! $(fio --version | grep -i fio-3)
+if [ ! $(fio --version | grep -i fio-3) ]
 then
 	echo "Fio version 3+ required because fio-plot expects nanosecond precision"
 	exit 1
