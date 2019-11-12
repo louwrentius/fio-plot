@@ -58,7 +58,6 @@ def chart_2d_log_data(config, data):
     table_rows = []
 
     marker_list = list(markers.MarkerStyle.markers.keys())
-    pprint.pprint(marker_list)
 
     for item in data:
 
@@ -73,11 +72,13 @@ def chart_2d_log_data(config, data):
         xvalues = unpacked[0]
         yvalues = unpacked[1]
 
+        scaled_xaxis = supporting.scale_xaxis_time(xvalues)
+        x_label = scaled_xaxis['format']
+        xvalues = scaled_xaxis['data']
+
         if 'lat' in item['type']:
-            print("scaling for latency")
             scaled_data = supporting.scale_yaxis_latency(yvalues)
             axes[datalabel]['ylabel'] = scaled_data['format']
-            pprint.pprint([axes[datalabel]])
             yvalues = scaled_data['data']
 
         if config['enable_markers']:
@@ -98,7 +99,7 @@ def chart_2d_log_data(config, data):
             color=colors.pop(0), label=axes[datalabel]['ylabel'])[0]
         # pprint.pprint(axes[dataplot])
         axes[item['type']].set_ylim([0, maximum])
-        host.set_xlabel('Time in miliseconds')
+        host.set_xlabel(x_label)
 
         # Label Axis
         # if counter % 3 == 0:
@@ -118,9 +119,9 @@ def chart_2d_log_data(config, data):
         labels.append(
             f"{axes[datalabel]['ylabel']} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} MEAN: {int(round(np.mean(yvalues))):>6} STDV: {round(np.std(yvalues), 2):>6}")
         counter += 1
-        host.legend(lines, labels, prop=fontP,
-                    bbox_to_anchor=(0.5, -0.25), loc='lower center', ncol=3)
 
+    host.legend(lines, labels, prop=fontP,
+                bbox_to_anchor=(0.5, -0.33), loc='lower center', ncol=2)
     # Add grid (or not)
     if not config['disable_grid']:
         axes[item['type']].grid(ls='dotted')
