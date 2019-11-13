@@ -34,16 +34,29 @@ def scale_xaxis_time(dataset):
     return result
 
 
-def scale_yaxis_latency(dataset):
-    result = {'format': 'Latency (ns)', 'data': dataset}
+def get_scale_factor(dataset):
     mean = statistics.mean(dataset)
+    scale_factors = [{'scale': 1000000, 'label': 'Latency (ms)'},
+                     {'scale': 1000, 'label': 'Latency (\u03BCs)'},
+                     {'scale': 0, 'label': 'Latency (ns)'}]
+    for item in scale_factors:
+        if mean > item['scale']*5:
+            return item
 
-    if (mean > 1000) & (mean < 1000000):
-        result['data'] = [x / 1000 for x in dataset]
-        result['format'] = r'$Latency\ (\mu$s)'
-    if mean > 1000000:
-        result['data'] = [x / 1000000 for x in dataset]
-        result['format'] = 'Latency (ms)'
+
+def get_largest_scale_factor(scale_factors):
+
+    scalefactor = scale_factors[0]
+    pprint.pprint(scalefactor)
+    scalefactor = [x for x in scale_factors if x['scale']
+                   >= scalefactor['scale']]
+    return scalefactor[0]
+
+
+def scale_yaxis_latency(dataset, scale):
+    result = {}
+    result['data'] = [x / scale['scale'] for x in dataset]
+    result['format'] = scale['label']
     return result
 
 
@@ -101,7 +114,9 @@ def generate_axes(ax, datatypes):
             else:
                 value = ax.twinx()
                 value.tick_params(axis='y', **tkw)
+
             axes[item] = value
+            axes[item].ticklabel_format(style='plain')
             axes[f"{item}_pos"] = positions.pop(0)
             if len(axes) == 6:
                 axes[item].spines["right"].set_position(("axes", -0.24))
@@ -114,6 +129,8 @@ def process_dataset(dataset):
     datatypes = []
     new_list = []
     new_structure = {'datatypes': None, 'dataset': None}
+    final_list = []
+    scale_factors = []
 
     for item in dataset:
 
@@ -123,24 +140,32 @@ def process_dataset(dataset):
         item['xvalues'] = unpacked[0]
         item['yvalues'] = unpacked[1]
         item['data'] = None
+
         scaled_xaxis = scale_xaxis_time(item['xvalues'])
         item['xlabel'] = scaled_xaxis['format']
         item['xvalues'] = scaled_xaxis['data']
 
+        if item['type'] == 'bw':
+            item['maximum'] = max(item['yvalues']) * 1.2
+
         if 'lat' in item['type']:
-            scaled_data = scale_yaxis_latency(item['yvalues'])
+            scale_factors.append(get_scale_factor(item['yvalues']))
+
+        new_list.append(item)
+
+    scale_factor = get_largest_scale_factor(scale_factors)
+
+    for item in new_list:
+        if 'lat' in item['type']:
+            scaled_data = scale_yaxis_latency(item['yvalues'], scale_factor)
             item['ylabel'] = scaled_data['format']
             item['yvalues'] = scaled_data['data']
         else:
             item['ylabel'] = lookupTable(item['type'])['ylabel']
-
-        if item['type'] == 'bw':
-            item['maximum'] = max(item['yvalues']) * 1.2
-        else:
-            item['maximum'] = max(item['yvalues']) * 1.3
-        new_list.append(item)
+        item['maximum'] = max(item['yvalues']) * 1.3
+        final_list.append(item)
 
     new_structure['datatypes'] = list(set(datatypes))
-    new_structure['dataset'] = new_list
+    new_structure['dataset'] = final_list
 
     return new_structure

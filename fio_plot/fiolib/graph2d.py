@@ -88,7 +88,7 @@ def chart_2d_log_data(config, dataset):
         mean = np.mean(yvalues)
         stdv = (np.std(yvalues) / mean) * 100
         labels.append(
-            f"{item['ylabel']} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} MEAN: {int(round(mean)):>6} $\sigma$: {round(stdv, 2):>6}%")
+            f"{item['ylabel']} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} MEAN: {round(mean,3):>6} $\sigma$: {round(stdv, 2):>6}%")
     pprint.pprint(axes)
     host.legend(lines, labels, prop=fontP,
                 bbox_to_anchor=(0.5, -0.33), loc='lower center', ncol=2)
