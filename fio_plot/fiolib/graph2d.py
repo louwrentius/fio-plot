@@ -2,7 +2,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.markers as markers
 from matplotlib.font_manager import FontProperties
-from matplotlib import rcParams, cycler
 import numpy as np
 import pprint as pprint
 import fiolib.supporting as supporting
@@ -17,37 +16,43 @@ def make_patch_spines_invisible(ax):
 
 
 def create_title_and_sub(config, plt):
+    number_of_types = len(config['type'])
+    if number_of_types <= 2:
+        x_offset = 0.5
+    else:
+        x_offset = 0.425
+
     plt.suptitle(config['title'])
+
     if config['subtitle']:
         plt.title(config['subtitle'],
-                  fontsize=8, horizontalalignment='center', y=1.02)
+                  fontsize=8, horizontalalignment='center', x=x_offset, y=1.02)
     else:
         plt.title(config['rw'] + " | iodepth " +
                   str(config['iodepth']).strip('[]') + " | numjobs " +
                   str(config['numjobs']).strip('[]') +
                   " | " + str(config['type']).strip('[]').replace('\'', ''),
-                  fontsize=8, horizontalalignment='center', y=1.02)
+                  fontsize=8, horizontalalignment='center', x=x_offset, y=1.02)
 
 
 def chart_2d_log_data(config, dataset):
 
-    # datatypes = list(set([x['type'] for x in data]))
-
+    # Raw data must be processed into series data + enriched
     data = supporting.process_dataset(dataset)
     datatypes = data['datatypes']
-
+    # Create matplotlib figure and first axis
     fig, host = plt.subplots()
     fig.set_size_inches(9, 5)
-
+    # Generate axes for the graph
     axes = supporting.generate_axes(host, datatypes)
+    # Create title
     create_title_and_sub(config, plt)
-
+    bottom_offset = 0.25
     if 'bw' in datatypes and (len(datatypes) > 2):
         fig.subplots_adjust(left=0.21)
-        fig.subplots_adjust(bottom=0.22)
+        fig.subplots_adjust(bottom=bottom_offset)
     else:
-        fig.subplots_adjust()
-        fig.subplots_adjust(bottom=0.22)
+        fig.subplots_adjust(bottom=bottom_offset)
 
     lines = []
     labels = []
@@ -58,6 +63,8 @@ def chart_2d_log_data(config, dataset):
     fontP = FontProperties(family='monospace')
     fontP.set_size('xx-small')
 
+    table_data = {}
+    pprint.pprint(data)
     for item in data['dataset']:
 
         if config['enable_markers']:
@@ -72,26 +79,26 @@ def chart_2d_log_data(config, dataset):
         dataplot = f"{item['type']}_plot"
         axes[dataplot] = axes[item['type']].plot(xvalues, yvalues, marker=marker_value, markevery=(len(
             yvalues) / (len(yvalues) * 10)), color=colors.pop(0), label=item['ylabel'])[0]
-        # pprint.pprint(axes[dataplot])
         axes[item['type']].set_ylim([0, item['maximum']])
         host.set_xlabel(item['xlabel'])
 
         # Label Axis
-        pprint.pprint(axes[f"{item['type']}_pos"])
         padding = axes[f"{item['type']}_pos"]
         axes[item['type']].set_ylabel(
             item['ylabel'],
             labelpad=padding)
 
-        # Create legend
+        # Add line to legend
         lines.append(axes[dataplot])
-        mean = np.mean(yvalues)
-        stdv = (np.std(yvalues) / mean) * 100
-        labels.append(
-            f"{item['ylabel']} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} MEAN: {round(mean,3):>6} $\sigma$: {round(stdv, 2):>6}%")
-    pprint.pprint(axes)
-    host.legend(lines, labels, prop=fontP,
-                bbox_to_anchor=(0.5, -0.33), loc='lower center', ncol=2)
 
+        labels.append(
+            f"{item['type']:>4} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} mean: {item['mean']:>6} std: {item['stdv']:>5}")
+
+    # Create Legend
+
+    host.legend(lines, labels, prop=fontP,
+                bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
+
+    # Save graph to file (png)
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     fig.savefig(f"{now}.png", dpi=config['dpi'])

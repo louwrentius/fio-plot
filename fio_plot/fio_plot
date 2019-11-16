@@ -588,17 +588,12 @@ def main():
         sys.exit(1)
 
     settings = vars(args)
-    # pprint.pprint(settings)
-    # b = benchmark.benchmark(settings)
 
     if settings['loggraph']:
         benchmarkfiles = logdata.listFioLogFiles(settings['input_directory'])
         logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
-        # pprint.pprint(logfiles)
         rawdata = logdata.readLogDataFromFiles(settings, logfiles)
-        # pprint.pprint(rawdata)
         merged = logdata.mergeDataSet(settings, rawdata)
-        # pprint.pprint(merged)
         graph.chart_2d_log_data(settings, merged)
 
     # if settings['latency_iops_3d']:

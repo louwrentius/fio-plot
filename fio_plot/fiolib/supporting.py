@@ -1,6 +1,7 @@
 #!/usr/local/bin env
 import pprint as pprint
 import statistics
+import numpy as np
 
 
 def running_mean(l, N):
@@ -40,14 +41,14 @@ def get_scale_factor(dataset):
                      {'scale': 1000, 'label': 'Latency (\u03BCs)'},
                      {'scale': 0, 'label': 'Latency (ns)'}]
     for item in scale_factors:
+        """ Notice the factor, prevents scaling the graph up too soon if values
+            are small, thus becomming almost unreadable """
         if mean > item['scale']*5:
             return item
 
 
 def get_largest_scale_factor(scale_factors):
-
     scalefactor = scale_factors[0]
-    pprint.pprint(scalefactor)
     scalefactor = [x for x in scale_factors if x['scale']
                    >= scalefactor['scale']]
     return scalefactor[0]
@@ -132,6 +133,9 @@ def process_dataset(dataset):
     final_list = []
     scale_factors = []
 
+    """
+    This first loop is to unpack the data in series and add scale the xaxis
+    """
     for item in dataset:
 
         datatypes.append(item['type'])
@@ -145,15 +149,16 @@ def process_dataset(dataset):
         item['xlabel'] = scaled_xaxis['format']
         item['xvalues'] = scaled_xaxis['data']
 
-        if item['type'] == 'bw':
-            item['maximum'] = max(item['yvalues']) * 1.2
-
         if 'lat' in item['type']:
             scale_factors.append(get_scale_factor(item['yvalues']))
 
         new_list.append(item)
 
-    scale_factor = get_largest_scale_factor(scale_factors)
+    """
+    This second loop assures that all data is scaled with the same factor
+    """
+    if len(scale_factors) > 0:
+        scale_factor = get_largest_scale_factor(scale_factors)
 
     for item in new_list:
         if 'lat' in item['type']:
@@ -162,7 +167,29 @@ def process_dataset(dataset):
             item['yvalues'] = scaled_data['data']
         else:
             item['ylabel'] = lookupTable(item['type'])['ylabel']
-        item['maximum'] = max(item['yvalues']) * 1.3
+
+        mean = np.mean(item['yvalues'])
+        stdv = round((np.std(item['yvalues']) / mean) * 100, 2)
+
+        if mean > 1:
+            mean = round(mean, 2)
+        if mean <= 1:
+            mean = round(mean, 3)
+        if mean >= 20:
+            mean = int(round(mean, 0))
+
+        item['mean'] = mean
+        item['stdv'] = stdv
+        """
+        This is soft of a hack to prevent IOPs and BW to be on top of each other
+        BW and IOPS are directly related and BW should not be shown as it is
+        often not relevant anyway, but for readability, this is added.
+        """
+        if item['type'] == 'bw':
+            item['maximum'] = max(item['yvalues']) * 1.2
+        else:
+            item['maximum'] = max(item['yvalues']) * 1.3
+
         final_list.append(item)
 
     new_structure['datatypes'] = list(set(datatypes))
