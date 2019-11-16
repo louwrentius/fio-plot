@@ -47,7 +47,7 @@ def chart_2d_log_data(config, dataset):
     axes = supporting.generate_axes(host, datatypes)
     # Create title
     create_title_and_sub(config, plt)
-    bottom_offset = 0.25
+    bottom_offset = 0.22
     if 'bw' in datatypes and (len(datatypes) > 2):
         fig.subplots_adjust(left=0.21)
         fig.subplots_adjust(bottom=bottom_offset)
@@ -90,14 +90,16 @@ def chart_2d_log_data(config, dataset):
 
         # Add line to legend
         lines.append(axes[dataplot])
-
         labels.append(
             f"{item['type']:>4} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} mean: {item['mean']:>6} std: {item['stdv']:>5}")
 
     # Create Legend
-
+    if len(lines) >= 6:
+        ncol = 3
+    else:
+        ncol = 2
     host.legend(lines, labels, prop=fontP,
-                bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
+                bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=ncol)
 
     # Save graph to file (png)
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
