@@ -552,24 +552,29 @@ def set_arguments():
             maximum queue depth to graph")
     ag.add_argument("-d", "--dpi", help="\
             dpi of output png", nargs='?', default=200, type=int)
+    ag.add_argument("-p", "--percentile", help="\
+            calculate percentile, default 99.9th", nargs='?', default=99, type=float)
     ag.add_argument("-J", "--maxjobs", help="\
             maximum numjobs to graph in 3d graph", nargs='?', default=64, type=int)
     ag.add_argument("-n", "--numjobs", nargs='+', help="\
             specifies for which numjob parameter you want the 2d graphs to be\
                  generated", default=1, type=int)
-    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite'],
+    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw'],
                     help="read/write mode randread/randwrite")
     ag.add_argument("-m", "--max", help=" optional max value for z-axis")
     ag.add_argument("--max-y", help=" optional max value for y-axis")
     ag.add_argument("-g", "--loggraph", action='store_true',
                     help="Create graph based on raw log data")
-    ag.add_argument("-e", "--moving-average", default=1, type=int,
+    ag.add_argument("-e", "--moving-average", default=None, type=int,
                     help="The moving average helps to smooth out graphs,\
                          the argument is the size of the moving window\
-                              (default is 1 to disable)")
+                              (default is None to disable)")
     ag.add_argument("-T", "--type", nargs='+', help="\
             type should be iops,bw,lat,clat,slat", type=str,
                     choices=['bw', 'iops', 'lat', 'slat', 'clat'])
+    ag.add_argument("-f", "--filter", nargs='+', help="\
+            filter should be read/write/rw", type=str, default=('read', 'write'),
+                    choices=['read', 'write'])
 
     return parser
 
