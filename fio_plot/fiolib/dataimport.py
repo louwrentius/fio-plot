@@ -60,7 +60,7 @@ def getValueSetsFromData(settings, dataset):
     iodepth = []
     numjobs = []
     benchtype = []
-    # pprint.pprint(dataset)
+
     for item in dataset:
         iodepth.append(item['iodepth'])
         numjobs.append(item['numjobs'])
@@ -87,27 +87,34 @@ def getMergeOperation(datatype):
 
 
 def mergeSingleDataSet(data, datatype):
-    mergedSet = []
-    for column in ['timestamp', 'value']:
-        unmergedSet = []
-        for record in data:
-            templist = []
-            for row in record['data']:
-                templist.append(int(row[column]))
-            unmergedSet.append(templist)
-        if column == 'value':
-            oper = getMergeOperation(datatype)
-        else:
-            oper = getMergeOperation(column)
-        merged = [oper(x) for x in zip(*unmergedSet)]
-        mergedSet.append(merged)
-    return list(zip(*mergedSet))
+    mergedSet = {'read': [], 'write': []}
+
+    lookup = {'read': 0, 'write': 1}
+
+    for rw in ['read', 'write']:
+        for column in ['timestamp', 'value']:
+            unmergedSet = []
+            for record in data:
+                templist = []
+                for row in record['data']:
+                    if int(row['rwt']) == lookup[rw]:
+                        templist.append(int(row[column]))
+                unmergedSet.append(templist)
+            if column == 'value':
+                oper = getMergeOperation(datatype)
+            else:
+                oper = getMergeOperation(column)
+            merged = [oper(x) for x in zip(*unmergedSet)]
+            mergedSet[rw].append(merged)
+        mergedSet[rw] = list(zip(*mergedSet[rw]))
+    # pprint.pprint(mergedSet)
+    return mergedSet
 
 
 def mergeDataSet(settings, dataset):
     mergedSets = []
     filterstrings = returnFilenameFilterString(settings)
-    # pprint.pprint(filterstrings)
+    # pprint.pprint(dataset)
     for filterstring in filterstrings:
         record = {'type': filterstring['type'],
                   'iodepth': filterstring['iodepth'], 'numjobs': filterstring['numjobs']}
@@ -115,8 +122,6 @@ def mergeDataSet(settings, dataset):
         for item in dataset:
             if filterstring['searchstring'] in item['searchstring']:
                 data.append(item)
-        # if len(data) > 1:
-            # pprint.pprint([name['filename'] for name in data])
         data = mergeSingleDataSet(data, filterstring['type'])
         record['data'] = data
         mergedSets.append(record)

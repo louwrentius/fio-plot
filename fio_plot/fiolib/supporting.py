@@ -61,6 +61,32 @@ def scale_yaxis_latency(dataset, scale):
     return result
 
 
+# def get_colors():
+#    return [
+#        'tab:blue',
+#        'tab:orange',
+#        'tab:green',
+#        'tab:red',
+#        'tab:purple',
+#        'tab:brown',
+#        'tab:pink',
+#        'tab:olive',
+#        'tab:cyan',
+#        'darkgreen',
+#        'cornflowerblue',
+#        'red',
+#        'gold',
+#        'darkcyan',
+#        'darkviolet',
+#        'deepskyblue',
+#        'lawngreen',
+#        'xkcd:lime',
+#        'xkcd:salmon',
+#        'pale red',
+#        'ocre',
+#
+#    ]
+
 def get_colors():
     return [
         'tab:blue',
@@ -72,12 +98,69 @@ def get_colors():
         'tab:pink',
         'tab:olive',
         'tab:cyan',
-        'darkgreen',
-        'cornflowerblue',
-        'deepping',
-        'red',
-        'gold',
-        'darkcyan'
+        'xkcd:cloudy blue',
+        'xkcd:dark pastel green',
+        'xkcd:cement',
+        'xkcd:dark grass green',
+        'xkcd:dusty teal',
+        'xkcd:grey teal',
+        'xkcd:macaroni and cheese',
+        'xkcd:pinkish tan',
+        'xkcd:spruce',
+        'xkcd:strong blue',
+        'xkcd:toxic green',
+        'xkcd:windows blue',
+        'xkcd:blue blue',
+        'xkcd:blue with a hint of purple',
+        'xkcd:booger',
+        'xkcd:bright sea green',
+        'xkcd:dark green blue',
+        'xkcd:deep turquoise',
+        'xkcd:green teal',
+        'xkcd:strong pink',
+        'xkcd:bland',
+        'xkcd:deep aqua',
+        'xkcd:lavender pink',
+        'xkcd:light moss green',
+        'xkcd:light seafoam green',
+        'xkcd:olive yellow',
+        'xkcd:pig pink',
+        'xkcd:deep lilac',
+        'xkcd:desert',
+        'xkcd:dusty lavender',
+        'xkcd:purpley grey',
+        'xkcd:purply',
+        'xkcd:candy pink',
+        'xkcd:light pastel green',
+        'xkcd:boring green',
+        'xkcd:kiwi green',
+        'xkcd:light grey green',
+        'xkcd:orange pink',
+        'xkcd:tea green',
+        'xkcd:very light brown',
+        'xkcd:egg shell',
+        'xkcd:eggplant purple',
+        'xkcd:powder pink',
+        'xkcd:reddish grey',
+        'xkcd:baby shit brown',
+        'xkcd:liliac',
+        'xkcd:stormy blue',
+        'xkcd:ugly brown',
+        'xkcd:custard',
+        'xkcd:darkish pink',
+        'xkcd:deep brown',
+        'xkcd:greenish beige',
+        'xkcd:manilla',
+        'xkcd:off blue',
+        'xkcd:battleship grey',
+        'xkcd:browny green',
+        'xkcd:bruise',
+        'xkcd:kelley green',
+        'xkcd:sickly yellow',
+        'xkcd:sunny yellow',
+        'xkcd:azul',
+        'xkcd:darkgreen',
+        'xkcd:green/yellow'
     ]
 
 
@@ -125,7 +208,7 @@ def generate_axes(ax, datatypes):
     return axes
 
 
-def process_dataset(dataset):
+def process_dataset(settings, dataset):
 
     datatypes = []
     new_list = []
@@ -137,21 +220,24 @@ def process_dataset(dataset):
     This first loop is to unpack the data in series and add scale the xaxis
     """
     for item in dataset:
+        for rw in settings['filter']:
+            if len(item['data'][rw]) > 0:
+                datatypes.append(item['type'])
+                # pprint.pprint(item['data'][rw])
+                unpacked = list(zip(*item['data'][rw]))
+                # pprint.pprint(unpacked)
+                item[rw] = {}
 
-        datatypes.append(item['type'])
+                item[rw]['xvalues'] = unpacked[0]
+                item[rw]['yvalues'] = unpacked[1]
 
-        unpacked = list(zip(*item['data']))
-        item['xvalues'] = unpacked[0]
-        item['yvalues'] = unpacked[1]
-        item['data'] = None
+                scaled_xaxis = scale_xaxis_time(item[rw]['xvalues'])
+                item['xlabel'] = scaled_xaxis['format']
+                item['xvalues'] = scaled_xaxis['data']
 
-        scaled_xaxis = scale_xaxis_time(item['xvalues'])
-        item['xlabel'] = scaled_xaxis['format']
-        item['xvalues'] = scaled_xaxis['data']
-
-        if 'lat' in item['type']:
-            scale_factors.append(get_scale_factor(item['yvalues']))
-
+                if 'lat' in item['type']:
+                    scale_factors.append(
+                        get_scale_factor(item[rw]['yvalues']))
         new_list.append(item)
 
     """
@@ -161,38 +247,51 @@ def process_dataset(dataset):
         scale_factor = get_largest_scale_factor(scale_factors)
 
     for item in new_list:
-        if 'lat' in item['type']:
-            scaled_data = scale_yaxis_latency(item['yvalues'], scale_factor)
-            item['ylabel'] = scaled_data['format']
-            item['yvalues'] = scaled_data['data']
-        else:
-            item['ylabel'] = lookupTable(item['type'])['ylabel']
+        for rw in settings['filter']:
+            if rw in item.keys():
+                if 'lat' in item['type']:
+                    scaled_data = scale_yaxis_latency(
+                        item[rw]['yvalues'], scale_factor)
+                    item[rw]['ylabel'] = scaled_data['format']
+                    item[rw]['yvalues'] = scaled_data['data']
+                else:
+                    item[rw]['ylabel'] = lookupTable(item['type'])['ylabel']
 
-        mean = np.mean(item['yvalues'])
-        stdv = round((np.std(item['yvalues']) / mean) * 100, 2)
+                mean = np.mean(item[rw]['yvalues'])
+                stdv = round((np.std(item[rw]['yvalues']) / mean) * 100, 2)
+                percentile = round(np.percentile(
+                    item[rw]['yvalues'], settings['percentile']), 2)
 
-        if mean > 1:
-            mean = round(mean, 2)
-        if mean <= 1:
-            mean = round(mean, 3)
-        if mean >= 20:
-            mean = int(round(mean, 0))
+                if mean > 1:
+                    mean = round(mean, 2)
+                if mean <= 1:
+                    mean = round(mean, 3)
+                if mean >= 20:
+                    mean = int(round(mean, 0))
 
-        item['mean'] = mean
-        item['stdv'] = stdv
-        """
-        This is soft of a hack to prevent IOPs and BW to be on top of each other
-        BW and IOPS are directly related and BW should not be shown as it is
-        often not relevant anyway, but for readability, this is added.
-        """
-        if item['type'] == 'bw':
-            item['maximum'] = max(item['yvalues']) * 1.2
-        else:
-            item['maximum'] = max(item['yvalues']) * 1.3
+                if percentile > 1:
+                    percentile = round(percentile, 2)
+                if percentile <= 1:
+                    percentile = round(percentile, 3)
+                if percentile >= 20:
+                    percentile = int(round(percentile, 0))
+
+                item[rw]['mean'] = mean
+                item[rw]['stdv'] = stdv
+                item[rw]['percentile'] = percentile
+                """
+                This is soft of a hack to prevent IOPs and BW to be on top of each other
+                BW and IOPS are directly related and BW should not be shown as it is
+                often not relevant anyway, but for readability, this is added.
+                """
+                if item['type'] == 'bw':
+                    item[rw]['maximum'] = max(item[rw]['yvalues']) * 1.2
+                else:
+                    item[rw]['maximum'] = max(item[rw]['yvalues']) * 1.3
 
         final_list.append(item)
 
     new_structure['datatypes'] = list(set(datatypes))
     new_structure['dataset'] = final_list
-
+    # pprint.pprint(new_structure)
     return new_structure

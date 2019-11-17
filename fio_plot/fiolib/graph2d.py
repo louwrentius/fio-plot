@@ -15,30 +15,32 @@ def make_patch_spines_invisible(ax):
         sp.set_visible(False)
 
 
-def create_title_and_sub(config, plt):
-    number_of_types = len(config['type'])
+def create_title_and_sub(settings, plt):
+    number_of_types = len(settings['type'])
     if number_of_types <= 2:
         x_offset = 0.5
     else:
         x_offset = 0.425
 
-    plt.suptitle(config['title'])
+    plt.suptitle(settings['title'])
 
-    if config['subtitle']:
-        plt.title(config['subtitle'],
-                  fontsize=8, horizontalalignment='center', x=x_offset, y=1.02)
+    if settings['subtitle']:
+        subtitle = settings['subtitle']
+
     else:
-        plt.title(config['rw'] + " | iodepth " +
-                  str(config['iodepth']).strip('[]') + " | numjobs " +
-                  str(config['numjobs']).strip('[]') +
-                  " | " + str(config['type']).strip('[]').replace('\'', ''),
-                  fontsize=8, horizontalalignment='center', x=x_offset, y=1.02)
+        iodepth = str(settings['iodepth']).strip('[]')
+        numjobs = str(settings['numjobs']).strip('[]')
+        datatype = str(settings['type']).strip('[]').replace('\'', '')
+        subtitle = f"{settings['rw']} | iodepth {iodepth} | numjobs {numjobs} | {datatype}"
+
+    plt.title(subtitle, fontsize=8,
+              horizontalalignment='center', x=x_offset, y=1.02)
 
 
-def chart_2d_log_data(config, dataset):
+def chart_2d_log_data(settings, dataset):
 
     # Raw data must be processed into series data + enriched
-    data = supporting.process_dataset(dataset)
+    data = supporting.process_dataset(settings, dataset)
     datatypes = data['datatypes']
     # Create matplotlib figure and first axis
     fig, host = plt.subplots()
@@ -46,8 +48,11 @@ def chart_2d_log_data(config, dataset):
     # Generate axes for the graph
     axes = supporting.generate_axes(host, datatypes)
     # Create title
-    create_title_and_sub(config, plt)
-    bottom_offset = 0.22
+    create_title_and_sub(settings, plt)
+    extra_offset = len(datatypes) * len(settings['iodepth']) * len(
+        settings['numjobs']) * len(settings['filter'])
+    pprint.pprint(extra_offset)
+    bottom_offset = 0.18 + (extra_offset/120)
     if 'bw' in datatypes and (len(datatypes) > 2):
         fig.subplots_adjust(left=0.21)
         fig.subplots_adjust(bottom=bottom_offset)
@@ -63,38 +68,43 @@ def chart_2d_log_data(config, dataset):
     fontP = FontProperties(family='monospace')
     fontP.set_size('xx-small')
 
-    table_data = {}
-    pprint.pprint(data)
     for item in data['dataset']:
+        # pprint.pprint(f"dataset: {len(data['dataset'])}")
+        for rw in settings['filter']:
+            if rw in item.keys():
+                if settings['enable_markers']:
+                    marker_value = marker_list.pop(0)
+                else:
+                    marker_value = None
 
-        if config['enable_markers']:
-            marker_value = marker_list.pop(0)
-        else:
-            marker_value = None
+                xvalues = item[rw]['xvalues']
+                yvalues = item[rw]['yvalues']
 
-        xvalues = item['xvalues']
-        yvalues = item['yvalues']
+                if settings['moving_average']:
+                    yvalues = supporting.running_mean(
+                        yvalues, settings['moving_average'])
 
-        # PLOT
-        dataplot = f"{item['type']}_plot"
-        axes[dataplot] = axes[item['type']].plot(xvalues, yvalues, marker=marker_value, markevery=(len(
-            yvalues) / (len(yvalues) * 10)), color=colors.pop(0), label=item['ylabel'])[0]
-        axes[item['type']].set_ylim([0, item['maximum']])
-        host.set_xlabel(item['xlabel'])
+                # PLOT
+                dataplot = f"{item['type']}_plot"
+                axes[dataplot] = axes[item['type']].plot(xvalues, yvalues, marker=marker_value, markevery=(len(
+                    yvalues) / (len(yvalues) * 10)), color=colors.pop(0), label=item[rw]['ylabel'])[0]
 
-        # Label Axis
-        padding = axes[f"{item['type']}_pos"]
-        axes[item['type']].set_ylabel(
-            item['ylabel'],
-            labelpad=padding)
+                axes[item['type']].set_ylim([0, item[rw]['maximum']])
+                host.set_xlabel(item['xlabel'])
 
-        # Add line to legend
-        lines.append(axes[dataplot])
-        labels.append(
-            f"{item['type']:>4} qd: {item['iodepth']:>2} nj: {item['numjobs']:>2} mean: {item['mean']:>6} std: {item['stdv']:>5}")
+                # Label Axis
+                padding = axes[f"{item['type']}_pos"]
+                axes[item['type']].set_ylabel(
+                    item[rw]['ylabel'],
+                    labelpad=padding)
+
+                # Add line to legend
+                lines.append(axes[dataplot])
+                labels.append(
+                    f"|{item['type']:>4}|{rw:>5}|qd: {item['iodepth']:>2}|nj: {item['numjobs']:>2}|mean: {item[rw]['mean']:>6}|std: {item[rw]['stdv']:>6} |P{settings['percentile']}: {item[rw]['percentile']:>6}")
 
     # Create Legend
-    if len(lines) >= 6:
+    if len(lines) >= 100:
         ncol = 3
     else:
         ncol = 2
@@ -103,4 +113,4 @@ def chart_2d_log_data(config, dataset):
 
     # Save graph to file (png)
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    fig.savefig(f"{now}.png", dpi=config['dpi'])
+    fig.savefig(f"{now}.png", dpi=settings['dpi'])
