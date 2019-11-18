@@ -92,10 +92,13 @@ def chart_2d_log_data(settings, dataset):
                     yvalues) / (len(yvalues) * 10)), color=colors.pop(0), label=item[rw]['ylabel'])[0]
                 host.set_xlabel(item['xlabel'])
 
-                max_yvalues = max(yvalues)
-                if max_yvalues > maximum[item['type']]:
-                    maximum[item['type']] = max_yvalues
-                    axes[item['type']].set_ylim(0, max_yvalues)
+                if settings['max']:
+                    max_yvalue = settings['max']
+                else:
+                    max_yvalue = max(yvalues)
+                if max_yvalue > maximum[item['type']]:
+                    maximum[item['type']] = max_yvalue
+                axes[item['type']].set_ylim(0, max_yvalue * 1.1)
 
                 # Label Axis
                 padding = axes[f"{item['type']}_pos"]
@@ -106,7 +109,7 @@ def chart_2d_log_data(settings, dataset):
                 # Add line to legend
                 lines.append(axes[dataplot])
                 labels.append(
-                    f"|{item['type']:>4}|{rw:>5}|qd: {item['iodepth']:>2}|nj: {item['numjobs']:>2}|mean: {item[rw]['mean']:>6}|std: {item[rw]['stdv']:>6} |P{settings['percentile']}: {item[rw]['percentile']:>6}")
+                    f"|{item['type']:>4}|{rw:>5}|qd: {item['iodepth']:>2}|nj: {item['numjobs']:>2}|mean: {item[rw]['mean']:>6}|std%: {item[rw]['stdv']:>6} |P{settings['percentile']}: {item[rw]['percentile']:>6}")
 
     # Create Legend
     if len(lines) >= 100:
