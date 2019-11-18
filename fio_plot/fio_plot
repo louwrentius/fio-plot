@@ -561,7 +561,8 @@ def set_arguments():
                  generated", default=1, type=int)
     ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw'],
                     help="read/write mode randread/randwrite")
-    ag.add_argument("-m", "--max", help=" optional max value for z-axis")
+    ag.add_argument("-m", "--max", default=None, type=int,
+                    help=" optional max value for z-axis")
     ag.add_argument("--max-y", help=" optional max value for y-axis")
     ag.add_argument("-g", "--loggraph", action='store_true',
                     help="Create graph based on raw log data")
