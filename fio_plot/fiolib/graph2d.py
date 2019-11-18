@@ -51,7 +51,7 @@ def chart_2d_log_data(settings, dataset):
     create_title_and_sub(settings, plt)
     extra_offset = len(datatypes) * len(settings['iodepth']) * len(
         settings['numjobs']) * len(settings['filter'])
-    pprint.pprint(extra_offset)
+    # pprint.pprint(extra_offset)
     bottom_offset = 0.18 + (extra_offset/120)
     if 'bw' in datatypes and (len(datatypes) > 2):
         fig.subplots_adjust(left=0.21)
@@ -68,8 +68,9 @@ def chart_2d_log_data(settings, dataset):
     fontP = FontProperties(family='monospace')
     fontP.set_size('xx-small')
 
+    maximum = dict.fromkeys(settings['type'], 0)
+
     for item in data['dataset']:
-        # pprint.pprint(f"dataset: {len(data['dataset'])}")
         for rw in settings['filter']:
             if rw in item.keys():
                 if settings['enable_markers']:
@@ -80,6 +81,7 @@ def chart_2d_log_data(settings, dataset):
                 xvalues = item[rw]['xvalues']
                 yvalues = item[rw]['yvalues']
 
+                # Moving Average
                 if settings['moving_average']:
                     yvalues = supporting.running_mean(
                         yvalues, settings['moving_average'])
@@ -88,9 +90,12 @@ def chart_2d_log_data(settings, dataset):
                 dataplot = f"{item['type']}_plot"
                 axes[dataplot] = axes[item['type']].plot(xvalues, yvalues, marker=marker_value, markevery=(len(
                     yvalues) / (len(yvalues) * 10)), color=colors.pop(0), label=item[rw]['ylabel'])[0]
-
-                axes[item['type']].set_ylim([0, item[rw]['maximum']])
                 host.set_xlabel(item['xlabel'])
+
+                max_yvalues = max(yvalues)
+                if max_yvalues > maximum[item['type']]:
+                    maximum[item['type']] = max_yvalues
+                    axes[item['type']].set_ylim(0, max_yvalues)
 
                 # Label Axis
                 padding = axes[f"{item['type']}_pos"]
