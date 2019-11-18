@@ -88,7 +88,6 @@ def getMergeOperation(datatype):
 
 def mergeSingleDataSet(data, datatype):
     mergedSet = {'read': [], 'write': []}
-
     lookup = {'read': 0, 'write': 1}
 
     for rw in ['read', 'write']:
@@ -107,7 +106,6 @@ def mergeSingleDataSet(data, datatype):
             merged = [oper(x) for x in zip(*unmergedSet)]
             mergedSet[rw].append(merged)
         mergedSet[rw] = list(zip(*mergedSet[rw]))
-    # pprint.pprint(mergedSet)
     return mergedSet
 
 
