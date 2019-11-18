@@ -61,32 +61,6 @@ def scale_yaxis_latency(dataset, scale):
     return result
 
 
-# def get_colors():
-#    return [
-#        'tab:blue',
-#        'tab:orange',
-#        'tab:green',
-#        'tab:red',
-#        'tab:purple',
-#        'tab:brown',
-#        'tab:pink',
-#        'tab:olive',
-#        'tab:cyan',
-#        'darkgreen',
-#        'cornflowerblue',
-#        'red',
-#        'gold',
-#        'darkcyan',
-#        'darkviolet',
-#        'deepskyblue',
-#        'lawngreen',
-#        'xkcd:lime',
-#        'xkcd:salmon',
-#        'pale red',
-#        'ocre',
-#
-#    ]
-
 def get_colors():
     return [
         'tab:blue',
@@ -233,11 +207,12 @@ def process_dataset(settings, dataset):
 
                 scaled_xaxis = scale_xaxis_time(item[rw]['xvalues'])
                 item['xlabel'] = scaled_xaxis['format']
-                item['xvalues'] = scaled_xaxis['data']
+                item[rw]['xvalues'] = scaled_xaxis['data']
 
                 if 'lat' in item['type']:
                     scale_factors.append(
                         get_scale_factor(item[rw]['yvalues']))
+
         new_list.append(item)
 
     """
@@ -284,10 +259,10 @@ def process_dataset(settings, dataset):
                 BW and IOPS are directly related and BW should not be shown as it is
                 often not relevant anyway, but for readability, this is added.
                 """
-                if item['type'] == 'bw':
-                    item[rw]['maximum'] = max(item[rw]['yvalues']) * 1.2
-                else:
-                    item[rw]['maximum'] = max(item[rw]['yvalues']) * 1.3
+                # if item['type'] == 'bw':
+                #     item[rw]['maximum'] = max(item[rw]['yvalues']) * 1.2
+                # else:
+                #     item[rw]['maximum'] = max(item[rw]['yvalues']) * 1.3
 
         final_list.append(item)
 
