@@ -182,6 +182,16 @@ def generate_axes(ax, datatypes):
     return axes
 
 
+def round_metric(value):
+
+    if value > 1:
+        value = round(value, 2)
+        if value <= 1:
+            value = round(value, 3)
+        if value >= 20:
+            value = int(round(value, 0))
+
+
 def process_dataset(settings, dataset):
 
     datatypes = []
@@ -259,14 +269,9 @@ def process_dataset(settings, dataset):
                 BW and IOPS are directly related and BW should not be shown as it is
                 often not relevant anyway, but for readability, this is added.
                 """
-                # if item['type'] == 'bw':
-                #     item[rw]['maximum'] = max(item[rw]['yvalues']) * 1.2
-                # else:
-                #     item[rw]['maximum'] = max(item[rw]['yvalues']) * 1.3
 
         final_list.append(item)
 
     new_structure['datatypes'] = list(set(datatypes))
     new_structure['dataset'] = final_list
-    # pprint.pprint(new_structure)
     return new_structure
