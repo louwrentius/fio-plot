@@ -30,7 +30,7 @@ def get_record_set(dataset, dataset_types, rw, numjobs):
 
     for depth in dataset_types['iodepth']:
         for record in dataset:
-            if (int(record['iodepth']) == int(depth)) and (int(record['numjobs']) == int(numjobs)) and record['rw'] == rw:
+            if (int(record['iodepth']) == int(depth)) and int(record['numjobs']) == int(numjobs[0]) and record['rw'] == rw:
                 iops_series_raw.append(record['iops'])
                 lat_series_raw.append(record['lat'])
                 iops_stddev_series_raw.append(record['iops_stddev'])
@@ -88,11 +88,19 @@ def autolabel(rects, axis):
     for rect in rects:
         height = rect.get_height()
         if height < 10:
-            formatter = '%.4f'
+            formatter = '%.2f'
         else:
             formatter = '%d'
+        value = rect.get_x()
+
+        if height >= 10000:
+            value = int(round(height / 1000, 0))
+            formatter = '%dK'
+        else:
+            value = height
+
         axis.text(rect.get_x() + rect.get_width() / 2,
-                  1.015 * height, formatter % height, ha='center',
+                  1.015 * height, formatter % value, ha='center',
                   fontsize=8)
 
 
@@ -102,7 +110,7 @@ def create_stddev_table(data, ax2):
 
     cols = len(data['x_axis'])
     table = ax2.table(cellText=table_vals,  loc='center right', rowLabels=[
-        'IO queue depth', r'$IOP/s\ \sigma\ \%$', r'$Latency\ \sigma\ \%$'],
+        'IO queue depth', f'IOP/s \u03C3 %', f'Latency \u03C3 %'],
         colLoc='center right',
         cellLoc='center right', colWidths=[0.05] * cols,
         rasterized=False)
@@ -171,7 +179,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     #
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     title = settings['title'].replace(" ", '_')
-    plt.tight_layout(rect=[0, 0.00, 0.95, 0.95])
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig(f"{title}_{now}.png", dpi=settings['dpi'])
 
 
