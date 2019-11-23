@@ -7,6 +7,7 @@ from matplotlib import cm
 from mpl_toolkits.mplot3d import axes3d
 from datetime import datetime
 import matplotlib as mpl
+import fiolib.supporting as supporting
 
 
 def plot_3d(settings, dataset):
@@ -29,7 +30,28 @@ def plot_3d(settings, dataset):
     lx = len(dataset_types['iodepth'])
     ly = len(dataset_types['numjobs'])
 
-    n = np.array(data['values'], dtype=float)
+    # Ton of code to scale latency
+    if metric == 'lat':
+        scale_factors = []
+        for row in data['values']:
+            scale_factor = supporting.get_scale_factor(row)
+            scale_factors.append(scale_factor)
+        largest_scale_factor = supporting.get_largest_scale_factor(
+            scale_factors)
+        pprint.pprint(largest_scale_factor)
+
+        scaled_values = []
+        for row in data['values']:
+            result = supporting.scale_yaxis_latency(
+                row, largest_scale_factor)
+            scaled_values.append(result['data'])
+        z_axis_label = largest_scale_factor['label']
+    else:
+        scaled_values = data['values']
+        z_axis_label = metric
+
+    # np.set_printoptions(suppress=True)
+    n = np.array(scaled_values, dtype=float)
 
     size = lx * 0.05  # thickness of the bar
     xpos_orig = np.arange(0, lx, 1)
@@ -43,22 +65,26 @@ def plot_3d(settings, dataset):
     ypos_f = ypos.flatten()
     zpos = np.zeros(lx*ly)
 
+    # Positioning and sizing of the bars
     dx = size * np.ones_like(zpos)
     dy = dx.copy()
     dz = n.flatten()
     values = dz / (dz.max()/1)
+
+    # Create the 3D chart with positioning and colors
     cmap = plt.get_cmap('rainbow', xpos.ravel().shape[0])
     colors = cm.rainbow(values)
-
     ax1.bar3d(xpos_f, ypos_f, zpos, dx, dy, dz, color=colors)
+
+    # Create the color bar to the right
     norm = mpl.colors.Normalize(vmin=0, vmax=dz.max())
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     res = fig.colorbar(sm, fraction=0.046, pad=0.04)
-    res.ax.set_title(metric)
+    res.ax.set_title(z_axis_label)
 
+    # Set tics for x/y axis
     float_x = [float(x) for x in (xpos_orig)]
-    # unused? float_y = [float(y) for y in (ypos_orig)]
 
     ax1.w_xaxis.set_ticks(float_x)
     ax1.w_yaxis.set_ticks(ypos_orig)
@@ -66,16 +92,11 @@ def plot_3d(settings, dataset):
     ax1.w_xaxis.set_ticklabels(iodepth)
     ax1.w_yaxis.set_ticklabels(numjobs)
 
-    # ax1.set_zlim3d(0,int(settings['zmax']))
-
-    # zticks = np.arange(dz.min(), dz.max(), ((dz.max()/10)%1000))
-    # ax1.w_zaxis.set_ticks(zticks)
-
     # axis labels
-    fontsize = 14
+    fontsize = 16
     ax1.set_xlabel('iodepth', fontsize=fontsize)
     ax1.set_ylabel('numjobs', fontsize=fontsize)
-    ax1.set_zlabel(metric,  fontsize=fontsize)
+    ax1.set_zlabel(z_axis_label,  fontsize=fontsize)
 
     ax1.xaxis.labelpad = 10
     ax1.zaxis.labelpad = 20
