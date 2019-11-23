@@ -560,7 +560,7 @@ def set_arguments():
             maximum numjobs to graph in 3d graph", nargs='?', default=64, type=int)
     ag.add_argument("-n", "--numjobs", nargs='+', help="\
             specifies for which numjob parameter you want the 2d graphs to be\
-                 generated", default=1, type=int)
+                 generated", default=[1], type=int)
     ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw'],
                     help="read/write mode randread/randwrite")
     ag.add_argument("-m", "--max", default=None, type=int,
