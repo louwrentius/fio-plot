@@ -119,6 +119,12 @@ def chart_2d_log_data(settings, dataset):
     #
     # Save graph to file (png)
     #
+    if settings['source']:
+        axis = list(axes.keys())[0]
+        ax = axes[axis]
+        plt.text(1, -0.08, str(settings['source']), ha='right', va='top',
+                 transform=ax.transAxes, fontsize=9)
+
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     title = settings['title'].replace(" ", '_')
     plt.tight_layout(rect=[0, 0.00, 0.95, 0.95])
