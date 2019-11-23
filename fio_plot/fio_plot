@@ -17,6 +17,8 @@ from datetime import datetime
 from collections import defaultdict
 import fiolib.dataimport as logdata
 import fiolib.graph2d as graph
+import fiolib.bar2d as bar2d
+import fiolib.jsonimport as jsonimport
 
 
 class Chart(object):
@@ -608,22 +610,21 @@ def main():
     #    b.chart_3d_iops_numjobs('randread','lat')
     #    b.chart_3d_iops_numjobs('randwrite','lat')
 
-    # if settings['latency_iops_2d']:
-    #    config = b.chart_iops_latency('randread')
-    #    c = IOL_Chart(config['stats'], config)
-    #    c.plot_io_and_latency(config['mode'],config['settings']['numjobs'])
-    #    config = b.chart_iops_latency('randwrite')
-    #    c = IOL_Chart(config['stats'], config)
-    #    c.plot_io_and_latency(config['mode'],config['settings']['numjobs'])
+    if settings['latency_iops_2d']:
+        list_of_json_files = jsonimport.list_json_files(settings)
+        dataset = jsonimport.import_json_dataset(list_of_json_files)
+        parsed_data = jsonimport.get_flat_json_mapping(dataset)
+        # pprint.pprint(parsed_data)
+        bar2d.chart_2dbarchart_jsonlogdata(settings, parsed_data)
 
-    # if settings['histogram']:
-    #    b.chart_latency_histogram('randread')
-    #    b.chart_latency_histogram('randwrite')
+        # if settings['histogram']:
+        #    b.chart_latency_histogram('randread')
+        #    b.chart_latency_histogram('randwrite')
 
-    # if not settings['histogram'] and not settings['latency_iops_2d'] and not settings['latency_iops_3d']:
-    #    parser.print_help()
-    #    print("Specify -L -l, -H or all of them")
-    #    exit(1)
+        # if not settings['histogram'] and not settings['latency_iops_2d'] and not settings['latency_iops_3d']:
+        #    parser.print_help()
+        #    print("Specify -L -l, -H or all of them")
+        #    exit(1)
 
 
 if __name__ == "__main__":

@@ -186,10 +186,26 @@ def round_metric(value):
 
     if value > 1:
         value = round(value, 2)
-        if value <= 1:
-            value = round(value, 3)
-        if value >= 20:
-            value = int(round(value, 0))
+    if value <= 1:
+        value = round(value, 3)
+    if value >= 20:
+        value = int(round(value, 0))
+    return value
+
+
+def round_metric_series(dataset):
+    data = [round_metric(x) for x in dataset]
+    return data
+
+
+def raw_stddev_to_percent(values, stddev_series):
+    result = []
+    for x, y in zip(values, stddev_series):
+        pprint.pprint(f"{x} - {y}")
+        percent = round((int(y) / int(x)) * 100, 0)
+        result.append(percent)
+    pprint.pprint(result)
+    return result
 
 
 def process_dataset(settings, dataset):
@@ -275,3 +291,29 @@ def process_dataset(settings, dataset):
     new_structure['datatypes'] = list(set(datatypes))
     new_structure['dataset'] = final_list
     return new_structure
+
+
+def create_title_and_sub(settings, plt):
+    #
+    # Offset title/subtitle if there is a 3rd y-axis
+    #
+    number_of_types = len(settings['type'])
+    if number_of_types <= 2:
+        x_offset = 0.5
+    else:
+        x_offset = 0.425
+    #
+    # plt.subtitle sets title and plt.title sets subtitle ....
+    #
+    plt.suptitle(settings['title'])
+
+    if settings['subtitle']:
+        subtitle = settings['subtitle']
+    else:
+        iodepth = str(settings['iodepth']).strip('[]')
+        numjobs = str(settings['numjobs']).strip('[]')
+        datatype = str(settings['type']).strip('[]').replace('\'', '')
+        subtitle = f"| {settings['rw']} | iodepth {iodepth} | numjobs {numjobs} | {datatype}"
+
+    plt.title(subtitle, fontsize=8,
+              horizontalalignment='center', x=x_offset, y=1.02)
