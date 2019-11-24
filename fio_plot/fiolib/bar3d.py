@@ -8,12 +8,13 @@ from mpl_toolkits.mplot3d import axes3d
 from datetime import datetime
 import matplotlib as mpl
 import fiolib.supporting as supporting
+from matplotlib.pyplot import gca
+from matplotlib.font_manager import FontProperties
 
 
 def plot_3d(settings, dataset):
 
     dataset_types = shared.get_dataset_types(dataset)
-    # pprint.pprint(dataset_types)
     metric = settings['type'][0]
     rw = settings['rw']
     iodepth = dataset_types['iodepth']
@@ -88,7 +89,6 @@ def plot_3d(settings, dataset):
 
     ax1.w_xaxis.set_ticks(float_x)
     ax1.w_yaxis.set_ticks(ypos_orig)
-
     ax1.w_xaxis.set_ticklabels(iodepth)
     ax1.w_yaxis.set_ticklabels(numjobs)
 
@@ -98,9 +98,21 @@ def plot_3d(settings, dataset):
     ax1.set_ylabel('numjobs', fontsize=fontsize)
     ax1.set_zlabel(z_axis_label,  fontsize=fontsize)
 
-    ax1.xaxis.labelpad = 10
-    ax1.zaxis.labelpad = 20
+    [t.set_verticalalignment('center_baseline') for t in ax1.get_yticklabels()]
+    [t.set_verticalalignment('center_baseline') for t in ax1.get_xticklabels()]
+
+    ax1.zaxis.labelpad = 25
+
+    tick_label_font_size = 12
+    for t in ax1.xaxis.get_major_ticks():
+        t.label.set_fontsize(tick_label_font_size)
+
+    for t in ax1.yaxis.get_major_ticks():
+        t.label.set_fontsize(tick_label_font_size)
+
     ax1.zaxis.set_tick_params(pad=10)
+    for t in ax1.zaxis.get_major_ticks():
+        t.label.set_fontsize(tick_label_font_size)
 
     # title
     mode = rw
