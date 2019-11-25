@@ -7,19 +7,14 @@
 # Requires matplotib and numpy.
 #
 import sys
-import matplotlib.pyplot as plt
-from matplotlib import cm
-import matplotlib as mpl
-import numpy as np
 import argparse
 import pprint
-from collections import defaultdict
 import fiolib.dataimport as logdata
 import fiolib.graph2d as graph
 import fiolib.jsonimport as jsonimport
 import fiolib.bar2d as bar2d
 import fiolib.bar3d as bar3d
-import fiolib.barhistogram as hisogram
+import fiolib.barhistogram as histogram
 
 
 def set_arguments():
@@ -105,25 +100,22 @@ def main():
         parsed_data = jsonimport.get_flat_json_mapping(dataset)
         bar3d.plot_3d(settings, parsed_data)
 
-    #    b.chart_3d_iops_numjobs('randread','iops')
-    #    b.chart_3d_iops_numjobs('randwrite','iops')
-    #    b.chart_3d_iops_numjobs('randread','lat')
-    #    b.chart_3d_iops_numjobs('randwrite','lat')
-
     if settings['latency_iops_2d']:
         list_of_json_files = jsonimport.list_json_files(settings)
         dataset = jsonimport.import_json_dataset(list_of_json_files)
         parsed_data = jsonimport.get_flat_json_mapping(dataset)
         bar2d.chart_2dbarchart_jsonlogdata(settings, parsed_data)
 
-        # if settings['histogram']:
-        #    b.chart_latency_histogram('randread')
-        #    b.chart_latency_histogram('randwrite')
+    if settings['histogram']:
+        list_of_json_files = jsonimport.list_json_files(settings)
+        dataset = jsonimport.import_json_dataset(list_of_json_files)
+        parsed_data = jsonimport.get_flat_json_mapping(dataset)
+        histogram.chart_latency_histogram(settings, parsed_data)
 
-        # if not settings['histogram'] and not settings['latency_iops_2d'] and not settings['latency_iops_3d']:
-        #    parser.print_help()
-        #    print("Specify -L -l, -H or all of them")
-        #    exit(1)
+    if not settings['histogram'] and not settings['latency_iops_2d'] and not settings['latency_iops_3d']:
+        parser.print_help()
+        print("Specify -L -l, -H or all of them")
+        exit(1)
 
 
 if __name__ == "__main__":
