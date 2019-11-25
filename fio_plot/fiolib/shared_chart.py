@@ -11,8 +11,20 @@ def get_dataset_types(dataset):
         for y in dataset:
             dataset_types[x].add(operation[x](y[x]))
         dataset_types[x] = sorted(dataset_types[x])
-
     return dataset_types
+
+
+def get_record_set_histogram(settings, dataset):
+    rw = settings['rw']
+    iodepth = int(settings['iodepth'][0])
+    numjobs = int(settings['numjobs'][0])
+
+    record_set = {'iodepth': iodepth, 'numjobs': numjobs, 'data': None}
+
+    for record in dataset:
+        if (int(record['iodepth']) == iodepth) and (int(record['numjobs']) == numjobs) and record['rw'] == rw:
+            record_set['data'] = record
+            return record_set
 
 
 def get_record_set_3d(dataset, dataset_types, rw, metric):
