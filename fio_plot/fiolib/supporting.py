@@ -201,10 +201,10 @@ def round_metric_series(dataset):
 def raw_stddev_to_percent(values, stddev_series):
     result = []
     for x, y in zip(values, stddev_series):
-        pprint.pprint(f"{x} - {y}")
+        # pprint.pprint(f"{x} - {y}")
         percent = round((int(y) / int(x)) * 100, 0)
         result.append(percent)
-    pprint.pprint(result)
+    # pprint.pprint(result)
     return result
 
 
@@ -280,11 +280,6 @@ def process_dataset(settings, dataset):
                 item[rw]['mean'] = mean
                 item[rw]['stdv'] = stdv
                 item[rw]['percentile'] = percentile
-                """
-                This is soft of a hack to prevent IOPs and BW to be on top of each other
-                BW and IOPS are directly related and BW should not be shown as it is
-                often not relevant anyway, but for readability, this is added.
-                """
 
         final_list.append(item)
 

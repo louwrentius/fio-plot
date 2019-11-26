@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pprint
 import fiolib.shared_chart as shared
 import fiolib.supporting as supporting
-import fiolib.shared_chart as shared
 from datetime import datetime
 
 
