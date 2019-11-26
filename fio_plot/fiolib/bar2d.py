@@ -12,7 +12,6 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     dataset_types = shared.get_dataset_types(dataset)
     data = shared.get_record_set(dataset, dataset_types,
                                  settings['rw'], settings['numjobs'])
-    pprint.pprint(data)
 
     fig, (ax1, ax2) = plt.subplots(
         nrows=2, gridspec_kw={'height_ratios': [7, 1]})
@@ -25,7 +24,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
 
     ax2.axis('off')
     #
-    #
+    # Creating the bars and chart
     x_pos = np.arange(0, len(data['x_axis']) * 2, 2)
     width = 0.9
 
@@ -33,7 +32,6 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
 
     rects1 = ax1.bar(x_pos, data['y1_axis']['data'], width,
                      color='#a8ed63')
-    # rects2 = ax3.bar(x_pos + width, data['y_data2'], width,
     rects2 = ax3.bar(x_pos + width, n, width,
                      color='#34bafa')
 
@@ -51,7 +49,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     settings['iodepth'] = dataset_types['iodepth']
     supporting.create_title_and_sub(settings, plt)
     #
-    #
+    # Labeling the top of the bars with their value
     shared.autolabel(rects1, ax1)
     shared.autolabel(rects2, ax3)
     #
