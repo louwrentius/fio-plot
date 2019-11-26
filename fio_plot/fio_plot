@@ -19,43 +19,43 @@ import fiolib.barhistogram as histogram
 
 def set_arguments():
 
-    parser = argparse.ArgumentParser(description="Convert FIO JSON output \
-            to charts")
+    parser = argparse.ArgumentParser(
+        description="Generates charts/graphs from FIO JSON output or logdata.")
     ag = parser.add_argument_group(title="Generic Settings")
     ag.add_argument("-i", "--input-directory", help="input directory where\
-            JSON files can be found")
+            JSON files can be found.")
     ag.add_argument("-T", "--title", help="specifies title to use in charts")
     ag.add_argument("-s", "--source", help="Author")
     ag.add_argument("-L", "--iodepth-numjobs-3d", action='store_true', help="\
-            Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis")
+            Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.")
     ag.add_argument("-l", "--latency-iops-2d", action='store_true', help="\
-            Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value")
+            Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value.")
     ag.add_argument("-H", "--histogram", action='store_true', help="\
             Generates a latency histogram for a particular queue depth and numjobs value.")
     ag.add_argument("--disable-grid", action='store_true', help="\
-            Disables the dotted grid in the output graph")
+            Disables the dotted grid in the output graph.")
     ag.add_argument("--enable-markers", action='store_true', help="\
-            Enable markers for the plot lines")
+            Enable markers for the plot lines.")
     ag.add_argument("--subtitle", help="\
-            Specify your own subtitle or leave it blank with double quotes", type=str, default=None)
-    ag.add_argument("-d", "--iodepth", type=int, nargs='+', default=1, help="\
-            The I/O queue depth to graph")
+            Specify your own subtitle or leave it blank with double quotes.", type=str, default=None)
+    ag.add_argument("-d", "--iodepth", type=int, nargs='+', default=[1], help="\
+            The I/O queue depth to graph.")
     ag.add_argument("-M", "--maxdepth", nargs='?', default=64, type=int, help="\
-            Maximum queue depth to graph in 3D graph")
+            Maximum queue depth to graph in 3D graph.")
     ag.add_argument("-D", "--dpi", help="\
             The chart will be saved with this DPI setting. Higher means larger image.", nargs='?', default=200, type=int)
     ag.add_argument("-p", "--percentile", help="\
-            Calculate the percentile, default 99.99th", nargs='?', default=99.99, type=float)
+            Calculate the percentile, default 99.99th.", nargs='?', default=99.99, type=float)
     ag.add_argument("-J", "--maxjobs", help="\
-            Maximum number of jobs to graph in 3D graph", nargs='?', default=64, type=int)
+            Maximum number of jobs to graph in 3D graph.", nargs='?', default=64, type=int)
     ag.add_argument("-n", "--numjobs", nargs='+', help="\
             Specifies for which numjob parameter you want the 2d graphs to be\
                  generated. You can specify multiple values separated by spaces.", default=[1], type=int)
     ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw'],
-                    help="Specifies the kind of data you want to graph (read/write/randread/randwrite/randrw)")
+                    help="Specifies the kind of data you want to graph.")
     ag.add_argument("-m", "--max", default=None, type=int,
-                    help="Optional maximum value for Z-axis in 3D graph")
-    ag.add_argument("-y", "--max-y", help="Optional maximum value for y-axis")
+                    help="Optional maximum value for Z-axis in 3D graph.")
+    ag.add_argument("-y", "--max-y", help="Optional maximum value for y-axis.")
     ag.add_argument("-g", "--loggraph", action='store_true',
                     help="This option generates a 2D graph of the log data recorded by FIO.")
     ag.add_argument("-e", "--moving-average", default=None, type=int,
@@ -63,10 +63,10 @@ def set_arguments():
                          the argument is the size of the moving window\
                               (default is None to disable). Be carefull as this setting may smooth out issues you may want to be aware of.")
     ag.add_argument("-t", "--type", nargs='+', help="\
-            This setting specifies which kind of metric you want to graph. Should be one or more of: iops,bw,lat,clat,slat", type=str,
+            This setting specifies which kind of metric you want to graph.", type=str,
                     choices=['bw', 'iops', 'lat', 'slat', 'clat'])
     ag.add_argument("-f", "--filter", nargs='+', help="\
-            filter should be read/write", type=str, default=('read', 'write'),
+            filter should be read/write.", type=str, default=('read', 'write'),
                     choices=['read', 'write'])
 
     return parser
@@ -74,6 +74,8 @@ def set_arguments():
 
 def main():
     settings = {}
+    uses_json_files = {'iodepth_numjobs_3d': bar3d.plot_3d, 'latency_iops_2d':
+                       bar2d.chart_2dbarchart_jsonlogdata, 'histogram': histogram.chart_latency_histogram}
     parser = set_arguments()
     try:
         args = parser.parse_args()
@@ -87,6 +89,7 @@ def main():
 
     settings = vars(args)
 
+    option_found = False
     if settings['loggraph']:
         benchmarkfiles = logdata.list_fio_log_files(
             settings['input_directory'])
@@ -94,32 +97,22 @@ def main():
         rawdata = logdata.readLogDataFromFiles(settings, logfiles)
         merged = logdata.mergeDataSet(settings, rawdata)
         graph.chart_2d_log_data(settings, merged)
-        exit(0)
+        option_found = True
 
-    if settings['iodepth_numjobs_3d']:
-        list_of_json_files = jsonimport.list_json_files(settings)
-        dataset = jsonimport.import_json_dataset(list_of_json_files)
-        parsed_data = jsonimport.get_flat_json_mapping(dataset)
-        bar3d.plot_3d(settings, parsed_data)
-        exit(0)
+    for item in uses_json_files.keys():
+        if settings[item]:
+            list_of_json_files = jsonimport.list_json_files(settings)
+            dataset = jsonimport.import_json_dataset(list_of_json_files)
+            parsed_data = jsonimport.get_flat_json_mapping(dataset)
+            uses_json_files[item](settings, parsed_data)
+            option_found = True
 
-    if settings['latency_iops_2d']:
-        list_of_json_files = jsonimport.list_json_files(settings)
-        dataset = jsonimport.import_json_dataset(list_of_json_files)
-        parsed_data = jsonimport.get_flat_json_mapping(dataset)
-        bar2d.chart_2dbarchart_jsonlogdata(settings, parsed_data)
-        exit(0)
-
-    if settings['histogram']:
-        list_of_json_files = jsonimport.list_json_files(settings)
-        dataset = jsonimport.import_json_dataset(list_of_json_files)
-        parsed_data = jsonimport.get_flat_json_mapping(dataset)
-        histogram.chart_latency_histogram(settings, parsed_data)
-
-    if not settings['histogram'] and not settings['latency_iops_2d'] and not settings['iodepth_numjobs_3d']:
+    if not option_found:
         parser.print_help()
-        print("Specify -L -l, -H or all of them")
+        print("Specify -g, -l, -L or -H")
         exit(1)
+    else:
+        exit(0)
 
 
 if __name__ == "__main__":
