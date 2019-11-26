@@ -22,7 +22,7 @@ def plot_3d(settings, dataset):
     data = shared.get_record_set_3d(dataset, dataset_types,
                                     rw, metric)
 
-    pprint.pprint(data)
+    # pprint.pprint(data)
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111, projection='3d')
@@ -39,7 +39,7 @@ def plot_3d(settings, dataset):
             scale_factors.append(scale_factor)
         largest_scale_factor = supporting.get_largest_scale_factor(
             scale_factors)
-        pprint.pprint(largest_scale_factor)
+        # pprint.pprint(largest_scale_factor)
 
         scaled_values = []
         for row in data['values']:
@@ -51,7 +51,6 @@ def plot_3d(settings, dataset):
         scaled_values = data['values']
         z_axis_label = metric
 
-    # np.set_printoptions(suppress=True)
     n = np.array(scaled_values, dtype=float)
 
     size = lx * 0.05  # thickness of the bar
