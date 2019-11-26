@@ -47,10 +47,6 @@ def autolabel(rects, axis):
 
 
 def chart_latency_histogram(settings, dataset):
-    iodepth = settings['iodepth']
-    numjobs = settings['numjobs']
-    depth = iodepth
-    mode = settings['rw']
     record_set = shared.get_record_set_histogram(settings, dataset)
 
     # We have to sort the data / axis from low to high
@@ -102,7 +98,7 @@ def chart_latency_histogram(settings, dataset):
 
     # Configure the title
     settings['type'] = ""
-    supporting.create_title_and_sub(settings, plt)
+    supporting.create_title_and_sub(settings, plt, ['type', 'filter'])
     # Configure legend
     ax1.legend((rects1[0], rects2[0], rects3[0]), (label_ms, label_us, label_ns), frameon=False,
                loc='best')

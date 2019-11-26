@@ -5,6 +5,9 @@ import numpy as np
 
 
 def running_mean(l, N):
+    """From a list of values (N), calculate the running mean with a
+    window of (l) items. How larger the value l is, the more smooth the graph.
+    """
     sum = 0
     result = list(0 for x in l)
 
@@ -20,6 +23,9 @@ def running_mean(l, N):
 
 
 def scale_xaxis_time(dataset):
+    """FIO records log data time stamps in microseconds. To prevent huge numbers
+    on the x-axis, the values are scaled to seconds, minutes or hours basedon the
+    mean value of all data."""
     result = {'format': 'Time (ms)', 'data': dataset}
     mean = statistics.mean(dataset)
 
@@ -36,6 +42,10 @@ def scale_xaxis_time(dataset):
 
 
 def get_scale_factor(dataset):
+    """The mean of the dataset is calculated. The size of the mean will determine
+    which scale factor should be used on the data. The data is not scaled, only
+    the scale factor and the y-axis label is returned in a dictionary.
+    """
     mean = statistics.mean(dataset)
     scale_factors = [{'scale': 1000000, 'label': 'Latency (ms)'},
                      {'scale': 1000, 'label': 'Latency (\u03BCs)'},
@@ -48,6 +58,9 @@ def get_scale_factor(dataset):
 
 
 def get_largest_scale_factor(scale_factors):
+    """Based on multiple dataset, it is determined what the highest scale factor
+    is. This assures that the values on the y-axis don't become too large.
+    """
     scalefactor = scale_factors[0]
     scalefactor = [x for x in scale_factors if x['scale']
                    >= scalefactor['scale']]
@@ -55,6 +68,8 @@ def get_largest_scale_factor(scale_factors):
 
 
 def scale_yaxis_latency(dataset, scale):
+    """The dataset supplied is scaled with the supplied scale. The scaled
+    dataset is returned."""
     result = {}
     result['data'] = [x / scale['scale'] for x in dataset]
     result['format'] = scale['label']
@@ -62,6 +77,8 @@ def scale_yaxis_latency(dataset, scale):
 
 
 def get_colors():
+    """ This is a fixed list of colors that are used to color the different
+    lines in a graph."""
     return [
         'tab:blue',
         'tab:orange',
@@ -288,27 +305,41 @@ def process_dataset(settings, dataset):
     return new_structure
 
 
-def create_title_and_sub(settings, plt):
+def create_title_and_sub(settings, plt, skip_keys=[], sub_x_offset=0, sub_y_offset=0):
     #
     # Offset title/subtitle if there is a 3rd y-axis
     #
     number_of_types = len(settings['type'])
+    y_offset = 1.02
     if number_of_types <= 2:
         x_offset = 0.5
     else:
         x_offset = 0.425
+
+    if sub_x_offset > 0:
+        x_offset = sub_x_offset
+    if sub_y_offset > 0:
+        y_offset = sub_y_offset
+
     #
     # plt.subtitle sets title and plt.title sets subtitle ....
     #
     plt.suptitle(settings['title'])
-
+    subtitle = None
+    sub_title_items = {'rw': settings['rw'],
+                       'iodepth': str(settings['iodepth']).strip('[]'),
+                       'numjobs': str(settings['numjobs']).strip('[]'),
+                       'type': str(settings['type']).strip('[]').replace('\'', ''),
+                       'filter': str(settings['filter']).strip('[]').replace('\'', '')}
     if settings['subtitle']:
         subtitle = settings['subtitle']
     else:
-        iodepth = str(settings['iodepth']).strip('[]')
-        numjobs = str(settings['numjobs']).strip('[]')
-        datatype = str(settings['type']).strip('[]').replace('\'', '')
-        subtitle = f"| {settings['rw']} | iodepth {iodepth} | numjobs {numjobs} | {datatype}"
+        temporary_string = "|"
+        for key in sub_title_items.keys():
+            if key not in skip_keys:
+                if len(settings[key]) > 0:
+                    temporary_string += f" {key} {sub_title_items[key]} |"
+        subtitle = temporary_string
 
     plt.title(subtitle, fontsize=8,
-              horizontalalignment='center', x=x_offset, y=1.02)
+              horizontalalignment='center', x=x_offset, y=y_offset)
