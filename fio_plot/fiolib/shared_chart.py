@@ -27,21 +27,36 @@ def get_record_set_histogram(settings, dataset):
             return record_set
 
 
-def get_record_set_3d(dataset, dataset_types, rw, metric):
+def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
     record_set = {'iodepth': dataset_types['iodepth'],
                   'numjobs': dataset_types['numjobs'], 'values': []}
     # pprint.pprint(dataset)
+    if settings['rw'] == 'randrw':
+        if len(settings['filter']) > 1 or not settings['filter']:
+            print(
+                "Since we are processing randrw data, you must specify a filter for either read or write data, not both.")
+            exit(1)
+
     for depth in dataset_types['iodepth']:
         row = []
         for jobs in dataset_types['numjobs']:
             for record in dataset:
-                if (int(record['iodepth']) == int(depth)) and int(record['numjobs']) == jobs and record['rw'] == rw:
+                if (int(record['iodepth']) == int(depth)) and int(record['numjobs']) == jobs and record['rw'] == rw and record['type'] in settings['filter']:
                     row.append(record[metric])
         record_set['values'].append(supporting.round_metric_series(row))
     return record_set
 
 
-def get_record_set(dataset, dataset_types, rw, numjobs):
+def get_record_set(settings, dataset, dataset_types, rw, numjobs):
+    """The supplied dataset, a list of flat dictionaries with data is filtered based
+    on the parameters as set by the command line. The filtered data is also scaled and rounded.
+    """
+    if settings['rw'] == 'randrw':
+        if len(settings['filter']) > 1 or not settings['filter']:
+            print(
+                "Since we are processing randrw data, you must specify a filter for either read or write data, not both.")
+            exit(1)
+
     record_set = {'x_axis': dataset_types['iodepth'], 'x_axis_format': 'Queue Depth', 'y1_axis': None,
                   'y2_axis': None, 'numjobs': numjobs}
 
@@ -52,7 +67,7 @@ def get_record_set(dataset, dataset_types, rw, numjobs):
 
     for depth in dataset_types['iodepth']:
         for record in dataset:
-            if (int(record['iodepth']) == int(depth)) and int(record['numjobs']) == int(numjobs[0]) and record['rw'] == rw:
+            if (int(record['iodepth']) == int(depth)) and int(record['numjobs']) == int(numjobs[0]) and record['rw'] == rw and record['type'] in settings['filter']:
                 iops_series_raw.append(record['iops'])
                 lat_series_raw.append(record['lat'])
                 iops_stddev_series_raw.append(record['iops_stddev'])

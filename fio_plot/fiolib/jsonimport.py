@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import pprint
 
 
 def list_json_files(settings):
@@ -42,7 +43,6 @@ def get_json_mapping(mode):
     root = ['jobs', 0]
     jobOptions = root + ['job options']
     data = root + [mode]
-
     dictionary = {
         'iodepth': (jobOptions + ['iodepth']),
         'numjobs': (jobOptions + ['numjobs']),
@@ -50,7 +50,6 @@ def get_json_mapping(mode):
         'iops': (data + ['iops']),
         'iops_stddev': (data + ['iops_stddev']),
         'lat_ns': (data + ['lat_ns', 'mean']),
-        # 'lat': (data + ['lat','mean']),
         'lat_stddev': (data + ['lat_ns', 'stddev']),
         'latency_ms': (root + ['latency_ms']),
         'latency_us': (root + ['latency_us']),
@@ -60,14 +59,22 @@ def get_json_mapping(mode):
     return dictionary
 
 
-def get_flat_json_mapping(dataset):
+def get_flat_json_mapping(settings, dataset):
+    """This function returns a list of simplified dictionaries based on the
+    data within the supplied json data."""
     stats = []
     for record in dataset:
-        # pprint.pprint(record)
-        mode = get_nested_value(
-            record, ('jobs', 0, 'job options', 'rw'))[4:]
+        if settings['rw'] == 'randrw':
+            if settings['filter'][0]:
+                mode = settings['filter'][0]
+            else:
+                print(
+                    "When processing randrw data, a -f filter (read/write) must also be specified.")
+                exit(1)
+        else:
+            mode = get_nested_value(
+                record, ('jobs', 0, 'job options', 'rw'))[4:]
         m = get_json_mapping(mode)
-        # pprint.pprint(m)
         row = {'iodepth': get_nested_value(record, m['iodepth']),
                'numjobs': get_nested_value(record, m['numjobs']),
                'rw': get_nested_value(record, m['rw']),
@@ -77,7 +84,8 @@ def get_flat_json_mapping(dataset):
                'lat_stddev': get_nested_value(record, m['lat_stddev']),
                'latency_ms': get_nested_value(record, m['latency_ms']),
                'latency_us': get_nested_value(record, m['latency_us']),
-               'latency_ns': get_nested_value(record, m['latency_ns'])}
+               'latency_ns': get_nested_value(record, m['latency_ns']),
+               'type': mode}
         stats.append(row)
     return stats
 

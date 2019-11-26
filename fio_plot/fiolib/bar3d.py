@@ -14,14 +14,17 @@ from matplotlib.font_manager import FontProperties
 
 def plot_3d(settings, dataset):
 
+    if not settings['type']:
+        print("The type of data (iops/lat) must be specified.")
+        exit(1)
+
     dataset_types = shared.get_dataset_types(dataset)
     metric = settings['type'][0]
     rw = settings['rw']
     iodepth = dataset_types['iodepth']
     numjobs = dataset_types['numjobs']
-    data = shared.get_record_set_3d(dataset, dataset_types,
+    data = shared.get_record_set_3d(settings, dataset, dataset_types,
                                     rw, metric)
-
     # pprint.pprint(data)
 
     fig = plt.figure()
@@ -114,9 +117,8 @@ def plot_3d(settings, dataset):
         t.label.set_fontsize(tick_label_font_size)
 
     # title
-    mode = rw
-    plt.suptitle(settings['title'] + " | " + mode + " | " +
-                 metric, fontsize=16, horizontalalignment='center')
+    supporting.create_title_and_sub(
+        settings, plt, skip_keys=['iodepth', 'numjobs'],  sub_x_offset=0.57, sub_y_offset=1.05)
 
     fig.text(0.75, 0.03, settings['source'])
 
