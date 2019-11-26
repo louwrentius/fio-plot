@@ -93,13 +93,17 @@ def chart_2d_log_data(settings, dataset):
                 #
                 # Assure axes are scaled correctly, starting from zero.
                 #
+                factor = 1.1
+                if item['type'] == 'bw':
+                    factor = 1.2
+
                 if settings['max']:
                     max_yvalue = settings['max']
                 else:
                     max_yvalue = max(yvalues)
                     if max_yvalue > maximum[item['type']]:
                         maximum[item['type']] = max_yvalue
-                axes[item['type']].set_ylim(0, maximum[item['type']] * 1.1)
+                axes[item['type']].set_ylim(0, maximum[item['type']] * factor)
                 #
                 # Label Axis
                 #
@@ -122,8 +126,8 @@ def chart_2d_log_data(settings, dataset):
     if settings['source']:
         axis = list(axes.keys())[0]
         ax = axes[axis]
-        plt.text(1, -0.08, str(settings['source']), ha='right', va='top',
-                 transform=ax.transAxes, fontsize=9)
+        plt.text(1, -0.10, str(settings['source']), ha='right', va='top',
+                 transform=ax.transAxes, fontsize=8, fontfamily='monospace')
 
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     title = settings['title'].replace(" ", '_')
