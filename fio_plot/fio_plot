@@ -104,8 +104,9 @@ def main():
         if settings[item]:
             list_of_json_files = jsonimport.list_json_files(settings)
             dataset = jsonimport.import_json_dataset(list_of_json_files)
-            parsed_data = jsonimport.get_flat_json_mapping(dataset)
+            parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
             # Which function to execute is specified in uses_json_files
+            # pprint.pprint(parsed_data)
             uses_json_files[item](settings, parsed_data)
             option_found = True
 

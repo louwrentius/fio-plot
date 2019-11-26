@@ -10,7 +10,7 @@ import fiolib.shared_chart as shared
 
 def chart_2dbarchart_jsonlogdata(settings, dataset):
     dataset_types = shared.get_dataset_types(dataset)
-    data = shared.get_record_set(dataset, dataset_types,
+    data = shared.get_record_set(settings, dataset, dataset_types,
                                  settings['rw'], settings['numjobs'])
 
     fig, (ax1, ax2) = plt.subplots(
