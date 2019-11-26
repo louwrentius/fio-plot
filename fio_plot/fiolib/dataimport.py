@@ -5,7 +5,7 @@ import pprint as pprint
 import statistics
 
 
-def listFioLogFiles(directory):
+def list_fio_log_files(directory):
     absolute_dir = os.path.abspath(directory)
     files = os.listdir(absolute_dir)
     fiologfiles = []
@@ -21,7 +21,7 @@ def listFioLogFiles(directory):
     return fiologfiles
 
 
-def returnFilenameFilterString(settings):
+def return_filename_filter_string(settings):
     searchstrings = []
 
     rw = settings['rw']
@@ -40,11 +40,11 @@ def returnFilenameFilterString(settings):
     return searchstrings
 
 
-def filterLogFiles(settings, fileList):
-    searchstrings = returnFilenameFilterString(settings)
+def filterLogFiles(settings, file_list):
+    searchstrings = return_filename_filter_string(settings)
     # pprint.pprint(searchstrings)
     result = []
-    for item in fileList:
+    for item in file_list:
         for searchstring in searchstrings:
             if searchstring['searchstring'] in item:
                 data = {'filename': item}
@@ -111,7 +111,7 @@ def mergeSingleDataSet(data, datatype):
 
 def mergeDataSet(settings, dataset):
     mergedSets = []
-    filterstrings = returnFilenameFilterString(settings)
+    filterstrings = return_filename_filter_string(settings)
     # pprint.pprint(dataset)
     for filterstring in filterstrings:
         record = {'type': filterstring['type'],
