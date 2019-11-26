@@ -75,7 +75,8 @@ def set_arguments():
 def main():
     settings = {}
     uses_json_files = {'iodepth_numjobs_3d': bar3d.plot_3d, 'latency_iops_2d':
-                       bar2d.chart_2dbarchart_jsonlogdata, 'histogram': histogram.chart_latency_histogram}
+                       bar2d.chart_2dbarchart_jsonlogdata,
+                       'histogram': histogram.chart_latency_histogram}
     parser = set_arguments()
     try:
         args = parser.parse_args()
@@ -104,6 +105,7 @@ def main():
             list_of_json_files = jsonimport.list_json_files(settings)
             dataset = jsonimport.import_json_dataset(list_of_json_files)
             parsed_data = jsonimport.get_flat_json_mapping(dataset)
+            # Which function to execute is specified in uses_json_files
             uses_json_files[item](settings, parsed_data)
             option_found = True
 
