@@ -10,11 +10,12 @@ def list_json_files(settings):
     json_files = []
     for item in files:
         if item.endswith(".json"):
-            json_files.append(os.path.join(absolute_dir, item))
+            if item.startswith(settings['rw']):
+                json_files.append(os.path.join(absolute_dir, item))
 
     if len(json_files) == 0:
         print(
-            "Could not find any JSON files in the specified directory " + str(absolute_dir))
+            "Could not find any (matching) JSON files in the specified directory " + str(absolute_dir))
         sys.exit(1)
 
     return json_files

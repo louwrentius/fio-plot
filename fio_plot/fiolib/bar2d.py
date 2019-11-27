@@ -47,7 +47,11 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     # Set title
     settings['type'] = ""
     settings['iodepth'] = dataset_types['iodepth']
-    supporting.create_title_and_sub(settings, plt)
+    if settings['rw'] == 'randrw':
+        supporting.create_title_and_sub(settings, plt, skip_keys=['iodepth'])
+    else:
+        supporting.create_title_and_sub(
+            settings, plt, skip_keys=['iodepth', 'filter'])
     #
     # Labeling the top of the bars with their value
     shared.autolabel(rects1, ax1)
