@@ -7,7 +7,9 @@ This kind of chart shows both IOPs and Latency for multiple queue depths.
 
 ### 3D chart
 A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs.
+
 ![3dbarchart][3dbarchart]
+
 [3dbarchart]: https://louwrentius.com/static/images/servermdadmraid5-3d.png
 
 ### line chart based on FIO log data
