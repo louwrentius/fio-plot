@@ -54,8 +54,7 @@ In this example, a benchmark is run against a device.
 [histogram]: 4
 
 ### A note about queue depths
-Many SSD vendors report really high IOPs performance numbers, beyond 100.000 IOPs for a single SSDs. Those numbers are always obtained with very high queue
-depths of 32 or higher. 
+Many SSD vendors report really high IOPs performance numbers, beyond 100.000 IOPs for a single SSD. Those numbers are always obtained using a queue depth of 32 or higher. 
 
 ![queuedepthlowhigh01][queuedepthlowhigh01]
 
