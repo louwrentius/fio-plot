@@ -1,0 +1,17 @@
+[iotest]
+rw=${RW}
+blocksize=${BLOCKSIZE}
+filename=${FILE}
+ioengine=libaio
+iodepth=${IODEPTH}
+direct=1
+invalidate=1
+refill_buffers=1
+runtime=${RUNTIME}
+numjobs=${NUMJOBS}
+group_reporting=1
+write_bw_log=${RW}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+write_lat_log=${RW}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+write_iops_log=${RW}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+log_avg_msec=250
+
