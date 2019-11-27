@@ -142,5 +142,17 @@ This is how I understand queue depths and the impact on performance.
 							filter should be read/write.
 
 
+### Example Usage
 
+Creating a 2D Bar Chart based on randread data and numjobs = 1.
+
+    ./fio_plot -i benchmark_data -T "Title" -s https://louwrentius.com -l -n 1 -r randread
+
+Creating a 3D graph. 
+
+    ./fio_plot -i benchmark_data -T "Title" -s https://louwrentius.com -L -r randread -t iops
+    
+Creating a latency histogram with a queue depth of 1 and numjobs is 1.
+
+    ./fio_plot -i benchmark_data -T "Test" -s https://louwrentius.com -H -r randread -d 1 -n 1
 
