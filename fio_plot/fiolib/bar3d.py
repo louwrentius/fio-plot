@@ -4,15 +4,16 @@ import matplotlib.pyplot as plt
 import pprint
 import fiolib.shared_chart as shared
 from matplotlib import cm
+# The module required for the 3D graph.
 from mpl_toolkits.mplot3d import axes3d
 from datetime import datetime
 import matplotlib as mpl
 import fiolib.supporting as supporting
-from matplotlib.pyplot import gca
-from matplotlib.font_manager import FontProperties
 
 
 def plot_3d(settings, dataset):
+    """This function is responsible for plotting the entire 3D plot.
+    """
 
     if not settings['type']:
         print("The type of data (iops/lat) must be specified.")
