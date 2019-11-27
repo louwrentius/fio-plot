@@ -2,13 +2,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pprint
-from matplotlib.font_manager import FontProperties
 import fiolib.supporting as supporting
 from datetime import datetime
 import fiolib.shared_chart as shared
 
 
 def chart_2dbarchart_jsonlogdata(settings, dataset):
+    """This function is responsible for drawing iops/latency bars for a
+    particular iodepth."""
     dataset_types = shared.get_dataset_types(dataset)
     data = shared.get_record_set(settings, dataset, dataset_types,
                                  settings['rw'], settings['numjobs'])

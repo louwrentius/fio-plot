@@ -18,8 +18,7 @@ import fiolib.barhistogram as histogram
 
 
 def set_arguments():
-    """Parses all commandline arguments. Based on argparse.
-    """
+    """Parses all commandline arguments. Based on argparse."""
     parser = argparse.ArgumentParser(
         description="Generates charts/graphs from FIO JSON output or logdata.")
     ag = parser.add_argument_group(title="Generic Settings")
