@@ -6,6 +6,8 @@ import statistics
 
 
 def list_fio_log_files(directory):
+    """Lists all .log files in a directory. Exits with an error if no files are found.
+    """
     absolute_dir = os.path.abspath(directory)
     files = os.listdir(absolute_dir)
     fiologfiles = []
@@ -22,6 +24,10 @@ def list_fio_log_files(directory):
 
 
 def return_filename_filter_string(settings):
+    """Returns a list of dicts with, a key/value for the search string.
+    This string is used to filter the log files based on the command line 
+    parameters.
+    """
     searchstrings = []
 
     rw = settings['rw']
@@ -41,6 +47,8 @@ def return_filename_filter_string(settings):
 
 
 def filterLogFiles(settings, file_list):
+    """Returns a list of log files that matches the supplied filter string(s).
+    """
     searchstrings = return_filename_filter_string(settings)
     # pprint.pprint(searchstrings)
     result = []
@@ -54,26 +62,15 @@ def filterLogFiles(settings, file_list):
     return result
 
 
-def getValueSetsFromData(settings, dataset):
-
-    result = {}
-    iodepth = []
-    numjobs = []
-    benchtype = []
-
-    for item in dataset:
-        iodepth.append(item['iodepth'])
-        numjobs.append(item['numjobs'])
-        benchtype.append(item['type'])
-
-    result = {'iodepth': list(set(iodepth)),
-              'numjobs': list(set(numjobs)),
-              'type': list(set(benchtype))}
-
-    return result
-
-
 def getMergeOperation(datatype):
+    """ FIO log files with a numjobs larger than 1 generates a separate file
+    for each job thread. So if numjobs is 8, there will be eight files.
+
+    We need to merge the data from all those job files into one result.
+    Depending on the type of data, we must sum or average the data.
+
+    This function returns the appropriate function/operation based on the type.
+    """
 
     operationMapping = {'iops': sum,
                         'lat': statistics.mean,
@@ -87,6 +84,10 @@ def getMergeOperation(datatype):
 
 
 def mergeSingleDataSet(data, datatype):
+    """In this function we merge all data for one particular set of files.
+    For examle, iodepth = 1 and numjobs = 8. The function returns one single
+    dataset containing the summed/averaged data.
+    """
     mergedSet = {'read': [], 'write': []}
     lookup = {'read': 0, 'write': 1}
 
@@ -110,6 +111,9 @@ def mergeSingleDataSet(data, datatype):
 
 
 def mergeDataSet(settings, dataset):
+    """We need to merge multiple datasets, for multiple iodepts and numjob
+    values. The return is a list of those merged datasets.
+    """
     mergedSets = []
     filterstrings = return_filename_filter_string(settings)
     # pprint.pprint(dataset)
@@ -127,6 +131,9 @@ def mergeDataSet(settings, dataset):
 
 
 def readLogData(inputfile):
+    """FIO log data is imported as CSV data. The scope is the import of a
+    single file.
+    """
     dataset = []
     if os.path.exists(inputfile):
         with open(inputfile) as csv_file:
@@ -141,6 +148,8 @@ def readLogData(inputfile):
 
 
 def readLogDataFromFiles(settings, inputfiles):
+    """Returns a list of imported datasets based on the input files.
+    """
     data = []
     for inputfile in inputfiles:
         logdata = readLogData(inputfile['filename'])
