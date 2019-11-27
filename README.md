@@ -1,9 +1,11 @@
 ### fio-plot
 Fio-plot generates charts from FIO benchmark data. It can process FIO output in JSON format. It can also process FIO log file output (in CSV format).
 
-### 2d chart 
+### 2D chart 
 This kind of chart shows both IOPs and Latency for multiple queue depths.
 ![barchart][queuedepthlowhigh01]
+
+*Please note that these benchmark numbers are not representative of the capabilities of the SSD as the RAID controller is the bottleneck.*
 
 ### 3D chart
 A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs.
@@ -11,6 +13,7 @@ A 3D bar chart that plots both queue depth an numjobs against either latency or 
 ![3dbarchart][3dbarchart]
 
 [3dbarchart]: https://louwrentius.com/static/images/servermdadmraid5-3d.png
+
 
 ### line chart based on FIO log data
 To create this graph, the FIO log data is parsed to show how the device / file
@@ -23,6 +26,8 @@ customize the graph to only show the information you're interested in.
 ### Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.
 ![histogram][histogram]
+
+[histogram]: https://louwrentius.com/static/images/histogram01.png
 
 ### Benchmark script
 Alongside fio-plot, a benchmark script is provided that automates the process of running multiple benchmarks with different parameters. For example, it allows
