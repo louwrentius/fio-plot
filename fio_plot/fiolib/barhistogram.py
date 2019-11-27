@@ -8,6 +8,10 @@ from datetime import datetime
 
 
 def sort_latency_keys(latency):
+    """The FIO latency data has latency buckets and those are sorted ascending.
+    The milisecond data has a >=2000 bucket which cannot be sorted in a 'normal'
+    way, so it is just stuck on top. This function resturns a list of sorted keys.
+    """
     placeholder = ""
     tmp = []
     for item in latency:
@@ -23,7 +27,8 @@ def sort_latency_keys(latency):
 
 
 def sort_latency_data(latency_dict):
-
+    """The sorted keys from the sort_latency_keys function are used to create
+    a sorted list of values, matching the order of the keys."""
     keys = latency_dict.keys()
     values = {'keys': None, 'values': []}
     sorted_keys = sort_latency_keys(keys)
@@ -34,6 +39,8 @@ def sort_latency_data(latency_dict):
 
 
 def autolabel(rects, axis):
+    """This function puts a value label on top of a 2d bar. If a bar is so small
+    it's barely visible, if at all, the label is omitted."""
     fontsize = 6
     for rect in rects:
         height = rect.get_height()
@@ -47,6 +54,8 @@ def autolabel(rects, axis):
 
 
 def chart_latency_histogram(settings, dataset):
+    """This function is responsible to draw the 2D latency histogram,
+    (a bar chart)."""
     record_set = shared.get_record_set_histogram(settings, dataset)
 
     # We have to sort the data / axis from low to high
