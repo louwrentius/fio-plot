@@ -18,7 +18,8 @@ import fiolib.barhistogram as histogram
 
 
 def set_arguments():
-
+    """Parses all commandline arguments. Based on argparse.
+    """
     parser = argparse.ArgumentParser(
         description="Generates charts/graphs from FIO JSON output or logdata.")
     ag = parser.add_argument_group(title="Generic Settings")
@@ -105,8 +106,7 @@ def main():
             list_of_json_files = jsonimport.list_json_files(settings)
             dataset = jsonimport.import_json_dataset(list_of_json_files)
             parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
-            # Which function to execute is specified in uses_json_files
-            # pprint.pprint(parsed_data)
+            # Which function to execute is specified in 'uses_json_files'
             uses_json_files[item](settings, parsed_data)
             option_found = True
 
