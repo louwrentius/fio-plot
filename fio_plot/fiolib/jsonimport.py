@@ -5,6 +5,7 @@ import pprint
 
 
 def list_json_files(settings):
+    """List all JSON files that maches the command line settings."""
     absolute_dir = os.path.abspath(settings['input_directory'])
     files = os.listdir(absolute_dir)
     json_files = []
@@ -22,12 +23,15 @@ def list_json_files(settings):
 
 
 def import_json_data(filename):
+    """Returns a dictionary of imported JSON data."""
     with open(filename) as json_data:
         d = json.load(json_data)
     return d
 
 
 def import_json_dataset(fileset):
+    """Returns a list of imported raw JSON data for every file in the fileset.
+    """
     d = []
     for f in fileset:
         d.append(import_json_data(f))
@@ -35,12 +39,18 @@ def import_json_dataset(fileset):
 
 
 def get_nested_value(dictionary, key):
+    """This function reads the data from the FIO JSON file based on the supplied
+    key (which is often a nested path within the JSON file).
+    """
     for item in key:
         dictionary = dictionary[item]
     return dictionary
 
 
 def get_json_mapping(mode):
+    """ This function contains a hard-coded mapping of FIO nested JSON data
+    to a flat dictionary.
+    """
     root = ['jobs', 0]
     jobOptions = root + ['job options']
     data = root + [mode]
@@ -89,11 +99,3 @@ def get_flat_json_mapping(settings, dataset):
                'type': mode}
         stats.append(row)
     return stats
-
-
-def filterStats(self, key, value):
-    l = []
-    for item in self.stats:
-        if item[key] == value:
-            l.append(item)
-    return l
