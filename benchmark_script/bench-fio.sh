@@ -2,8 +2,29 @@
 
 export BLOCKSIZE=4k 
 export RUNTIME=60
-export OUTPUT=/fio
-export FILE=$2
+export JOBFILE=$1
+export OUTPUT=$2
+export DIRECTORY=$3
+export FILE=$4
+export SIZE=$5
+
+if [ ! $(fio --version | grep -i fio-3) ]
+then
+	echo "Fio version 3+ required because fio-plot expects nanosecond precision"
+	exit 1
+fi
+
+if [ ! -e $JOBFILE ]
+then
+	echo "Fio job file $JOBFILE not found."
+	exit 1
+fi
+
+if [ ! -e $OUTPUT ]
+then
+	echo "Directory for output $OUTPUT not found."
+	exit 1
+fi
 
 for x in randread randwrite
 do
