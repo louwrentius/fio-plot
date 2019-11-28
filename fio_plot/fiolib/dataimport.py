@@ -59,7 +59,12 @@ def filterLogFiles(settings, file_list):
                 data.update(searchstring)
                 result.append(data)
     # pprint.pprint(result)
-    return result
+    if len(result) > 0:
+        return result
+    else:
+        print(
+            f"\nNo log files found that matches the specified parameter {settings['rw']}\n")
+        exit(1)
 
 
 def getMergeOperation(datatype):
