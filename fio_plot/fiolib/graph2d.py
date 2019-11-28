@@ -25,6 +25,7 @@ def chart_2d_log_data(settings, dataset):
     #
     fig, host = plt.subplots()
     fig.set_size_inches(9, 5)
+    plt.margins(0)
     #
     # Generates the axis for the graph with a maximum of 3 axis (per type of
     # iops,lat,bw)
