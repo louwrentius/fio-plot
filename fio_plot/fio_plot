@@ -23,19 +23,24 @@ def set_arguments():
         description="Generates charts/graphs from FIO JSON output or logdata.")
     ag = parser.add_argument_group(title="Generic Settings")
     ag.add_argument("-i", "--input-directory", help="input directory where\
-            JSON files can be found.")
+            JSON files or log data (CSV) can be found.", required=True)
     ag.add_argument("-T", "--title", help="specifies title to use in charts")
     ag.add_argument("-s", "--source", help="Author")
-    ag.add_argument("-L", "--iodepth-numjobs-3d", action='store_true', help="\
+
+    exclusive_group = ag.add_mutually_exclusive_group(required=True)
+    exclusive_group.add_argument("-L", "--iodepth-numjobs-3d", action='store_true', help="\
             Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.")
-    ag.add_argument("-l", "--latency-iops-2d", action='store_true', help="\
+    exclusive_group.add_argument("-l", "--latency-iops-2d", action='store_true', help="\
             Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value.")
-    ag.add_argument("-H", "--histogram", action='store_true', help="\
+    exclusive_group.add_argument("-H", "--histogram", action='store_true', help="\
             Generates a latency histogram for a particular queue depth and numjobs value.")
+    exclusive_group.add_argument("-g", "--loggraph", action='store_true',
+                                 help="This option generates a 2D graph of the log data recorded by FIO.")
+
     ag.add_argument("--disable-grid", action='store_true', help="\
             Disables the dotted grid in the output graph.")
     ag.add_argument("--enable-markers", action='store_true', help="\
-            Enable markers for the plot lines.")
+            Enable markers for the plot lines when graphing log data.")
     ag.add_argument("--subtitle", help="\
             Specify your own subtitle or leave it blank with double quotes.", type=str, default=None)
     ag.add_argument("-d", "--iodepth", type=int, nargs='+', default=[1], help="\
@@ -56,8 +61,6 @@ def set_arguments():
     ag.add_argument("-m", "--max", default=None, type=int,
                     help="Optional maximum value for Z-axis in 3D graph.")
     ag.add_argument("-y", "--max-y", help="Optional maximum value for y-axis.")
-    ag.add_argument("-g", "--loggraph", action='store_true',
-                    help="This option generates a 2D graph of the log data recorded by FIO.")
     ag.add_argument("-e", "--moving-average", default=None, type=int,
                     help="The moving average helps to smooth out graphs,\
                          the argument is the size of the moving window\
@@ -89,6 +92,11 @@ def main():
         sys.exit(1)
 
     settings = vars(args)
+
+    if settings['loggraph'] and not settings['type']:
+        print(
+            "\nIf -g is specified, you must specify the type of data with -t (see help)\n")
+        exit(1)
 
     option_found = False
     if settings['loggraph']:
