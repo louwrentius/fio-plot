@@ -16,7 +16,7 @@ def plot_3d(settings, dataset):
     """
 
     if not settings['type']:
-        print("The type of data (iops/lat) must be specified.")
+        print("The type of data must be specified with -t (iops/lat).")
         exit(1)
 
     dataset_types = shared.get_dataset_types(dataset)
