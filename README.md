@@ -73,6 +73,10 @@ In a virtualized environment, high queue depths and thus high IOPs numbers can b
 
 This is how I understand queue depths and the impact on performance.
 
+### Dependancies
+
+Fio-plot requires 'matplotlib' and 'numpy' to be installed.
+
 ### Usage
 
 	usage: fio_plot [-h] [-i INPUT_DIRECTORY] [-T TITLE] [-s SOURCE] [-L] [-l]
