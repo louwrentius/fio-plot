@@ -157,7 +157,7 @@ def get_colors():
 
 def lookupTable(metric):
 
-    lookup = {'iops': {'ylabel': 'IOP/s',
+    lookup = {'iops': {'ylabel': 'IOPS',
                        'label_pos': 0, 'label_rot': 'vertical'},
               'bw': {'ylabel': 'Througput (KB/s)',
                      'label_pos': -55, 'label_rot': 'vertical'},
