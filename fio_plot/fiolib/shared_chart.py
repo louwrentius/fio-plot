@@ -115,7 +115,7 @@ def get_record_set(settings, dataset, dataset_types, rw, numjobs):
     #
     #
     record_set['y1_axis'] = {'data': iops_series_rounded,
-                             'format': "IOP/s", 'stddev': iops_stdev_rounded_percent}
+                             'format': "IOPS", 'stddev': iops_stdev_rounded_percent}
     record_set['y2_axis'] = scaled_latency_data
 
     return record_set
