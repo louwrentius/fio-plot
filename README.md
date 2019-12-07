@@ -150,13 +150,13 @@ Fio-plot requires 'matplotlib' and 'numpy' to be installed.
 
 Creating a 2D Bar Chart based on randread data and numjobs = 1.
 
-    ./fio_plot -i benchmark_data -T "Title" -s https://louwrentius.com -l -n 1 -r randread
+    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -n 1 -r randread
 
 Creating a 3D graph. 
 
-    ./fio_plot -i benchmark_data -T "Title" -s https://louwrentius.com -L -r randread -t iops
+    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
     
 Creating a latency histogram with a queue depth of 1 and numjobs is 1.
 
-    ./fio_plot -i benchmark_data -T "Test" -s https://louwrentius.com -H -r randread -d 1 -n 1
+    ./fio_plot -i <benchmark_data_folder> -T "Test" -s https://louwrentius.com -H -r randread -d 1 -n 1
 
