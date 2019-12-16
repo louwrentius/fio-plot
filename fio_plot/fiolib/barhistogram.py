@@ -121,5 +121,6 @@ def chart_latency_histogram(settings, dataset):
 
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     title = settings['title'].replace(" ", '_')
+    title = title.replace("/", '-')
     plt.tight_layout(rect=[0, 0.00, 0.95, 0.95])
     fig.savefig(f"{title}_{now}.png", dpi=settings['dpi'])
