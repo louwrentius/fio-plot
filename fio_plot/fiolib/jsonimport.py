@@ -82,6 +82,8 @@ def get_flat_json_mapping(settings, dataset):
                 print(
                     "When processing randrw data, a -f filter (read/write) must also be specified.")
                 exit(1)
+        elif settings['rw'] == 'read' or settings['rw'] == 'write':
+            mode = settings['rw']
         else:
             mode = get_nested_value(
                 record, ('jobs', 0, 'job options', 'rw'))[4:]
