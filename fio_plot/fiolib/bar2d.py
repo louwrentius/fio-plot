@@ -69,6 +69,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     # Save graph to file
     #
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    title = settings['title'].replace(" ", '_')
+    title = settings['title'].replace(" ", '-')
+    title = title.replace("/", '-')
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig(f"{title}_{now}.png", dpi=settings['dpi'])
