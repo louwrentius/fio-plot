@@ -3,6 +3,7 @@ import sys
 import csv
 import pprint as pprint
 import statistics
+import fiolib.supporting as supporting
 
 
 def list_fio_log_files(directory):
@@ -25,7 +26,7 @@ def list_fio_log_files(directory):
 
 def return_filename_filter_string(settings):
     """Returns a list of dicts with, a key/value for the search string.
-    This string is used to filter the log files based on the command line 
+    This string is used to filter the log files based on the command line
     parameters.
     """
     searchstrings = []
@@ -135,6 +136,46 @@ def mergeDataSet(settings, dataset):
     return mergedSets
 
 
+def parse_raw_cvs_data(dataset):
+    """This function exists mostly because I tried to test the performance
+    of a 1.44MB floppy drive. The device is so slow that it can't keep up.
+    This results in records that span multiple seconds, skewing the graphs.
+    If this is detected, the data is averaged over the interval between records.
+    Although this shows a more realistic throughput of 
+    """
+    new_set = []
+    distance_list = []
+    for index, item in enumerate(dataset):
+        if index == 0:
+            continue
+        else:
+            distance = int(item['timestamp']) - \
+                int(dataset[index - 1]['timestamp'])
+            distance_list.append(distance)
+    mean = statistics.mean(distance_list)
+    if mean > 1000:
+        print(f"{supporting.bcolors.WARNING} WARNING: the storage could not "
+              f"keep up with the configured I/O request size. Data is interpolated.{supporting.bcolors.ENDC}")
+        for index, item in enumerate(dataset):
+            if index == 0:
+                average_value = int(item['value']) / \
+                    int(item['timestamp']) * 1000
+
+            else:
+                previous_timestamp = int(dataset[index - 1]['timestamp'])
+                distance = int(item['timestamp']) - previous_timestamp
+                number_of_seconds = int(distance / 1000)
+                average_value = int(item['value']) / distance * 1000
+                for x in range(number_of_seconds):
+                    temp_dict = dict(item)
+                    temp_dict['value'] = average_value
+                    temp_dict['timestamp'] = previous_timestamp + x
+                    new_set.append(temp_dict)
+        return new_set
+    else:
+        return dataset
+
+
 def readLogData(inputfile):
     """FIO log data is imported as CSV data. The scope is the import of a
     single file.
@@ -149,6 +190,7 @@ def readLogData(inputfile):
                 fieldnames=['timestamp', 'value', 'rwt', 'blocksize', 'offset'])
             for item in csv_reader:
                 dataset.append(item)
+    dataset = parse_raw_cvs_data(dataset)
     return dataset
 
 

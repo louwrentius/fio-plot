@@ -131,6 +131,7 @@ def chart_2d_log_data(settings, dataset):
                  transform=ax.transAxes, fontsize=8, fontfamily='monospace')
 
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    title = settings['title'].replace(" ", '_')
+    title = settings['title'].replace(" ", '-')
+    title = title.replace("/", '-')
     plt.tight_layout(rect=[0, 0.00, 0.95, 0.95])
-    fig.savefig(f"{title}_{now}.png", dpi=settings['dpi'])
+    fig.savefig(f"{title}-{now}.png", dpi=settings['dpi'])
