@@ -343,3 +343,14 @@ def create_title_and_sub(settings, plt, skip_keys=[], sub_x_offset=0, sub_y_offs
 
     plt.title(subtitle, fontsize=8,
               horizontalalignment='center', x=x_offset, y=y_offset)
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
