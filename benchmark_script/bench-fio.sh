@@ -40,11 +40,11 @@ then
 	exit 1
 fi
 
-for x in randread randwrite
+for RW in randread randwrite
 do
-	for y in 1 2 4 8 16 32
+	for IODEPTH in 1 2 4 8 16 32
 	do
-		for z in 1 2 4 8 16 32
+		for NUMJOBS in 1 2 4 8 16 32
 		do
 			sync
 			echo 3 > /proc/sys/vm/drop_caches
@@ -52,10 +52,10 @@ do
 			echo "=== $FILE ============================================"
 			echo "Running benchmark $x with I/O depth of $y and numjobs $z"
 			cd $OUTPUT
-			export RW=$x
-			export IODEPTH=$y
-			export NUMJOBS=$z
-			$FIO $JOBFILE --output-format=json > $OUTPUT/$x-$y-$z.json
+			export RW
+			export IODEPTH
+			export NUMJOBS
+			$FIO $JOBFILE --output-format=json --output=$OUTPUT/$RW-$IODEPTH-$NUMJOBS.json
 			cd $MYPWD
 		done
 	done
