@@ -1,5 +1,13 @@
 #!/bin/bash
 
+set -eu
+
+if [ $# -ne 5 ]
+then
+	echo "Usage: $0 <JOBFILE> <OUTPUT> <DIRECTORY> <FILE> <SIZE>"
+	exit 1
+fi
+
 export BLOCKSIZE=4k 
 export RUNTIME=60
 export JOBFILE=$1
@@ -41,7 +49,7 @@ do
 			export RW=$x
 			export IODEPTH=$y
 			export NUMJOBS=$z
-			fio $1 --output-format=json > $OUTPUT/$x-$y-$z.json   
+			fio $JOBFILE --output-format=json > $OUTPUT/$x-$y-$z.json
 			cd $MYPWD
 		done
 	done
