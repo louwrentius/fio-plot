@@ -8,6 +8,12 @@ then
 	exit 1
 fi
 
+if [ -z ${FIO+x} ]
+then
+	FIO=fio
+fi
+
+
 export BLOCKSIZE=4k 
 export RUNTIME=60
 export JOBFILE=$1
@@ -16,7 +22,7 @@ export DIRECTORY=$3
 export FILE=$4
 export SIZE=$5
 
-if [ ! $(fio --version | grep -i fio-3) ]
+if [ ! $($FIO --version | grep -i fio-3) ]
 then
 	echo "Fio version 3+ required because fio-plot expects nanosecond precision"
 	exit 1
@@ -49,7 +55,7 @@ do
 			export RW=$x
 			export IODEPTH=$y
 			export NUMJOBS=$z
-			fio $JOBFILE --output-format=json > $OUTPUT/$x-$y-$z.json
+			$FIO $JOBFILE --output-format=json > $OUTPUT/$x-$y-$z.json
 			cd $MYPWD
 		done
 	done
