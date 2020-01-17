@@ -48,15 +48,12 @@ do
 		do
 			sync
 			echo 3 > /proc/sys/vm/drop_caches
-			MYPWD=`pwd`
 			echo "=== $FILE ============================================"
 			echo "Running benchmark $RW with I/O depth of $IODEPTH and numjobs $NUMJOBS"
-			cd $OUTPUT
 			export RW
 			export IODEPTH
 			export NUMJOBS
 			$FIO $JOBFILE --output-format=json --output=$OUTPUT/$RW-$IODEPTH-$NUMJOBS.json
-			cd $MYPWD
 		done
 	done
 done
