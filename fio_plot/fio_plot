@@ -24,7 +24,8 @@ def set_arguments():
     ag = parser.add_argument_group(title="Generic Settings")
     ag.add_argument("-i", "--input-directory", help="input directory where\
             JSON files or log data (CSV) can be found.", required=True)
-    ag.add_argument("-T", "--title", help="specifies title to use in charts")
+    ag.add_argument("-T", "--title",
+                    help="specifies title to use in charts", required=True)
     ag.add_argument("-s", "--source", help="Author")
 
     exclusive_group = ag.add_mutually_exclusive_group(required=True)
