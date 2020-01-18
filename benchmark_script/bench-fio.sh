@@ -1,5 +1,19 @@
 #!/bin/bash
 
+set -eu
+
+if [ $# -ne 5 ]
+then
+	echo "Usage: $0 <JOBFILE> <OUTPUT> <DIRECTORY> <FILE> <SIZE>"
+	exit 1
+fi
+
+if [ -z ${FIO+x} ]
+then
+	FIO=fio
+fi
+
+
 export BLOCKSIZE=4k 
 export RUNTIME=60
 export JOBFILE=$1
@@ -8,7 +22,7 @@ export DIRECTORY=$3
 export FILE=$4
 export SIZE=$5
 
-if [ ! $(fio --version | grep -i fio-3) ]
+if [ ! $($FIO --version | grep -i fio-3) ]
 then
 	echo "Fio version 3+ required because fio-plot expects nanosecond precision"
 	exit 1
@@ -26,23 +40,20 @@ then
 	exit 1
 fi
 
-for x in randread randwrite
+for RW in randread randwrite
 do
-	for y in 1 2 4 8 16 32
+	for IODEPTH in 1 2 4 8 16 32
 	do
-		for z in 1 2 4 8 16 32
+		for NUMJOBS in 1 2 4 8 16 32
 		do
 			sync
 			echo 3 > /proc/sys/vm/drop_caches
-			MYPWD=`pwd`
 			echo "=== $FILE ============================================"
-			echo "Running benchmark $x with I/O depth of $y and numjobs $z"
-			cd $OUTPUT
-			export RW=$x
-			export IODEPTH=$y
-			export NUMJOBS=$z
-			fio $1 --output-format=json > $OUTPUT/$x-$y-$z.json   
-			cd $MYPWD
+			echo "Running benchmark $RW with I/O depth of $IODEPTH and numjobs $NUMJOBS"
+			export RW
+			export IODEPTH
+			export NUMJOBS
+			$FIO $JOBFILE --output-format=json --output=$OUTPUT/$RW-$IODEPTH-$NUMJOBS.json
 		done
 	done
 done
