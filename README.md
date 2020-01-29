@@ -1,5 +1,10 @@
 ### fio-plot
-Fio-plot generates charts from FIO benchmark data. It can process FIO output in JSON format. It can also process FIO log file output (in CSV format).
+
+[FIO][fio] is a tool for benchmarking storage devices, such as (but not limited to) hard drives (HDDs) and solid state drives (SSDs). FIO can be a very usefull tool to assess storage performance in terms of IOPS and Latency with regards to virtual machines or your corporate SAN to gauge capability and determine potential bottlenecks.
+
+Fio-plot generates charts from FIO storage benchmark data. It can process FIO output in JSON format. It can also process FIO log file output (in CSV format).
+
+[fio]: https://github.com/axboe/fio
 
 ### 2D chart 
 This kind of chart shows both IOPs and Latency for multiple queue depths.
