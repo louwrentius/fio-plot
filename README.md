@@ -53,6 +53,8 @@ In this example, a benchmark is run against a device.
 
 	./bench-fio.sh /fio/fio-job-template-device.fio /fio/data None /dev/sdc
 
+By default, the benchmark script test the device for 1 minute for each benchmark combination. If you want to test the entire device, to gauge the worst-case performance you can expect, remove the 'RUNTIME' variable. Please note that benchmarking the entire device takes a long time, so limit the combinations you want to test.
+
 [barchart]: 1 
 [3dbarchart]: 2
 [linechart]: 3
