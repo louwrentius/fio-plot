@@ -72,7 +72,7 @@ def plot_3d(settings, dataset):
     # Positioning and sizing of the bars
     dx = size * np.ones_like(zpos)
     dy = dx.copy()
-    dz = n.flatten()
+    dz = n.flatten(order='F')
     values = dz / (dz.max()/1)
 
     # Create the 3D chart with positioning and colors
