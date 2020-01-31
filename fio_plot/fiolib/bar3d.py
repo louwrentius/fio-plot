@@ -26,14 +26,34 @@ def plot_3d(settings, dataset):
     numjobs = dataset_types['numjobs']
     data = shared.get_record_set_3d(settings, dataset, dataset_types,
                                     rw, metric)
-    # pprint.pprint(data)
-
+    pprint.pprint(data['values'])
     fig = plt.figure()
     ax1 = fig.add_subplot(111, projection='3d')
     fig.set_size_inches(15, 10)
 
     lx = len(dataset_types['iodepth'])
     ly = len(dataset_types['numjobs'])
+
+    # This code is meant to make the 3D chart to honour the maxjobs and
+    # the maxdepth command line settings. It won't win any prizes for sure.
+    if settings['maxjobs']:
+        numjobs = [x for x in numjobs if x <= settings['maxjobs']]
+        ly = len(numjobs)
+    if settings['maxdepth']:
+        iodepth = [x for x in iodepth if x <= settings['maxdepth']]
+        lx = len(iodepth)
+    if settings['maxjobs'] or settings['maxdepth']:
+        temp_x = []
+        for item in data['values']:
+            if len(temp_x) < len(iodepth):
+                temp_y = []
+                for record in item:
+                    if len(temp_y) < len(numjobs):
+                        temp_y.append(record)
+                temp_x.append(temp_y)
+        data['iodepth'] = iodepth
+        data['numjobs'] = numjobs
+        data['values'] = temp_x
 
     # Ton of code to scale latency
     if metric == 'lat':
