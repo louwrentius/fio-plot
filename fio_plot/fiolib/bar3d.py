@@ -77,28 +77,33 @@ def plot_3d(settings, dataset):
 
     n = np.array(scaled_values, dtype=float)
 
-    size = lx * 0.05  # thickness of the bar
+    if lx < ly:
+        size = ly * 0.03  # thickness of the bar
+    else:
+        size = lx * 0.05  # thickness of the bar
+
     xpos_orig = np.arange(0, lx, 1)
     ypos_orig = np.arange(0, ly, 1)
 
     xpos = np.arange(0, lx, 1)
     ypos = np.arange(0, ly, 1)
-    xpos, ypos = np.meshgrid(xpos-(size/lx), ypos-(size))
+    xpos, ypos = np.meshgrid(xpos-(size/lx), ypos-(size * (ly/lx)))
 
     xpos_f = xpos.flatten()   # Convert positions to 1D array
     ypos_f = ypos.flatten()
+
     zpos = np.zeros(lx*ly)
 
     # Positioning and sizing of the bars
     dx = size * np.ones_like(zpos)
-    dy = dx.copy()
+    dy = size * (ly/lx) * np.ones_like(zpos)
     dz = n.flatten(order='F')
     values = dz / (dz.max()/1)
 
     # Create the 3D chart with positioning and colors
     cmap = plt.get_cmap('rainbow', xpos.ravel().shape[0])
     colors = cm.rainbow(values)
-    ax1.bar3d(xpos_f, ypos_f, zpos, dx, dy, dz, color=colors)
+    ax1.bar3d(xpos_f, ypos_f, zpos, dx, dy, dz, color=colors, zsort='max')
 
     # Create the color bar to the right
     norm = mpl.colors.Normalize(vmin=0, vmax=dz.max())
