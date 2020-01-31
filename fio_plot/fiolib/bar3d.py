@@ -26,7 +26,7 @@ def plot_3d(settings, dataset):
     numjobs = dataset_types['numjobs']
     data = shared.get_record_set_3d(settings, dataset, dataset_types,
                                     rw, metric)
-    pprint.pprint(data['values'])
+
     fig = plt.figure()
     ax1 = fig.add_subplot(111, projection='3d')
     fig.set_size_inches(15, 10)
