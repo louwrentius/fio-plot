@@ -163,6 +163,10 @@ Creating a 3D graph.
 
     ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
     
+Creating a 3D graph with a subselection of data
+
+    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops -J 16 -M 16
+
 Creating a latency histogram with a queue depth of 1 and numjobs is 1.
 
     ./fio_plot -i <benchmark_data_folder> -T "Test" -s https://louwrentius.com -H -r randread -d 1 -n 1
