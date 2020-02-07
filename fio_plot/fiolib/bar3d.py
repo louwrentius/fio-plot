@@ -150,6 +150,6 @@ def plot_3d(settings, dataset):
 
     plt.tight_layout()
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    plt.savefig('3d-iops-jobs' +
+    plt.savefig('3d-' + str(metric) + '-jobs' +
                 str(settings['rw']) + "-" + str(now) + '.png')
     plt.close('all')
