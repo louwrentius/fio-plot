@@ -4,6 +4,7 @@ import matplotlib.markers as markers
 from matplotlib.font_manager import FontProperties
 import fiolib.supporting as supporting
 from datetime import datetime
+import pprint
 
 
 def make_patch_spines_invisible(ax):
@@ -99,11 +100,12 @@ def chart_2d_log_data(settings, dataset):
                     factor = 1.2
 
                 if settings['max']:
-                    max_yvalue = settings['max']
+                    maximum[item['type']] = settings['max']
                 else:
                     max_yvalue = max(yvalues)
                     if max_yvalue > maximum[item['type']]:
                         maximum[item['type']] = max_yvalue
+
                 axes[item['type']].set_ylim(0, maximum[item['type']] * factor)
                 #
                 # Label Axis
