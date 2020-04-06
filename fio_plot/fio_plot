@@ -22,7 +22,7 @@ def set_arguments():
     parser = argparse.ArgumentParser(
         description="Generates charts/graphs from FIO JSON output or logdata.")
     ag = parser.add_argument_group(title="Generic Settings")
-    ag.add_argument("-i", "--input-directory", help="input directory where\
+    ag.add_argument("-i", "--input-directory", nargs='+', help="input directory where\
             JSON files or log data (CSV) can be found.", required=True)
     ag.add_argument("-T", "--title",
                     help="specifies title to use in charts", required=True)
@@ -101,10 +101,13 @@ def main():
 
     option_found = False
     if settings['loggraph']:
-        benchmarkfiles = logdata.list_fio_log_files(
-            settings['input_directory'])
+        benchmarkfiles = []
+        for input_dir in settings['input_directory']:
+            benchmarkfiles.extend(logdata.list_fio_log_files(input_dir))
         logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
+        # pprint.pprint(logfiles)
         rawdata = logdata.readLogDataFromFiles(settings, logfiles)
+        # pprint.pprint(rawdata)
         merged = logdata.mergeDataSet(settings, rawdata)
         graph.chart_2d_log_data(settings, merged)
         option_found = True

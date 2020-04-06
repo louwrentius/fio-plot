@@ -24,6 +24,12 @@ def list_fio_log_files(directory):
     return fiologfiles
 
 
+def return_folder_name(filename):
+    dirname = os.path.dirname(filename)
+    basename = os.path.basename(dirname)
+    return(basename)
+
+
 def return_filename_filter_string(settings):
     """Returns a list of dicts with, a key/value for the search string.
     This string is used to filter the log files based on the command line
@@ -58,6 +64,7 @@ def filterLogFiles(settings, file_list):
             if searchstring['searchstring'] in item:
                 data = {'filename': item}
                 data.update(searchstring)
+                data['directory'] = return_folder_name(item)
                 result.append(data)
     # pprint.pprint(result)
     if len(result) > 0:
@@ -116,23 +123,38 @@ def mergeSingleDataSet(data, datatype):
     return mergedSet
 
 
+def get_unique_directories(dataset):
+    directories = []
+    for item in dataset:
+        dirname = item['directory']
+        if dirname not in directories:
+            directories.append(dirname)
+    return directories
+
+
 def mergeDataSet(settings, dataset):
     """We need to merge multiple datasets, for multiple iodepts and numjob
     values. The return is a list of those merged datasets.
+
+    We also take into account if multiple folders are specified to compare
+    benchmarks results across different runs.
     """
     mergedSets = []
     filterstrings = return_filename_filter_string(settings)
-    # pprint.pprint(dataset)
-    for filterstring in filterstrings:
-        record = {'type': filterstring['type'],
-                  'iodepth': filterstring['iodepth'], 'numjobs': filterstring['numjobs']}
-        data = []
-        for item in dataset:
-            if filterstring['searchstring'] in item['searchstring']:
-                data.append(item)
-        data = mergeSingleDataSet(data, filterstring['type'])
-        record['data'] = data
-        mergedSets.append(record)
+    directories = get_unique_directories(dataset)
+
+    for directory in directories:
+        for filterstring in filterstrings:
+            record = {'type': filterstring['type'],
+                      'iodepth': filterstring['iodepth'], 'numjobs': filterstring['numjobs'], 'directory': directory}
+            data = []
+            for item in dataset:
+                if filterstring['searchstring'] in item['searchstring'] and \
+                        item['directory'] == directory:
+                    data.append(item)
+            newdata = mergeSingleDataSet(data, filterstring['type'])
+            record['data'] = newdata
+            mergedSets.append(record)
     return mergedSets
 
 
