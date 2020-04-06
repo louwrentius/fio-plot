@@ -4,6 +4,7 @@ import matplotlib.markers as markers
 from matplotlib.font_manager import FontProperties
 import fiolib.supporting as supporting
 from datetime import datetime
+import fiolib.dataimport as logdata
 import pprint
 
 
@@ -20,6 +21,7 @@ def chart_2d_log_data(settings, dataset):
     #
     data = supporting.process_dataset(settings, dataset)
     datatypes = data['datatypes']
+    directories = logdata.get_unique_directories(dataset)
     #
     # Create matplotlib figure and first axis. The 'host' axis is used for
     # x-axis and as a basis for the second and third y-axis
@@ -118,8 +120,12 @@ def chart_2d_log_data(settings, dataset):
                 # Add line to legend
                 #
                 lines.append(axes[dataplot])
+                if len(directories) > 1:
+                    mydir = f"{item['directory']}-"
+                else:
+                    mydir = ""
                 labels.append(
-                    f"|{item['type']:>4}|{rw:>5}|qd: {item['iodepth']:>2}|nj: {item['numjobs']:>2}|mean: {item[rw]['mean']:>6}|std%: {item[rw]['stdv']:>6} |P{settings['percentile']}: {item[rw]['percentile']:>6}")
+                    f"|{mydir}{item['type']:>4}|{rw:>5}|qd: {item['iodepth']:>2}|nj: {item['numjobs']:>2}|mean: {item[rw]['mean']:>6}|std%: {item[rw]['stdv']:>6} |P{settings['percentile']}: {item[rw]['percentile']:>6}")
 
     host.legend(lines, labels, prop=fontP,
                 bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
