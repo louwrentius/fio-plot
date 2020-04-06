@@ -6,13 +6,14 @@ import pprint
 
 def list_json_files(settings):
     """List all JSON files that maches the command line settings."""
-    absolute_dir = os.path.abspath(settings['input_directory'])
-    files = os.listdir(absolute_dir)
-    json_files = []
-    for item in files:
-        if item.endswith(".json"):
-            if item.startswith(settings['rw']):
-                json_files.append(os.path.join(absolute_dir, item))
+    for directory in settings['input_directory']:
+        absolute_dir = os.path.abspath(directory)
+        files = os.listdir(absolute_dir)
+        json_files = []
+        for item in files:
+            if item.endswith(".json"):
+                if item.startswith(settings['rw']):
+                    json_files.append(os.path.join(absolute_dir, item))
 
     if len(json_files) == 0:
         print(
