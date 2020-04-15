@@ -26,7 +26,11 @@ def list_json_files(settings):
 def import_json_data(filename):
     """Returns a dictionary of imported JSON data."""
     with open(filename) as json_data:
-        d = json.load(json_data)
+        try:
+            d = json.load(json_data)
+        except json.decoder.JSONDecodeError:
+            print(f"Failed to JSON parse {filename}")
+            sys.exit(1)
     return d
 
 
