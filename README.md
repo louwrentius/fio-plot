@@ -49,30 +49,28 @@ The FIO JSON output also contains latency histogram data. It's available in a ns
 This is the only chart type that requires / can only show the results of a single benchmark. 
 
 ### Benchmark script
-Alongside fio-plot, a benchmark script is provided that automates the process of running multiple benchmarks with different parameters. For example, it allows
-you to gather data for different queue depths or numjobs. 
+A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
+you to gather data for different queue depths and/or number of simultaneous jobs.
 
-You can run the benchmark against an entire device or a file. For both options
-FIO configuration files have been created.
+You can run the benchmark against an entire device or a file. To support both options, separate FIO configuration files have been created.
 
 The synax of ./bench-fio.sh is:
 
 	./bench-fil.sh <fio template> <output dir> <test directory> <test file> <file size>
 	
-In the case of a benchmark against a file, the 'test directory' and 'test file'
-parameters are used. When benchmarking agains a device the 'test directory' should be a dummy value ('None'), the 'test file' parameter should be filled in with 
-the device to be tested. 
+In the case of a benchmark against a *file*, the 'test directory', 'test file' and 'size' parameters are used. When benchmarking agains a *device* the 'test directory' should be a dummy value ('None'), the 'test file' parameter should be filled in with the device to be tested and the 'size' must be specified but is ignored (can be anything).
 
 In this example, a benchmark is run against a device. 
 
 	./bench-fio.sh /fio/fio-job-template-device.fio /fio/data None /dev/sdc
 
-By default, the benchmark script test the device for 1 minute for each benchmark combination. If you want to test the entire device, to gauge the worst-case performance you can expect, remove the 'RUNTIME' variable. Please note that benchmarking the entire device takes a long time, so limit the combinations you want to test.
+In this example, a benchmark is run against a file
 
-[barchart]: 1 
-[3dbarchart]: 2
-[linechart]: 3
-[histogram]: 4
+    ./bench-fio.sh /fio/fio-job-template-device.fio /fio/data /mnt/storage test.bin 100G
+
+By default, the benchmark script test the device for 1 minute for each benchmark combination. If you want to test the entire device, to gauge the worst-case performance you can expect, remove the 'RUNTIME' variable. 
+
+Please note that benchmarking the entire device can take a long time, so limit the combinations you want to test.
 
 ### A note about queue depths
 Many SSD vendors report really high IOPs performance numbers, beyond 100.000 IOPs for a single SSD. Those numbers are always obtained using a queue depth of 32 or higher. 
