@@ -28,7 +28,7 @@ A 3D bar chart that plots both queue depth an numjobs against either latency or 
 [3dbarchart]: https://louwrentius.com/static/images/servermdadmraid5-3d.png
 
 
-### line chart based on FIO log data
+### Line chart based on FIO log data
 To create this graph, the FIO log data is parsed to show how the device / file
 performed during a benchmark run. Latency IOPS and bandwidth can be shown. 
 ![linechart][queuedepthlowhigh03]
@@ -36,11 +36,17 @@ performed during a benchmark run. Latency IOPS and bandwidth can be shown.
 The command line options control which data is shown, so it is possible to
 customize the graph to only show the information you're interested in.
 
+*tip:* with the latest version of fio-plot, you can combine log data with the same properties by specifying multiple directories with the -i option. 
+
+This could be very handy if you made some performance tweaks and want to compare results.
+
 ### Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.
 ![histogram][histogram]
 
 [histogram]: https://louwrentius.com/static/images/histogram01.png
+
+This is the only chart type that requires / can only show the results of a single benchmark. 
 
 ### Benchmark script
 Alongside fio-plot, a benchmark script is provided that automates the process of running multiple benchmarks with different parameters. For example, it allows
@@ -51,7 +57,7 @@ FIO configuration files have been created.
 
 The synax of ./bench-fio.sh is:
 
-	./bench-fil.sh <fio template> <output dir> <test directory> <test file>
+	./bench-fil.sh <fio template> <output dir> <test directory> <test file> <file size>
 	
 In the case of a benchmark against a file, the 'test directory' and 'test file'
 parameters are used. When benchmarking agains a device the 'test directory' should be a dummy value ('None'), the 'test file' parameter should be filled in with 
@@ -73,7 +79,7 @@ Many SSD vendors report really high IOPs performance numbers, beyond 100.000 IOP
 
 ![queuedepthlowhigh01][queuedepthlowhigh01]
 
-[queuedepthlowhigh01]: https://louwrentius.com/static/images/impactofqueuedepth.png
+[queuedepthlowhigh01]: https://raw.githubusercontent.com/louwrentius/fio-plot/master/images/INTEL-D3-S4610-on-IBM-M1015_2020-01-29_144451.png
 
 In many real-life cases, such queue depths are never
 encountered. Often, SSDs can only achieve 10% of those IOPs performance numbers with a queue depth of 1. Such low queue depths are way more common. 
