@@ -60,11 +60,11 @@ The synax of ./bench-fio.sh is:
 	
 In the case of a benchmark against a *file*, the 'test directory', 'test file' and 'size' parameters are used. When benchmarking agains a *device* the 'test directory' should be a dummy value ('None'), the 'test file' parameter should be filled in with the device to be tested and the 'size' must be specified but is ignored (can be anything).
 
-In this example, a benchmark is run against a device. 
+In this example, a benchmark is run against a device: 
 
 	./bench-fio.sh /fio/fio-job-template-device.fio /fio/data None /dev/sdc
 
-In this example, a benchmark is run against a file
+In this example, a benchmark is run against a file:
 
     ./bench-fio.sh /fio/fio-job-template-device.fio /fio/data /mnt/storage test.bin 100G
 
@@ -171,7 +171,7 @@ Creating a 2D Bar Chart based on randread data and numjobs = 1.
 
     ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -n 1 -r randread
 
-Creating a 3D graph. 
+Creating a 3D graph showing IOPS. 
 
     ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
     
@@ -181,5 +181,25 @@ Creating a 3D graph with a subselection of data
 
 Creating a latency histogram with a queue depth of 1 and numjobs is 1.
 
-    ./fio_plot -i <benchmark_data_folder> -T "Test" -s https://louwrentius.com -H -r randread -d 1 -n 1
+    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -H -r randread -d 1 -n 1
 
+Creating a line chart from different benchmark runs in a single folder
+
+    ./fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1
+  
+The same result but if you want markers to help distinguish between lines:
+
+    ./fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1 --enable--markers
+    
+Create a line chart based on data from two different folders (but the same benchmark parameters)     
+
+    ./fio_plot -i <benchmark_data_folder A> <benchmark_data_folder B>  -T "Test" -g -r randread -t iops lat -d 8 -n 1
+    
+For example, you can run a benchmark on a RAID10 setup and store data in folder A. Store the benchmark data for a RAID5 setup in folder B and you can compare the results of both RAID setups in a single Line graph.
+
+Please note that the folder names are used in the graph to distinguish the datasets. Example:
+
+[![multipledataset][multipledataset]][multipledataset]
+
+[multipledataset]: https://louwrentius.com/static/images/comparingraid10raid5.png
+    
