@@ -202,4 +202,7 @@ Please note that the folder names are used in the graph to distinguish the datas
 [![multipledataset][multipledataset]][multipledataset]
 
 [multipledataset]: https://louwrentius.com/static/images/comparingraid10raid5.png
-    
+   
+Command used: 
+
+    ./fio_plot -i ../../RAID10 ../../RAID5 -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 
