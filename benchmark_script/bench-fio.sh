@@ -4,7 +4,7 @@ set -eu
 
 if [ $# -ne 5 ]
 then
-	echo "Usage: $0 <JOBFILE> <OUTPUT> <DIRECTORY> <FILE> <SIZE>"
+	echo "Usage: $0 <JOBFILE> <OUTPUT> <DIRECTORY> <SIZE>"
 	exit 1
 fi
 
@@ -48,7 +48,7 @@ do
 		do
 			sync
 			echo 3 > /proc/sys/vm/drop_caches
-			echo "=== $FILE ============================================"
+			echo "=== $DIRECTORY ============================================"
 			echo "Running benchmark $RW with I/O depth of $IODEPTH and numjobs $NUMJOBS"
 			export RW
 			export IODEPTH
