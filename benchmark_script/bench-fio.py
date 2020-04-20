@@ -54,7 +54,6 @@ def generate_output_folder(settings, benchmark):
 
 def run_fio(settings, benchmark):
     output_folder = generate_output_folder(settings, benchmark)
-    pprint.pprint(output_folder)
     make_folder(output_folder)
 
     output_file = f"{output_folder}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
