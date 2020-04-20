@@ -4,7 +4,7 @@ set -eu
 
 if [ $# -ne 5 ]
 then
-	echo "Usage: $0 <JOBFILE> <OUTPUT> <DIRECTORY> <SIZE>"
+	echo "Usage: $0 <JOBFILE> <OUTPUT> <DIRECTORY> <FILENAME> <SIZE>"
 	exit 1
 fi
 
