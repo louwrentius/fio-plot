@@ -3,3 +3,4 @@
 *.pyo
 .DS_Store
 __pycache__/
+test
