@@ -297,6 +297,8 @@ def display_header(settings, tests):
     print(f"{'Blocksize(s) to be tested:':<{fl}} {data['blocksize']:<}")
     if check_if_mixed_workload(settings):
         print(f"{'Mixed workload (% Read):':<{fl}} {data['readmix']:<}")
+    if len(settings['extra_opts']) > 0:
+        print(f"{'Extra options:':<{fl}} {data['extra_opts']:<}")
     print()
 
 
