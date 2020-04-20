@@ -66,7 +66,7 @@ def format_benchmark(benchmark):
 def run_benchmarks(settings, benchmarks):
     if not settings['quiet']:
         for benchmark in ProgressBar(benchmarks):
-            print(format_benchmark(benchmark))
+            print(f"\n - Status ")
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
