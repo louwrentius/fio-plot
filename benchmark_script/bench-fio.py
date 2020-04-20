@@ -14,6 +14,8 @@ from numpy import linspace
 
 
 def convert_dict_vals_to_str(dictionary):
+    """ Convert dictionary to format in uppercase, suitable as env vars.
+    """
     return {k.upper(): str(v) for k, v in dictionary.items()}
 
 
@@ -30,6 +32,9 @@ def run_raw_command(command, env=None):
 
 
 def run_command(settings, benchmark, command):
+    """ This command sets up the environment that is used in conjunction
+    with the Fio .ini job file.
+    """
     output_folder = generate_output_folder(settings, benchmark)
     env = os.environ
     settings = convert_dict_vals_to_str(settings)
@@ -41,6 +46,10 @@ def run_command(settings, benchmark, command):
 
 
 def check_fio_version(settings):
+    """ The 3.x series .json format is different from the 2.x series format.
+    This breaks fio-plot, thus this older version is not supported.
+    """
+
     command = ["fio", "--version"]
     result = run_raw_command(command).stdout
     result = result.decode("UTF-8").strip()
@@ -81,16 +90,8 @@ def run_fio(settings, benchmark):
         for option in settings['extra_opts']:
             option = str(option)
             command.append(f"--"+option)
-    # pprint.pprint(command)
+
     result = run_command(settings, benchmark, command)
-    # return result
-
-
-def format_benchmark(benchmark):
-    status = ""
-    for k, v in benchmark.items():
-        status += f"{k}: {v} - "
-    return status
 
 
 def run_benchmarks(settings, benchmarks):
@@ -134,6 +135,10 @@ def ProgressBar(iterObj):
 
 
 def generate_test_list(settings):
+    """ All options that need to be tested are multiplied together.
+    This creates a full list of all possible benchmark permutations that
+    need to be run.
+    """
     loop_items = ['target', 'mode', 'iodepth',
                   'numjobs', 'blocksize',  'readmix']
     dataset = []
@@ -165,11 +170,11 @@ def get_arguments(settings):
             (Default: {settings['template']})", default=settings['template'])
     ag.add_argument(
         "--iodepth", help=f"Override default iodepth test series\
-             ({settings['iodepth']}. Usage example: --iodepth 1 8 16", nargs='+', type=int,
+             ({settings['iodepth']}). Usage example: --iodepth 1 8 16", nargs='+', type=int,
         default=settings['iodepth'])
     ag.add_argument(
         "--numjobs", help=f"Override default number of jobs test series\
-            ({settings['numjobs']}. Usage example: --numjobs 1 8 16", nargs='+', type=int, default=settings['numjobs'])
+            ({settings['numjobs']}). Usage example: --numjobs 1 8 16", nargs='+', type=int, default=settings['numjobs'])
     ag.add_argument(
         "--duration", help=f"Override the default test duration per benchmark \
             (default: {settings['duration']})", default=settings['duration'])
@@ -196,12 +201,12 @@ def get_arguments(settings):
         "--loginterval", help=f"Interval that specifies how often stats are \
             logged to the .log files. (Default: {settings['loginterval']}", type=int, default=settings['loginterval'])
     ag.add_argument(
-        '--dry-run', help="Simulates a benchmark, does everything except running Fio.", action='store_true', default=False)
+        '--dry-run', help="Simulates a benchmark, does everything except running\
+             Fio.", action='store_true', default=False)
     return parser
 
 
 def get_default_settings():
-    """ Hard-coded set of default settings """
     settings = {}
     settings['target'] = []
     settings['template'] = "./fio-job-template.fio"
@@ -216,6 +221,7 @@ def get_default_settings():
     settings['duration'] = 60
     settings['extra_opts'] = []
     settings['loginterval'] = 500
+
     return settings
 
 
@@ -269,6 +275,7 @@ def display_header(settings, tests):
         print(f" ====---> WARNING - DRY RUN <---==== ")
         print()
     print(f"{'Job template:':<{fl}} {data['template']:<}")
+    print(f"{'I/O Engine:':<{fl}} {data['engine']:<}")
     print(f"{'Number of benchmarks:':<{fl}} {len(tests):<}")
     print(f"{'Estimated duration:':<{fl}} {duration:<}")
     print(f"{'Devices to be tested:':<{fl}} {data['target']:<}")
@@ -286,6 +293,8 @@ def display_header(settings, tests):
 
 
 def check_args(settings):
+    """ Some basic error handling.
+    """
     try:
         parser = get_arguments(settings)
         args = parser.parse_args()
@@ -306,7 +315,8 @@ def check_args(settings):
 
 
 def check_settings(settings):
-
+    """ Some basic error handling.
+    """
     if not os.path.exists(settings['template']):
         print()
         print(f"The specified template {settings['template']} does not exist.")
@@ -343,5 +353,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print(f"Control-C pressed - quitting...")
+        print(f"\nControl-C pressed - quitting...")
         sys.exit(1)
