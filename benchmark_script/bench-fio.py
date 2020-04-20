@@ -89,7 +89,6 @@ def ProgressBar(iterObj):
     qSteps = ['', u'\u258E', u'\u258C', u'\u258A']
     startT = time.time()
     timeStr = '   [0:00:00, -:--:--]'
-    activity = [' -', ' \\', ' |', ' /']
     for nn, item in enumerate(iterObj):
         if nn in steps:
             done = u'\u2588'*int(steps[nn]/4.0)+qSteps[int(steps[nn] % 4)]
@@ -99,7 +98,7 @@ def ProgressBar(iterObj):
             endT = time.time()
             timeStr = ' [%s, %s]' % (SecToStr(endT-startT),
                                      SecToStr((endT-startT)*(L/float(nn)-1)))
-        sys.stdout.write('\r'+barStr+activity[nn % 4]+timeStr)
+        sys.stdout.write('\r'+barStr+" " + timeStr)
         sys.stdout.flush()
         yield item
     barStr = u'%4d%% |%s|' % (100, u'\u2588'*25)
