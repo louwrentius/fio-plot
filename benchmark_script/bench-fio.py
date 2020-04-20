@@ -60,13 +60,13 @@ def run_fio(settings, benchmark):
 
 
 def format_benchmark(benchmark):
-    [print(f"{k}: {v} - ", end='') for k, v in benchmark.items()]
+    return [f"{k}: {v} - " for k, v in benchmark.items()]
 
 
 def run_benchmarks(settings, benchmarks):
     if not settings['quiet']:
         for benchmark in ProgressBar(benchmarks):
-            format_benchmark(benchmark)
+            print(format_benchmark(benchmark))
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
