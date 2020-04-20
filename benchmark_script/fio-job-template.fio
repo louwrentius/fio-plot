@@ -6,7 +6,6 @@ ioengine=${ENGINE}
 iodepth=${IODEPTH}
 numjobs=${NUMJOBS}
 direct=${DIRECT}
-randrepeat=${RANDREPEAT}
 runtime=${DURATION}
 group_reporting=1
 write_bw_log=${OUTPUT}/${RW}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
