@@ -98,12 +98,12 @@ def ProgressBar(iterObj):
             endT = time.time()
             timeStr = ' [%s, %s]' % (SecToStr(endT-startT),
                                      SecToStr((endT-startT)*(L/float(nn)-1)))
-        sys.stdout.write('\r'+barStr+" " + timeStr)
+        sys.stdout.write('\r'+barStr+" "+timeStr)
         sys.stdout.flush()
         yield item
     barStr = u'%4d%% |%s|' % (100, u'\u2588'*25)
     timeStr = '   [%s, 0:00:00]\n' % (SecToStr(time.time()-startT))
-    sys.stdout.write('\r'+barStr+timeStr)
+    sys.stdout.write('\r'+barStr+" "+timeStr)
     sys.stdout.flush()
 
 
