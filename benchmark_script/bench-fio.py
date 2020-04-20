@@ -18,7 +18,6 @@ def convert_dict_vals_to_str(dictionary):
 
 
 def run_raw_command(command, env=None):
-
     result = subprocess.run(command, shell=False,
                             capture_output=True,
                             env=env)
@@ -82,7 +81,7 @@ def run_fio(settings, benchmark):
         for option in settings['extra_opts']:
             option = str(option)
             command.append(f"--"+option)
-    pprint.pprint(command)
+    # pprint.pprint(command)
     result = run_command(settings, benchmark, command)
     # return result
 
