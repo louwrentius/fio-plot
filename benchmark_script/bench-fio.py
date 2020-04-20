@@ -26,8 +26,6 @@ def run_command(settings, benchmark, command):
     # pprint.pprint(env)
     result = subprocess.Popen(command, shell=False,
                               stdout=subprocess.PIPE, env=env).stdout.read()
-    pprint.pprint(result)
-    sys.exit(1)
 
 
 def check_fio_version(settings):
@@ -64,9 +62,7 @@ def run_fio(settings, benchmark):
 def run_benchmarks(settings, benchmarks):
     if not settings['quiet']:
         for benchmark in ProgressBar(benchmarks):
-            print(f"Currently working on {benchmark}")
             run_fio(settings, benchmark)
-
     else:
         for benchmark in benchmarks:
             run_fio(settings, benchmark)
