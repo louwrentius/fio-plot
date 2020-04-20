@@ -18,11 +18,13 @@ def convert_dict_vals_to_str(dictionary):
 
 
 def run_command(settings, benchmark, command):
+    output_folder = generate_output_folder(settings, benchmark)
     env = os.environ
     settings = convert_dict_vals_to_str(settings)
     benchmark = convert_dict_vals_to_str(benchmark)
     env.update(settings)
     env.update(benchmark)
+    env.update({'OUTPUT': output_folder})
     # pprint.pprint(env)
     result = subprocess.Popen(command, shell=False,
                               stdout=subprocess.PIPE, env=env).stdout.read()
@@ -46,9 +48,13 @@ def make_folder(folder):
         sys.exit(1)
 
 
-def run_fio(settings, benchmark):
+def generate_output_folder(settings, benchmark):
+    return f"{settings['output']}/{os.path.basename(benchmark['target'])}"
 
-    output_folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}"
+
+def run_fio(settings, benchmark):
+    output_folder = generate_output_folder(settings, benchmark)
+
     make_folder(output_folder)
 
     output_file = f"{output_folder}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
