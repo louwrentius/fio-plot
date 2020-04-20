@@ -19,7 +19,7 @@ def convert_dict_vals_to_str(dictionary):
 
 def run_raw_command(command, env=None):
     result = subprocess.run(command, shell=False,
-                            capture_output=True,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                             env=env)
     if result.returncode > 0:
         stdout = result.stdout.decode("UTF-8").strip()
