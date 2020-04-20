@@ -17,6 +17,19 @@ def convert_dict_vals_to_str(dictionary):
     return {k.upper(): str(v) for k, v in dictionary.items()}
 
 
+def run_raw_command(command, env=None):
+
+    result = subprocess.run(command, shell=False,
+                            capture_output=True,
+                            env=env)
+    if result.returncode > 0:
+        stdout = result.stdout.decode("UTF-8").strip()
+        stderr = result.stderr.decode("UTF-8").strip()
+        print(f"An error occurred: {stderr} - {stdout}")
+        sys.exit(1)
+    return result
+
+
 def run_command(settings, benchmark, command):
     output_folder = generate_output_folder(settings, benchmark)
     env = os.environ
@@ -25,21 +38,22 @@ def run_command(settings, benchmark, command):
     env.update(settings)
     env.update(benchmark)
     env.update({'OUTPUT': output_folder})
-    try:
-        subprocess.run(command, shell=False, check=True,
-                       stdout=subprocess.PIPE, env=env).stdout.read()
-    except subprocess.CalledProcessError:
-        print("An error occurred while running Fio.")
-        sys.exit(1)
+    result = run_raw_command(command, env)
 
 
 def check_fio_version(settings):
     command = ["fio", "--version"]
-    result = run_command(command)
-    if "fio-3" in result.stdout:
-        return True
+    result = run_raw_command(command).stdout
+    result = result.decode("UTF-8").strip()
+    if "fio-3" in result:
+        pass
+    elif "fio-2" in result:
+        print(
+            f"Your Fio version ({result}) is not compatible. Please use Fio-3.x")
+        sys.exit(1)
     else:
-        return False
+        print("Could not detect Fio version.")
+        sys.exit(1)
 
 
 def make_folder(folder):
@@ -64,6 +78,11 @@ def run_fio(settings, benchmark):
     command = ["fio", f"--output-format=json",
                f"--output={output_file}", settings['template']]
 
+    if settings['extra_opts']:
+        for option in settings['extra_opts']:
+            option = str(option)
+            command.append(f"--"+option)
+    pprint.pprint(command)
     result = run_command(settings, benchmark, command)
     # return result
 
@@ -171,7 +190,7 @@ def get_arguments(settings):
     ag.add_argument("--extra-opts", help=f"Allows you to add extra options, \
         for example, options that are specific to the selected ioengine. It \
              can be any other Fio option. Example: --extra-opts option-a=1 option-b=2.\
-                 You may also choose to add those options to the fio_template.fio file.", type=list)
+                 You may also choose to add those options to the fio_template.fio file.", nargs='+')
     ag.add_argument(
         "--quiet", help="The progresbar will be supressed.", action='store_true')
     ag.add_argument(
@@ -294,6 +313,7 @@ def main():
     args = check_args(settings)
     customsettings = vars(args)
     settings = {**settings, **customsettings}
+    check_fio_version(settings)
     check_if_template_exists(settings)
     tests = generate_test_list(settings)
     display_header(settings, tests)
