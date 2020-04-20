@@ -52,11 +52,12 @@ This is the only chart type that requires / can only show the results of a singl
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
 you to gather data for different queue depths and/or number of simultaneous jobs.
 
-You can run the benchmark against an entire device or a file. To support both options, separate FIO configuration files have been created.
+You can run the benchmark against an entire device or a file/folder.
+Alongside the benchmark script, a Fio job template file is supplied (fio-job-template.fio)
 
-The synax of ./bench-fio.sh is:
+The synax of ./bench-fio.py is:
 
-	./bench-fil.sh <fio template> <output dir> <test directory> <test file> <file size>
+	./bench-fio.py 
 	
 In the case of a benchmark against a *file*, the 'test directory', 'test file' and 'size' parameters are used. When benchmarking agains a *device* the 'test directory' should be a dummy value ('None'), the 'test file' parameter should be filled in with the device to be tested and the 'size' must be specified but is ignored (can be anything).
 

@@ -6,7 +6,7 @@ import argparse
 import sys
 import os
 import subprocess
-import pprint
+# import pprint
 import itertools
 import datetime
 import time
@@ -42,7 +42,7 @@ def run_command(settings, benchmark, command):
     env.update(settings)
     env.update(benchmark)
     env.update({'OUTPUT': output_folder})
-    result = run_raw_command(command, env)
+    run_raw_command(command, env)
 
 
 def check_fio_version(settings):
@@ -91,7 +91,7 @@ def run_fio(settings, benchmark):
             option = str(option)
             command.append(f"--"+option)
 
-    result = run_command(settings, benchmark, command)
+    run_command(settings, benchmark, command)
 
 
 def run_benchmarks(settings, benchmarks):
@@ -243,7 +243,7 @@ def parse_settings_for_display(settings):
         bool: str
     }
     for k, v in settings.items():
-        if type(v) != type(None):
+        if v:
             data[str(k)] = action[type(v)](v)
             length = len(data[k])
             if length > max_length:
@@ -262,14 +262,16 @@ def check_if_mixed_workload(settings):
 
 
 def display_header(settings, tests):
-    header = f"-------+ Fio Benchmark Script +"
+
+    header = f"+ Fio Benchmark Script +"
     data = parse_settings_for_display(settings)
     fl = 30
     length = data['length']
-    width = length + fl - len(header) + 1
+    width = length + fl - len(header)
     duration = calculate_duration(settings, tests)
-
+    print(f"█" * (fl + width + 1))
     print(header + '-' * width)
+    print(f"█" * (fl + width + 1))
     if settings['dry_run']:
         print()
         print(f" ====---> WARNING - DRY RUN <---==== ")
