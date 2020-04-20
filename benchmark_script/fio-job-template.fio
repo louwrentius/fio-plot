@@ -8,8 +8,8 @@ numjobs=${NUMJOBS}
 direct=${DIRECT}
 runtime=${DURATION}
 group_reporting=1
-write_bw_log=${OUTPUT}/${RW}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
-write_lat_log=${OUTPUT}/${RW}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
-write_iops_log=${OUTPUT}/${RW}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+write_bw_log=${OUTPUT}/${MODE}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+write_lat_log=${OUTPUT}/${MODE}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+write_iops_log=${OUTPUT}/${MODE}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
 log_avg_msec=${LOGINTERVAL}
 
