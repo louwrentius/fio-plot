@@ -25,9 +25,12 @@ def run_command(settings, benchmark, command):
     env.update(settings)
     env.update(benchmark)
     env.update({'OUTPUT': output_folder})
-    # pprint.pprint(env)
-    result = subprocess.Popen(command, shell=False,
-                              stdout=subprocess.PIPE, env=env).stdout.read()
+    try:
+        subprocess.run(command, shell=False, check=True,
+                       stdout=subprocess.PIPE, env=env).stdout.read()
+    except subprocess.CalledProcessError:
+        print("An error occurred while running Fio.")
+        sys.exit(1)
 
 
 def check_fio_version(settings):
@@ -60,8 +63,9 @@ def run_fio(settings, benchmark):
 
     command = ["fio", f"--output-format=json",
                f"--output={output_file}", settings['template']]
+
     result = run_command(settings, benchmark, command)
-    return result
+    # return result
 
 
 def format_benchmark(benchmark):
@@ -74,8 +78,6 @@ def format_benchmark(benchmark):
 def run_benchmarks(settings, benchmarks):
     if not settings['quiet']:
         for benchmark in ProgressBar(benchmarks):
-            status = format_benchmark(benchmark)
-            # print(f"\n   - Current benchmark: {status} ")
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
@@ -175,6 +177,8 @@ def get_arguments(settings):
     ag.add_argument(
         "--loginterval", help=f"Interval that specifies how often stats are \
             logged to the .log files. (Default: {settings['loginterval']}", type=int, default=settings['loginterval'])
+    ag.add_argument(
+        '--dry-run', help="Simulates a benchmark, does everything except running Fio.", action='store_true', default=False)
     return parser
 
 
@@ -225,12 +229,57 @@ def calculate_duration(settings, tests):
     return duration
 
 
+def parse_settings_for_display(settings):
+    data = {}
+    max_length = 0
+    action = {
+        list: lambda a: ' '.join(map(str, a)),
+        str: str,
+        int: str,
+        bool: str
+    }
+    for k, v in settings.items():
+        if type(v) != type(None):
+            data[str(k)] = action[type(v)](v)
+            length = len(data[k])
+            if length > max_length:
+                max_length = length
+    data['length'] = max_length
+    return data
+
+
+def check_if_mixed_workload(settings):
+    options = ['readwrite', 'rw', 'randrw']
+    for mode in settings['mode']:
+        if mode in options:
+            return True
+        else:
+            return False
+
+
 def display_header(settings, tests):
+    header = f"-------+ Fio Benchmark Script +"
+    data = parse_settings_for_display(settings)
+    fl = 30
+    length = data['length']
+    width = length + fl - len(header) + 1
     duration = calculate_duration(settings, tests)
-    print(f"   ------+ Fio Benchmark Script +------- ")
-    print(f"   Number of benchmarks: {len(tests):>15}")
-    print(f"   Estimated duration: {duration:>17}")
-    print(f"")
+
+    print(header + '-' * width)
+    if settings['dry_run']:
+        print()
+        print(f" ====---> WARNING - DRY RUN <---==== ")
+        print()
+    print(f"{'Number of benchmarks:':<{fl}} {len(tests):<}")
+    print(f"{'Estimated duration:':<{fl}} {duration:<}")
+    print(f"{'Devices to be tested:':<{fl}} {data['target']:<}")
+    print(f"{'Test mode (read/write):':<{fl}} {data['mode']:<}")
+    print(f"{'IOdepth to be tested:':<{fl}} {data['iodepth']:<}")
+    print(f"{'NumJobs to be tested:':<{fl}} {data['numjobs']:<}")
+    print(f"{'Blocksize(s) to be tested:':<{fl}} {data['blocksize']:<}")
+    if check_if_mixed_workload(settings):
+        print(f"{'Mixed workload (% Read):':<{fl}} {data['readmix']:<}")
+    print()
 
 
 def check_if_template_exists(settings):
@@ -241,16 +290,15 @@ def check_if_template_exists(settings):
 
 
 def main():
-
     settings = get_default_settings()
     args = check_args(settings)
     customsettings = vars(args)
     settings = {**settings, **customsettings}
     check_if_template_exists(settings)
-    # pprint.pprint(settings)
     tests = generate_test_list(settings)
     display_header(settings, tests)
-    run_benchmarks(settings, tests)
+    if not settings['dry_run']:
+        run_benchmarks(settings, tests)
 
 
 if __name__ == "__main__":
