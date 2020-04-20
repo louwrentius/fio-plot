@@ -219,10 +219,11 @@ def calculate_duration(settings, tests):
     return duration
 
 
-def display_stats(settings, tests):
+def display_header(settings, tests):
     duration = calculate_duration(settings, tests)
-    print(f"Number of benchmarks: {len(tests):>15}")
-    print(f"  Estimated duration: {duration:>15}")
+    print(f"  ------+ Fio Benchmark Script +------  ")
+    print(f"  Number of benchmarks: {len(tests):>15}")
+    print(f"  Estimated duration: {duration:>17}")
     print(f"")
 
 
@@ -234,7 +235,7 @@ def check_if_template_exists(settings):
 
 
 def main():
-    print(f" ------+ Fio Benchmark Script +------")
+
     settings = get_default_settings()
     args = check_args(settings)
     customsettings = vars(args)
@@ -242,7 +243,7 @@ def main():
     check_if_template_exists(settings)
     # pprint.pprint(settings)
     tests = generate_test_list(settings)
-    display_stats(settings, tests)
+    display_header(settings, tests)
     run_benchmarks(settings, tests)
 
 
