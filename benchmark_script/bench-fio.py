@@ -24,7 +24,7 @@ def run_raw_command(command, env=None):
     if result.returncode > 0:
         stdout = result.stdout.decode("UTF-8").strip()
         stderr = result.stderr.decode("UTF-8").strip()
-        print(f"An error occurred: {stderr} - {stdout}")
+        print(f"\nAn error occurred: {stderr} - {stdout}")
         sys.exit(1)
     return result
 
@@ -45,7 +45,7 @@ def check_fio_version(settings):
     result = run_raw_command(command).stdout
     result = result.decode("UTF-8").strip()
     if "fio-3" in result:
-        pass
+        return True
     elif "fio-2" in result:
         print(
             f"Your Fio version ({result}) is not compatible. Please use Fio-3.x")
@@ -153,23 +153,23 @@ def get_arguments(settings):
     ag.add_argument("-d", "--target",
                     help="Storage device / folder / file to be tested", required=True, nargs='+', type=str)
     ag.add_argument("-t", "--type", help="Target type, device, file or folder",
-                    choices=['device', 'file', 'folder'])
+                    choices=['device', 'file', 'folder'], required=True)
     ag.add_argument(
         "-s", "--size", help="File size if target is a file. If target \
-            is a directory, a file of the specified size is created per job")
-    ag.add_argument("-j", "--job-template",
-                    help="Path to Fio job template file.", required=True)
+            is a directory, a file of the specified size is created per job", type=str)
     ag.add_argument("-o", "--output",
                     help=f"Output folder for .json and .log output. If a read/write mix is specified,\
                     separate folders for each mix will be created.", required=True)
     ag.add_argument(
-        "--template", help=f"Fio job file in INI format. (Default: {settings['template']})", default=settings['template'])
+        "-j", "--template", help=f"Fio job file in INI format. \
+            (Default: {settings['template']})", default=settings['template'])
     ag.add_argument(
-        "--iodepth", help=f"Override default iodepth test series ({settings['iodepth']}", nargs='+', type=int,
+        "--iodepth", help=f"Override default iodepth test series\
+             ({settings['iodepth']}. Usage example: --iodepth 1 8 16", nargs='+', type=int,
         default=settings['iodepth'])
     ag.add_argument(
-        "--numjobs", help=f"Override default number of jobs test series \
-            ({settings['numjobs']}", nargs='+', type=int, default=settings['numjobs'])
+        "--numjobs", help=f"Override default number of jobs test series\
+            ({settings['numjobs']}. Usage example: --numjobs 1 8 16", nargs='+', type=int, default=settings['numjobs'])
     ag.add_argument(
         "--duration", help=f"Override the default test duration per benchmark \
             (default: {settings['duration']})", default=settings['duration'])
@@ -188,7 +188,7 @@ def get_arguments(settings):
             for an overview of supported engines. (Default: {settings['engine']}).", default=settings['engine'])
     ag.add_argument("--extra-opts", help=f"Allows you to add extra options, \
         for example, options that are specific to the selected ioengine. It \
-             can be any other Fio option. Example: --extra-opts option-a=1 option-b=2.\
+             can be any other Fio option. Example: --extra-opts norandommap=1 invalidate=0\
                  You may also choose to add those options to the fio_template.fio file.", nargs='+')
     ag.add_argument(
         "--quiet", help="The progresbar will be supressed.", action='store_true')
@@ -201,9 +201,9 @@ def get_arguments(settings):
 
 
 def get_default_settings():
+    """ Hard-coded set of default settings """
     settings = {}
-    settings['targetfile'] = []
-    settings['targetdevice'] = []
+    settings['target'] = []
     settings['template'] = "./fio-job-template.fio"
     settings['engine'] = "libaio"
     settings['mode'] = ["randread", "randwrite"]
@@ -215,28 +215,8 @@ def get_default_settings():
     settings['readmix'] = [75]
     settings['duration'] = 60
     settings['extra_opts'] = []
-    settings['iterable'] = []
     settings['loginterval'] = 500
     return settings
-
-
-def check_args(settings):
-    try:
-        parser = get_arguments(settings)
-        args = parser.parse_args()
-    except OSError:
-        parser.print_help()
-        sys.exit(1)
-
-    if len(sys.argv) == 1:
-        parser.print_help()
-        sys.exit(1)
-
-    if not check_fio_version:
-        parser.print_help()
-        sys.exit(1)
-
-    return args
 
 
 def calculate_duration(settings, tests):
@@ -288,6 +268,7 @@ def display_header(settings, tests):
         print()
         print(f" ====---> WARNING - DRY RUN <---==== ")
         print()
+    print(f"{'Job template:':<{fl}} {data['template']:<}")
     print(f"{'Number of benchmarks:':<{fl}} {len(tests):<}")
     print(f"{'Estimated duration:':<{fl}} {duration:<}")
     print(f"{'Devices to be tested:':<{fl}} {data['target']:<}")
@@ -295,18 +276,55 @@ def display_header(settings, tests):
     print(f"{'IOdepth to be tested:':<{fl}} {data['iodepth']:<}")
     print(f"{'NumJobs to be tested:':<{fl}} {data['numjobs']:<}")
     print(f"{'Blocksize(s) to be tested:':<{fl}} {data['blocksize']:<}")
+    if settings['size']:
+        print(f"{'File size:':<{fl}} {data['size']:<}")
     if check_if_mixed_workload(settings):
         print(f"{'Mixed workload (% Read):':<{fl}} {data['readmix']:<}")
-    if len(settings['extra_opts']) > 0:
+    if settings['extra_opts']:
         print(f"{'Extra options:':<{fl}} {data['extra_opts']:<}")
     print()
 
 
-def check_if_template_exists(settings):
-    if not os.path.exists(settings['template']):
-        print(
-            f"It seems that template file {settings['template']} does not exist.")
+def check_args(settings):
+    try:
+        parser = get_arguments(settings)
+        args = parser.parse_args()
+
+    except OSError:
+        parser.print_help()
         sys.exit(1)
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(2)
+
+    if not check_fio_version(settings):
+        parser.print_help()
+        sys.exit(3)
+
+    return args
+
+
+def check_settings(settings):
+
+    if not os.path.exists(settings['template']):
+        print()
+        print(f"The specified template {settings['template']} does not exist.")
+        print()
+        sys.exit(6)
+
+    if settings['type'] != 'device' and not settings['size']:
+        print()
+        print("When the target is a file or folder, --size must be specified.")
+        print()
+        sys.exit(4)
+
+    if settings['type'] == 'folder' and not os.path.exists(settings['target']):
+        print()
+        print(
+            f"The target folder ({settings['target']}) doesn't seem to exist.")
+        print()
+        sys.exit(5)
 
 
 def main():
@@ -314,8 +332,7 @@ def main():
     args = check_args(settings)
     customsettings = vars(args)
     settings = {**settings, **customsettings}
-    check_fio_version(settings)
-    check_if_template_exists(settings)
+    check_settings(settings)
     tests = generate_test_list(settings)
     display_header(settings, tests)
     if not settings['dry_run']:
