@@ -64,7 +64,9 @@ def run_fio(settings, benchmark):
 def run_benchmarks(settings, benchmarks):
     if not settings['quiet']:
         for benchmark in ProgressBar(benchmarks):
+            print(f"Currently working on {benchmark}")
             run_fio(settings, benchmark)
+
     else:
         for benchmark in benchmarks:
             run_fio(settings, benchmark)
