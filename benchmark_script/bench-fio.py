@@ -222,8 +222,9 @@ def calculate_duration(settings, tests):
 
 def display_stats(settings, tests):
     duration = calculate_duration(settings, tests)
-    pprint.pprint(f"        Number of tests: {len(tests):>10}")
-    pprint.pprint(f"Total test run duration: {duration:>10}")
+    pprint.pprint(f"Number of benchmarks: {len(tests):>10}")
+    pprint.pprint(f"  Estimated duration: {duration:>10}")
+    pprint.pprint(f"")
 
 
 def check_if_template_exists(settings):
