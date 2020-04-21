@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
-#
-# Benchmark Fio based on
+"""
+This script is written to automate the process of running multiple
+Fio benchmarks. The output of the benchmarks have been tailored to be used with
+fio-plot.
+
+You may also an older script already part of Fio if that better suits your needs: 
+https://github.com/axboe/fio/blob/master/tools/genfio
+The output of this tool may not always fit with the file-name requirements of
+fio-plot, depending on the graph type.
+"""
 
 import argparse
 import sys
 import os
 import subprocess
-# import pprint
 import itertools
 import datetime
 import time
@@ -80,7 +87,6 @@ def generate_output_folder(settings, benchmark):
 def run_fio(settings, benchmark):
     output_folder = generate_output_folder(settings, benchmark)
     make_folder(output_folder)
-
     output_file = f"{output_folder}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
 
     command = ["fio", f"--output-format=json",
@@ -104,6 +110,8 @@ def run_benchmarks(settings, benchmarks):
 
 
 def ProgressBar(iterObj):
+    """ https://stackoverflow.com/questions/3160699/python-progress-bar/49234284#49234284
+    """
     def SecToStr(sec):
         m, s = divmod(sec, 60)
         h, m = divmod(m, 60)
@@ -152,8 +160,8 @@ def generate_test_list(settings):
 
 def get_arguments(settings):
     parser = argparse.ArgumentParser(
-        description="Automates FIO benchmarking by varying iodepth and numjobs \
-            paramers. Parameters can be customized")
+        description="Automates FIO benchmarking. It can run benchmarks \
+            with different iodepths, jobs or other properties.")
     ag = parser.add_argument_group(title="Generic Settings")
     ag.add_argument("-d", "--target",
                     help="Storage device / folder / file to be tested", required=True, nargs='+', type=str)
@@ -263,15 +271,15 @@ def check_if_mixed_workload(settings):
 
 def display_header(settings, tests):
 
-    header = f"+ Fio Benchmark Script +"
+    header = f"+++ Fio Benchmark Script +++"
     data = parse_settings_for_display(settings)
     fl = 30
     length = data['length']
     width = length + fl - len(header)
     duration = calculate_duration(settings, tests)
-    print(f"█" * (fl + width + 1))
-    print(header + '-' * width)
-    print(f"█" * (fl + width + 1))
+    print(f"█" * (fl + width))
+    print((" " * int(width/2)) + header)
+    print()
     if settings['dry_run']:
         print()
         print(f" ====---> WARNING - DRY RUN <---==== ")
@@ -292,6 +300,7 @@ def display_header(settings, tests):
     if settings['extra_opts']:
         print(f"{'Extra options:':<{fl}} {data['extra_opts']:<}")
     print()
+    print(f"█" * (fl + width))
 
 
 def check_args(settings):
