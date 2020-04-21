@@ -71,7 +71,7 @@ you to gather data for different queue depths and/or number of simultaneous jobs
 
 This particular example benchmark was run with these parameters:
 
-    ./bench-fio.py --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
+    ./bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
 
 In this example, we run a mixed random read/write benchmark. We have two runs, one with a 75%/25 read/write mix and one with a 90%/10% mix. 
 
