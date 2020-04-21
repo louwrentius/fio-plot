@@ -14,7 +14,7 @@ We benchmark one device with a custom set of iodepths and numjobs:
 
 We benchmark one device and pass extra custom parameters. 
 
-	./bench-fio.py --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 invalidate=0
+	./bench-fio.py --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1
 
 ### Usage
 
