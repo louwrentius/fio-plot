@@ -304,7 +304,7 @@ def display_header(settings, tests):
     print(f"{'Test mode (read/write):':<{fl}} {data['mode']:<}")
     print(f"{'IOdepth to be tested:':<{fl}} {data['iodepth']:<}")
     print(f"{'NumJobs to be tested:':<{fl}} {data['numjobs']:<}")
-    print(f"{'Blocksize(s) to be tested:':<{fl}} {data['blocksize']:<}")
+    print(f"{'Blocksize(s) to be tested:':<{fl}} {data['block_size']:<}")
     if settings['size']:
         print(f"{'File size:':<{fl}} {data['size']:<}")
     if check_if_mixed_workload(settings):
