@@ -154,7 +154,7 @@ def generate_test_list(settings):
     need to be run.
     """
     loop_items = ['target', 'mode', 'iodepth',
-                  'numjobs', 'blocksize',  'readmix']
+                  'numjobs', 'block_size',  'readmix']
     dataset = []
     for item in loop_items:
         result = settings[item]
