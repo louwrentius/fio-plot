@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import unittest
-import importlib
 import bench_fio as b
 
 
