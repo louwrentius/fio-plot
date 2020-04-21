@@ -16,6 +16,48 @@ We benchmark one device and pass extra custom parameters.
 
 	./bench-fio.py --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1
 
+
+An example with output:
+
+	./bench-fio.py --target /dev/md0 --type device --template fio-job-template.fio  --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --readmix 75 90 
+
+	████████████████████████████████████████████████████
+			+++ Fio Benchmark Script +++
+
+	Job template:                  fio-job-template.fio
+	I/O Engine:                    libaio
+	Number of benchmarks:          6
+	Estimated duration:            0:06:00
+	Devices to be tested:          /dev/md0
+	Test mode (read/write):        randrw
+	IOdepth to be tested:          1 8 16
+	NumJobs to be tested:          8
+	Blocksize(s) to be tested:     4k
+	Mixed workload (% Read):       75 90
+
+	████████████████████████████████████████████████████
+	100% |█████████████████████████|   [0:06:06, 0:00:00]-]
+
+### Output
+
+The benchmark data consists of two typtes of data. 
+
+1. Fio .json output
+2. Fio .log output
+
+This is an example to clarify the directory structure:
+
+	RAID_ARRAY/
+	└── md0
+		├── randrw75
+		│   ├── randrw-1-8.json
+		│   ├── randrw-8-8.json
+		└── randrw90
+			├── randrw-1-8.json
+
+The .log files are ommitted. 
+
+
 ### Usage
 
 	usage: bench-fio.py [-h] -d TARGET [TARGET ...] -t {device,file,folder}
