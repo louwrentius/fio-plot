@@ -46,16 +46,21 @@ The benchmark data consists of two typtes of data.
 2. Fio .log output
 
 This is an example to clarify the directory structure:
+The folder 'RAID_ARRAY' is the folder specified in --output.
 
-	RAID_ARRAY/
-	└── md0
-		├── randrw75
-		│   ├── randrw-1-8.json
-		│   ├── randrw-8-8.json
-		└── randrw90
-			├── randrw-1-8.json
+RAID_ARRAY/
+└── md0 <-- the device to be tested
+    ├── randrw75
+    │   └── 4k <-- block size
+    │       ├── randrw-1-8.json
+    └── randrw90
+        └── 4k
+            ├── randrw-1-8.json
 
 The .log files are ommitted. 
+
+Please note that mixed workloads will get their own folder to prevent files being overwritten.
+Pure read/write/trim workloads will appear in the *device* folder.
 
 
 ### Usage
