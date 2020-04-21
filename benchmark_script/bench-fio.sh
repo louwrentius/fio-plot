@@ -2,6 +2,11 @@
 
 set -eu
 
+echo
+echo "This script has been replaced by bench-fio.py"
+echo "Please consider using this script. It's in the same folder."
+echo
+
 if [ $# -ne 5 ]
 then
 	echo "Usage: $0 <JOBFILE> <OUTPUT> <DIRECTORY> <FILENAME> <SIZE>"
