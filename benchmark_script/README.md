@@ -10,20 +10,20 @@ You can also use apt/yum to satisfy this requirement.
  
 We benchmark two devices with a randread/randrwite workload. 
 
-    ./bench-fio.py --target /dev/md0 /dev/md1 --type device --mode randread randwrite --output RAID_ARRAY 
+    ./bench_fio --target /dev/md0 /dev/md1 --type device --mode randread randwrite --output RAID_ARRAY 
 
 We benchmark one device with a custom set of iodepths and numjobs:
 
-    ./bench-fio.py --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --iodepth 1 8 16 --numjobs 8
+    ./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --iodepth 1 8 16 --numjobs 8
 
 We benchmark one device and pass extra custom parameters. 
 
-	./bench-fio.py --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1
+	./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1
 
 
 An example with output:
 
-	./bench-fio.py --target /dev/md0 --type device --template fio-job-template.fio  --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --readmix 75 90 
+	./bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --readmix 75 90 
 
 	████████████████████████████████████████████████████
 			+++ Fio Benchmark Script +++
@@ -84,7 +84,7 @@ Pure read/write/trim workloads will appear in the *device* folder.
 
 ### Usage
 
-	usage: bench-fio.py [-h] -d TARGET [TARGET ...] -t {device,file,folder}
+	usage: bench_fio [-h] -d TARGET [TARGET ...] -t {device,file,folder}
 						[-s SIZE] -o OUTPUT [-j TEMPLATE]
 						[--iodepth IODEPTH [IODEPTH ...]]
 						[--numjobs NUMJOBS [NUMJOBS ...]] [--duration DURATION]
