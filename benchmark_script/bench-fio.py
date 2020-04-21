@@ -99,7 +99,7 @@ def run_fio(settings, benchmark):
                f"--output={output_file}", settings['template']]
 
     if settings['size']:
-        command.append(f"--size settings['size']")
+        command.append(f"--size {settings['size']}")
 
     if settings['extra_opts']:
         for option in settings['extra_opts']:
