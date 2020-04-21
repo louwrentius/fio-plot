@@ -98,6 +98,9 @@ def run_fio(settings, benchmark):
     command = ["fio", f"--output-format=json",
                f"--output={output_file}", settings['template']]
 
+    if settings['size']:
+        command.append(f"--size settings['size']")
+
     if settings['extra_opts']:
         for option in settings['extra_opts']:
             option = str(option)
@@ -305,6 +308,7 @@ def display_header(settings, tests):
     print(f"{'IOdepth to be tested:':<{fl}} {data['iodepth']:<}")
     print(f"{'NumJobs to be tested:':<{fl}} {data['numjobs']:<}")
     print(f"{'Blocksize(s) to be tested:':<{fl}} {data['block_size']:<}")
+    print(f"{'Time per test (s):':<{fl}} {data['duration']:<}")
     if settings['size']:
         print(f"{'File size:':<{fl}} {data['size']:<}")
     if check_if_mixed_workload(settings):
