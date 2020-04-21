@@ -182,6 +182,8 @@ def get_arguments(settings):
     ag.add_argument(
         "-j", "--template", help=f"Fio job file in INI format. \
             (Default: {settings['template']})", default=settings['template'])
+    ag.add_argument("-b", "--block-size",
+                    help=f"Specify blocksize(s). (Default: {settings['blocksize']}", default=settings['blocksize'], nargs='+')
     ag.add_argument(
         "--iodepth", help=f"Override default iodepth test series\
              ({settings['iodepth']}). Usage example: --iodepth 1 8 16", nargs='+', type=int,
