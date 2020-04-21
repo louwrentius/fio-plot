@@ -4,7 +4,7 @@ This script is written to automate the process of running multiple
 Fio benchmarks. The output of the benchmarks have been tailored to be used with
 fio-plot.
 
-You may also an older script already part of Fio if that better suits your needs: 
+You may also an older script already part of Fio if that better suits your needs:
 https://github.com/axboe/fio/blob/master/tools/genfio
 The output of this tool may not always fit with the file-name requirements of
 fio-plot, depending on the graph type.
@@ -18,6 +18,7 @@ import itertools
 import datetime
 import time
 from numpy import linspace
+import pprint
 
 
 def convert_dict_vals_to_str(dictionary):
@@ -82,7 +83,10 @@ def make_folder(folder):
 
 def generate_output_folder(settings, benchmark):
 
-    folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}"
+    if benchmark['mode'] in settings['mixed']:
+        folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['mode']}{benchmark['readmix']}"
+    else:
+        folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}"
     return folder
 
 
