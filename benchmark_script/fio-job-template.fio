@@ -1,6 +1,6 @@
 [iotest]
 rw=${MODE}
-blocksize=${BLOCKSIZE}
+blocksize=${BLOCK_SIZE}
 filename=${TARGET}
 ioengine=${ENGINE}
 iodepth=${IODEPTH}
