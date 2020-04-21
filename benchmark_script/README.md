@@ -42,6 +42,9 @@ An example with output:
 	████████████████████████████████████████████████████
 	100% |█████████████████████████|   [0:06:06, 0:00:00]-]
 
+Tip: Because benchmarks can run a long time, it may be advised to run them
+in a 'screen' session.
+
 ### Output
 
 The benchmark data consists of two typtes of data. 
