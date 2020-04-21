@@ -84,7 +84,7 @@ def make_folder(folder):
 def generate_output_folder(settings, benchmark):
 
     if benchmark['mode'] in settings['mixed']:
-        folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['mode']}/{benchmark['blocksize']}/{benchmark['readmix']}"
+        folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['mode']}{benchmark['readmix']}/{benchmark['blocksize']}"
     else:
         folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['blocksize']}"
     return folder
