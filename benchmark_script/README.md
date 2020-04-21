@@ -1,3 +1,7 @@
+### Requirements
+
+The 'numpy' python module is required.
+
 ### Examples
  
 We benchmark two devices with a randread/randrwite workload. 
