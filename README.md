@@ -82,26 +82,6 @@ For more examples, please consult the separate [README.md][rm]
 
 [rm]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
 
-### A note about queue depths
-Many SSD vendors report really high IOPs performance numbers, beyond 100.000 IOPs for a single SSD. Those numbers are always obtained using a queue depth of 32 or higher. 
-
-![queuedepthlowhigh01][queuedepthlowhigh01]
-
-[queuedepthlowhigh01]: https://raw.githubusercontent.com/louwrentius/fio-plot/master/images/INTEL-D3-S4610-on-IBM-M1015_2020-01-29_144451.png
-
-In many real-life cases, such queue depths are never
-encountered. Often, SSDs can only achieve 10% of those IOPs performance numbers with a queue depth of 1. Such low queue depths are way more common. 
-
-![queuedepthlowhigh02][queuedepthlowhigh02]
-
-[queuedepthlowhigh02]: https://louwrentius.com/static/images/impactofqueuedepth02.png
-
-[queuedepthlowhigh03]: https://louwrentius.com/static/images/impactofqueuedepth03.png
-
-In a virtualized environment, high queue depths and thus high IOPs numbers can be observed if many VMs simultaneously use storage. Individual VMs won't observe very high IOPs, only as a total set of VMs can those high IOPs results be observed.
-
-This is how I understand queue depths and the impact on performance.
-
 ### Dependancies
 
 Fio-plot requires 'matplotlib' and 'numpy' to be installed.
