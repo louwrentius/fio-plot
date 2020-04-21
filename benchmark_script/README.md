@@ -2,6 +2,10 @@
 
 The 'numpy' python module is required.
 
+   pip3 install -r requirements.txt 
+
+You can also use apt/yum to satisfy this requirement.
+
 ### Examples
  
 We benchmark two devices with a randread/randrwite workload. 
@@ -49,10 +53,12 @@ This is an example to clarify the directory structure:
 The folder 'RAID_ARRAY' is the folder specified in --output.
 
 RAID_ARRAY/
-└── md0 <-- the device to be tested
+└── md0
     ├── randrw75
-    │   └── 4k <-- block size
-    │       ├── randrw-1-8.json
+    │   ├── 4k
+    │   │   ├── randrw-1-8.json
+    │   └── 8k
+    │       └── randrw-1-8.json
     └── randrw90
         └── 4k
             ├── randrw-1-8.json
