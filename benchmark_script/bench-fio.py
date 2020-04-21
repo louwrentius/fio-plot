@@ -81,7 +81,9 @@ def make_folder(folder):
 
 
 def generate_output_folder(settings, benchmark):
-    return f"{settings['output']}/{os.path.basename(benchmark['target'])}"
+
+    folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}"
+    return folder
 
 
 def run_fio(settings, benchmark):
@@ -229,7 +231,7 @@ def get_default_settings():
     settings['duration'] = 60
     settings['extra_opts'] = []
     settings['loginterval'] = 500
-
+    settings['mixed'] = ['readwrite', 'rw', 'randrw']
     return settings
 
 
@@ -261,7 +263,7 @@ def parse_settings_for_display(settings):
 
 
 def check_if_mixed_workload(settings):
-    options = ['readwrite', 'rw', 'randrw']
+    options = settings['mixed']
     for mode in settings['mode']:
         if mode in options:
             return True

@@ -50,28 +50,37 @@ This is the only chart type that requires / can only show the results of a singl
 
 ### Benchmark script
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
-you to gather data for different queue depths and/or number of simultaneous jobs.
+you to gather data for different queue depths and/or number of simultaneous jobs. The benchmark script shows progress in real-time.
+
+	████████████████████████████████████████████████████
+			+++ Fio Benchmark Script +++
+
+	Job template:                  fio-job-template.fio
+	I/O Engine:                    libaio
+	Number of benchmarks:          98
+	Estimated duration:            1:38:00
+	Devices to be tested:          /dev/md0
+	Test mode (read/write):        randrw
+	IOdepth to be tested:          1 2 4 8 16 32 64
+	NumJobs to be tested:          1 2 4 8 16 32 64
+	Blocksize(s) to be tested:     4k
+	Mixed workload (% Read):       75 90
+
+	████████████████████████████████████████████████████
+	4% |█                        | - [0:04:02, 1:35:00]-]
+
+This particular example benchmark was run with these parameters:
+
+    ./bench-fio.py --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
+
+In this example, we run a mixed random read/write benchmark. We have two runs, one with a 75%/25 read/write mix and one with a 90%/10% mix. 
 
 You can run the benchmark against an entire device or a file/folder.
-Alongside the benchmark script, a Fio job template file is supplied (fio-job-template.fio)
+Alongside the benchmark script, a Fio job template file is supplied (fio-job-template.fio). This file can be customised as desired.
 
-The synax of ./bench-fio.py is:
+For more examples, please consult the separate [README.md][rm]
 
-	./bench-fio.py 
-	
-In the case of a benchmark against a *file*, the 'test directory', 'test file' and 'size' parameters are used. When benchmarking agains a *device* the 'test directory' should be a dummy value ('None'), the 'test file' parameter should be filled in with the device to be tested and the 'size' must be specified but is ignored (can be anything).
-
-In this example, a benchmark is run against a device: 
-
-	./bench-fio.sh /fio/fio-job-template-device.fio /fio/data None /dev/sdc
-
-In this example, a benchmark is run against a file:
-
-    ./bench-fio.sh /fio/fio-job-template-device.fio /fio/data /mnt/storage test.bin 100G
-
-By default, the benchmark script test the device for 1 minute for each benchmark combination. If you want to test the entire device, to gauge the worst-case performance you can expect, remove the 'RUNTIME' variable. 
-
-Please note that benchmarking the entire device can take a long time, so limit the combinations you want to test.
+[rm]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
 
 ### A note about queue depths
 Many SSD vendors report really high IOPs performance numbers, beyond 100.000 IOPs for a single SSD. Those numbers are always obtained using a queue depth of 32 or higher. 
