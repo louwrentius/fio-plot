@@ -52,27 +52,26 @@ The benchmark data consists of two typtes of data.
 This is an example to clarify the directory structure:
 The folder 'RAID_ARRAY' is the folder specified in --output.
 
-RRAID_ARRAY/ <-- folder as specified wit --output
-└── md0 <-- device
-    ├── randrw75 <-- mixed load with % read 
-    │   ├── 4k <-- Block size
-    │   │   ├── randrw-16-8.json
-    │   │   ├── randrw-1-8.json
-    │   │   ├── randrw-8-8.json
-    │   └── 8k <-- Block size
-    │       ├── randrw-16-8.json
-    │       ├── randrw-1-8.json
-    │       ├── randrw-8-8.json
-    └── randrw90
-        ├── 4k
-        │   ├── randrw-16-8.json
-        │   ├── randrw-1-8.json
-        │   ├── randrw-8-8.json
-        └── 8k
-            ├── randrw-16-8.json
-            ├── randrw-1-8.json
-            ├── randrw-8-8.json
-
+	RAID_ARRAY/ <-- folder as specified wit --output
+	└── md0 <-- device
+		├── randrw75 <-- mixed load with % read 
+		│   ├── 4k <-- Block size
+		│   │   ├── randrw-16-8.json
+		│   │   ├── randrw-1-8.json
+		│   │   ├── randrw-8-8.json
+		│   └── 8k <-- Block size
+		│       ├── randrw-16-8.json
+		│       ├── randrw-1-8.json
+		│       ├── randrw-8-8.json
+		└── randrw90
+			├── 4k
+			│   ├── randrw-16-8.json
+			│   ├── randrw-1-8.json
+			│   ├── randrw-8-8.json
+			└── 8k
+				├── randrw-16-8.json
+				├── randrw-1-8.json
+				├── randrw-8-8.json
 
 The .log files are ommitted. 
 
