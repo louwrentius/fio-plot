@@ -156,8 +156,8 @@ def generate_test_list(settings):
     This creates a full list of all possible benchmark permutations that
     need to be run.
     """
-    loop_items = ['target', 'mode', 'iodepth',
-                  'numjobs', 'block_size',  'readmix']
+    loop_items = settings['loop_items']
+
     dataset = []
     for item in loop_items:
         result = settings[item]
@@ -186,7 +186,7 @@ def get_arguments(settings):
         "-j", "--template", help=f"Fio job file in INI format. \
             (Default: {settings['template']})", default=settings['template'])
     ag.add_argument("-b", "--block-size",
-                    help=f"Specify blocksize(s). (Default: {settings['blocksize']}", default=settings['blocksize'], nargs='+')
+                    help=f"Specify block size(s). (Default: {settings['block_size']}", default=settings['block_size'], nargs='+')
     ag.add_argument(
         "--iodepth", help=f"Override default iodepth test series\
              ({settings['iodepth']}). Usage example: --iodepth 1 8 16", nargs='+', type=int,
@@ -236,7 +236,7 @@ def get_default_settings():
     settings['mode'] = ["randread", "randwrite"]
     settings['iodepth'] = [1, 2, 4, 8, 16, 32, 64]
     settings['numjobs'] = [1, 2, 4, 8, 16, 32, 64]
-    settings['blocksize'] = ["4k"]
+    settings['block_size'] = ["4k"]
     settings['direct'] = 1
     settings['size'] = None
     settings['readmix'] = [75]
@@ -245,6 +245,8 @@ def get_default_settings():
     settings['loginterval'] = 500
     settings['mixed'] = ['readwrite', 'rw', 'randrw']
     settings['invalidate'] = 1
+    settings['loop_items'] = ['target', 'mode', 'iodepth',
+                              'numjobs', 'block_size',  'readmix']
     return settings
 
 
@@ -307,7 +309,7 @@ def display_header(settings, tests):
     print(f"{'Test mode (read/write):':<{fl}} {data['mode']:<}")
     print(f"{'IOdepth to be tested:':<{fl}} {data['iodepth']:<}")
     print(f"{'NumJobs to be tested:':<{fl}} {data['numjobs']:<}")
-    print(f"{'Blocksize(s) to be tested:':<{fl}} {data['block_size']:<}")
+    print(f"{'Block size(s) to be tested:':<{fl}} {data['block_size']:<}")
     print(f"{'Time per test (s):':<{fl}} {data['duration']:<}")
     if settings['size']:
         print(f"{'File size:':<{fl}} {data['size']:<}")
@@ -366,6 +368,7 @@ def check_settings(settings):
 
 def main():
     settings = get_default_settings()
+    pprint.pprint(settings)
     args = check_args(settings)
     customsettings = vars(args)
     settings = {**settings, **customsettings}
