@@ -205,6 +205,9 @@ def get_arguments(settings):
         for example, options that are specific to the selected ioengine. It \
              can be any other Fio option. Example: --extra-opts norandommap=1 invalidate=0\
                  You may also choose to add those options to the fio_template.fio file.", nargs='+')
+    ag.add_argument("--invalidate", type=int,
+                    help=f"From the Fio manual: Invalidate buffer-cache for the \
+                        file prior to starting I/O.(Default: {settings['invalidate']})", default=settings['invalidate'])
     ag.add_argument(
         "--quiet", help="The progresbar will be supressed.", action='store_true')
     ag.add_argument(
@@ -232,6 +235,7 @@ def get_default_settings():
     settings['extra_opts'] = []
     settings['loginterval'] = 500
     settings['mixed'] = ['readwrite', 'rw', 'randrw']
+    settings['invalidate'] = 1
     return settings
 
 
