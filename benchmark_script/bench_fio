@@ -111,7 +111,6 @@ def run_fio(settings, benchmark):
         for option in settings['extra_opts']:
             option = str(option)
             command.append(f"--"+option)
-    pprint.pprint(benchmark)
     run_command(settings, benchmark, command)
 
 
