@@ -368,7 +368,6 @@ def check_settings(settings):
 
 def main():
     settings = get_default_settings()
-    pprint.pprint(settings)
     args = check_args(settings)
     customsettings = vars(args)
     settings = {**settings, **customsettings}
