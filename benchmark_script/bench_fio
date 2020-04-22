@@ -101,6 +101,12 @@ def run_fio(settings, benchmark):
     if settings['size']:
         command.append(f"--size={settings['size']}")
 
+    if settings['type'] == 'file' or settings['type'] == 'device':
+        command.append(f"--filename={settings['target']}")
+
+    if settings['type'] == 'directory':
+        command.append(f"--directory={settings['target']}")
+
     if settings['extra_opts']:
         for option in settings['extra_opts']:
             option = str(option)
@@ -289,12 +295,13 @@ def check_if_mixed_workload(settings):
 def display_header(settings, tests):
 
     header = f"+++ Fio Benchmark Script +++"
+    blockchar = chr(9608)
     data = parse_settings_for_display(settings)
     fl = 30
     length = data['length']
     width = length + fl - len(header)
     duration = calculate_duration(settings, tests)
-    print(f"█" * (fl + width))
+    print(f"{blockchar}" * (fl + width))
     print((" " * int(width/2)) + header)
     print()
     if settings['dry_run']:
@@ -318,7 +325,7 @@ def display_header(settings, tests):
     if settings['extra_opts']:
         print(f"{'Extra options:':<{fl}} {data['extra_opts']:<}")
     print()
-    print(f"█" * (fl + width))
+    print(f"{blockchar}" * (fl + width))
 
 
 def check_args(settings):
