@@ -1,6 +1,6 @@
 ### Requirements
 
-The 'numpy' python module is required.
+Bench_fio requires Python3. The 'numpy' python module is required.
 
    pip3 install -r requirements.txt 
 
@@ -83,14 +83,15 @@ Pure read/write/trim workloads will appear in the *device* folder.
 
 
 ### Usage
-
-	usage: bench_fio [-h] -d TARGET [TARGET ...] -t {device,file,folder}
-						[-s SIZE] -o OUTPUT [-j TEMPLATE]
-						[--iodepth IODEPTH [IODEPTH ...]]
-						[--numjobs NUMJOBS [NUMJOBS ...]] [--duration DURATION]
-						[-m MODE [MODE ...]] [--readmix READMIX [READMIX ...]]
-						[-e ENGINE] [--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]]
-						[--quiet] [--loginterval LOGINTERVAL] [--dry-run]
+	usage: bench_fio [-h] -d TARGET [TARGET ...] -t {device,file,directory}
+					[-s SIZE] -o OUTPUT [-j TEMPLATE]
+					[-b BLOCK_SIZE [BLOCK_SIZE ...]]
+					[--iodepth IODEPTH [IODEPTH ...]]
+					[--numjobs NUMJOBS [NUMJOBS ...]] [--duration DURATION]
+					[-m MODE [MODE ...]] [--readmix READMIX [READMIX ...]]
+					[-e ENGINE] [--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]]
+					[--invalidate INVALIDATE] [--quiet]
+					[--loginterval LOGINTERVAL] [--dry-run]
 
 	Automates FIO benchmarking. It can run benchmarks with different iodepths,
 	jobs or other properties.
@@ -100,19 +101,21 @@ Pure read/write/trim workloads will appear in the *device* folder.
 
 	Generic Settings:
 	-d TARGET [TARGET ...], --target TARGET [TARGET ...]
-							Storage device / folder / file to be tested
-	-t {device,file,folder}, --type {device,file,folder}
-							Target type, device, file or folder
+							Storage device / directory / file to be tested
+	-t {device,file,directory}, --type {device,file,directory}
+							Target type, device, file or directory
 	-s SIZE, --size SIZE  File size if target is a file. If target is a
 							directory, a file of the specified size is created per
 							job
 	-o OUTPUT, --output OUTPUT
-							Output folder for .json and .log output. If a
-							read/write mix is specified, separate folders for each
-							mix will be created.
+							Output directory for .json and .log output. If a
+							read/write mix is specified, separate directories for
+							each mix will be created.
 	-j TEMPLATE, --template TEMPLATE
 							Fio job file in INI format. (Default: ./fio-job-
 							template.fio)
+	-b BLOCK_SIZE [BLOCK_SIZE ...], --block-size BLOCK_SIZE [BLOCK_SIZE ...]
+							Specify block size(s). (Default: ['4k']
 	--iodepth IODEPTH [IODEPTH ...]
 							Override default iodepth test series ([1, 2, 4, 8, 16,
 							32, 64]). Usage example: --iodepth 1 8 16
@@ -131,9 +134,9 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							represents the percentage of reads. A read/write mix
 							of 75%/25% is specified as '75' (default: [75]).
 							Multiple values can be specified and separate output
-							folders will be created. This argument is only used if
-							the benchmark is of type randrw. Otherwise this option
-							is ignored.
+							directories will be created. This argument is only
+							used if the benchmark is of type randrw. Otherwise
+							this option is ignored.
 	-e ENGINE, --engine ENGINE
 							Select the ioengine to use, see fio --enghelp for an
 							overview of supported engines. (Default: libaio).
@@ -143,6 +146,9 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							any other Fio option. Example: --extra-opts
 							norandommap=1 invalidate=0 You may also choose to add
 							those options to the fio_template.fio file.
+	--invalidate INVALIDATE
+							From the Fio manual: Invalidate buffer-cache for the
+							file prior to starting I/O.(Default: 1)
 	--quiet               The progresbar will be supressed.
 	--loginterval LOGINTERVAL
 							Interval that specifies how often stats are logged to
