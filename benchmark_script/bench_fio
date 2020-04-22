@@ -358,12 +358,14 @@ def check_settings(settings):
         print()
         sys.exit(4)
 
-    if settings['type'] == 'folder' and not os.path.exists(settings['target']):
-        print()
-        print(
-            f"The target folder ({settings['target']}) doesn't seem to exist.")
-        print()
-        sys.exit(5)
+    if settings['type'] == 'folder':
+        for item in settings['target']:
+            if not os.path.exists(item):
+                print()
+                print(
+                    f"The target folder ({item}) doesn't seem to exist.")
+                print()
+                sys.exit(5)
 
 
 def main():
