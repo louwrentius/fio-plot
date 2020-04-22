@@ -90,6 +90,36 @@ def generate_output_directory(settings, benchmark):
     return directory
 
 
+def check_target_type(target, filetype):
+    """ Validate path and file / directory type.
+    It also returns the appropritate fio command line parameter based on the
+    file type. 
+    """
+    test = {
+        'file': os.path.isfile,
+        'device': os.path.isfile,
+        'directory': os.path.isdir
+    }
+
+    parameter = {
+        'file': '--filename',
+        'device': '--filename',
+        'directory': '--directory'
+    }
+
+    if not os.path.exists(target):
+        print(f"Benchmark target {filetype} {target} does not exist.")
+        sys.exit(10)
+
+    check = test[filetype]
+
+    if check(target):
+        return True
+    else:
+        print(f"Target {filetype} {target} is not {filetype}.")
+        sys.exit(10)
+
+
 def run_fio(settings, benchmark):
     output_directory = generate_output_directory(settings, benchmark)
     make_directory(output_directory)
@@ -98,14 +128,14 @@ def run_fio(settings, benchmark):
     command = ["fio", f"--output-format=json",
                f"--output={output_file}", settings['template']]
 
+    target = benchmark['target']
+
     if settings['size']:
         command.append(f"--size={settings['size']}")
 
-    if settings['type'] == 'file' or settings['type'] == 'device':
-        command.append(f"--filename={benchmark['target']}")
+    target_parameter = check_target_type(target, settings['type'])
 
-    if settings['type'] == 'directory':
-        command.append(f"--directory={benchmark['target']}")
+    command.append(f"{target_parameter}={target}")
 
     if settings['extra_opts']:
         for option in settings['extra_opts']:
