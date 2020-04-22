@@ -86,6 +86,8 @@ For more examples, please consult the separate [README.md][rm]
 
 Fio-plot requires 'matplotlib' and 'numpy' to be installed.
 
+Please note that Fio-plot has been tested on matplotlib version 3.2.1
+
 ### Usage
 
 	usage: fio_plot [-h] [-i INPUT_DIRECTORY] [-T TITLE] [-s SOURCE] [-L] [-l]
