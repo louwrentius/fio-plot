@@ -95,26 +95,33 @@ def check_target_type(target, filetype):
     It also returns the appropritate fio command line parameter based on the
     file type. 
     """
+
+    keys = ['file', 'device', 'directory']
+
     test = {
-        'file': os.path.isfile,
-        'device': os.path.isfile,
-        'directory': os.path.isdir
+        keys[0]: os.path.isfile,
+        keys[1]: os.path.isfile,
+        keys[2]: os.path.isdir
     }
 
     parameter = {
-        'file': '--filename',
-        'device': '--filename',
-        'directory': '--directory'
+        keys[0]: '--filename',
+        keys[1]: '--filename',
+        keys[2]: '--directory'
     }
 
     if not os.path.exists(target):
         print(f"Benchmark target {filetype} {target} does not exist.")
         sys.exit(10)
 
+    if filetype not in keys:
+        print(f"Error, filetype {filetype} is an unknown option.")
+        exit(123)
+
     check = test[filetype]
 
     if check(target):
-        return parameter['filetype']
+        return parameter[filetype]
     else:
         print(f"Target {filetype} {target} is not {filetype}.")
         sys.exit(10)
