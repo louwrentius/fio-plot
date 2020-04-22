@@ -102,16 +102,16 @@ def run_fio(settings, benchmark):
         command.append(f"--size={settings['size']}")
 
     if settings['type'] == 'file' or settings['type'] == 'device':
-        command.append(f"--filename={settings['target']}")
+        command.append(f"--filename={benchmark['target']}")
 
     if settings['type'] == 'directory':
-        command.append(f"--directory={settings['target']}")
+        command.append(f"--directory={benchmark['target']}")
 
     if settings['extra_opts']:
         for option in settings['extra_opts']:
             option = str(option)
             command.append(f"--"+option)
-    pprint.pprint(settings)
+    pprint.pprint(benchmark)
     run_command(settings, benchmark, command)
 
 
