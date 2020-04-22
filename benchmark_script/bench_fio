@@ -294,7 +294,7 @@ def check_if_mixed_workload(settings):
 
 def display_header(settings, tests):
     header = f"+++ Fio Benchmark Script +++"
-    blockchar = chr(9608)
+    blockchar = '='
     data = parse_settings_for_display(settings)
     fl = 30  # Width of left column of text
     length = data['length']
