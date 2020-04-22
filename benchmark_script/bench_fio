@@ -43,13 +43,13 @@ def run_command(settings, benchmark, command):
     """ This command sets up the environment that is used in conjunction
     with the Fio .ini job file.
     """
-    output_folder = generate_output_folder(settings, benchmark)
+    output_directory = generate_output_directory(settings, benchmark)
     env = os.environ
     settings = convert_dict_vals_to_str(settings)
     benchmark = convert_dict_vals_to_str(benchmark)
     env.update(settings)
     env.update(benchmark)
-    env.update({'OUTPUT': output_folder})
+    env.update({'OUTPUT': output_directory})
     run_raw_command(command, env)
 
 
@@ -72,28 +72,28 @@ def check_fio_version(settings):
         sys.exit(1)
 
 
-def make_folder(folder):
+def make_directory(directory):
     try:
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
     except OSError:
-        print(f"Failed to create {folder}")
+        print(f"Failed to create {directory}")
         sys.exit(1)
 
 
-def generate_output_folder(settings, benchmark):
+def generate_output_directory(settings, benchmark):
 
     if benchmark['mode'] in settings['mixed']:
-        folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['mode']}{benchmark['readmix']}/{benchmark['block_size']}"
+        directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['mode']}{benchmark['readmix']}/{benchmark['block_size']}"
     else:
-        folder = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['block_size']}"
-    return folder
+        directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['block_size']}"
+    return directory
 
 
 def run_fio(settings, benchmark):
-    output_folder = generate_output_folder(settings, benchmark)
-    make_folder(output_folder)
-    output_file = f"{output_folder}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
+    output_directory = generate_output_directory(settings, benchmark)
+    make_directory(output_directory)
+    output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
 
     command = ["fio", f"--output-format=json",
                f"--output={output_file}", settings['template']]
@@ -111,7 +111,7 @@ def run_fio(settings, benchmark):
         for option in settings['extra_opts']:
             option = str(option)
             command.append(f"--"+option)
-
+    pprint.pprint(settings)
     run_command(settings, benchmark, command)
 
 
@@ -179,15 +179,15 @@ def get_arguments(settings):
             with different iodepths, jobs or other properties.")
     ag = parser.add_argument_group(title="Generic Settings")
     ag.add_argument("-d", "--target",
-                    help="Storage device / folder / file to be tested", required=True, nargs='+', type=str)
-    ag.add_argument("-t", "--type", help="Target type, device, file or folder",
-                    choices=['device', 'file', 'folder'], required=True)
+                    help="Storage device / directory / file to be tested", required=True, nargs='+', type=str)
+    ag.add_argument("-t", "--type", help="Target type, device, file or directory",
+                    choices=['device', 'file', 'directory'], required=True)
     ag.add_argument(
         "-s", "--size", help="File size if target is a file. If target \
             is a directory, a file of the specified size is created per job", type=str)
     ag.add_argument("-o", "--output",
-                    help=f"Output folder for .json and .log output. If a read/write mix is specified,\
-                    separate folders for each mix will be created.", required=True)
+                    help=f"Output directory for .json and .log output. If a read/write mix is specified,\
+                    separate directories for each mix will be created.", required=True)
     ag.add_argument(
         "-j", "--template", help=f"Fio job file in INI format. \
             (Default: {settings['template']})", default=settings['template'])
@@ -210,7 +210,7 @@ def get_arguments(settings):
         with --testmode, the ratio of reads vs. writes can be specified with this option.\
             the parameter is an integer and represents the percentage of reads.\
              A read/write mix of 75%%/25%%  is specified as '75' (default: {settings['readmix']}).\
-                Multiple values can be specified and separate output folders will be created.\
+                Multiple values can be specified and separate output directories will be created.\
                     This argument is only used if the benchmark is of type randrw. Otherwise \
                         this option is ignored.", nargs='+', type=int, default=settings['readmix'])
     ag.add_argument(
@@ -360,16 +360,16 @@ def check_settings(settings):
 
     if settings['type'] != 'device' and not settings['size']:
         print()
-        print("When the target is a file or folder, --size must be specified.")
+        print("When the target is a file or directory, --size must be specified.")
         print()
         sys.exit(4)
 
-    if settings['type'] == 'folder':
+    if settings['type'] == 'directory':
         for item in settings['target']:
             if not os.path.exists(item):
                 print()
                 print(
-                    f"The target folder ({item}) doesn't seem to exist.")
+                    f"The target directory ({item}) doesn't seem to exist.")
                 print()
                 sys.exit(5)
 
