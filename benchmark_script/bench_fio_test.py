@@ -9,7 +9,7 @@ class TestFunctions(unittest.TestCase):
         self.settings = b.get_default_settings()
         self.settings['target'] = ['device']
         self.tests = b.generate_test_list(self.settings)
-        self.settings['output'] = 'output_folder'
+        self.settings['output'] = 'output_directory'
 
     def test_generate_benchmarks(self):
         self.assertEqual(len(b.generate_test_list(self.settings)), 98)
@@ -28,17 +28,17 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(b.calculate_duration(
             self.settings, self.tests), '1:38:00')
 
-    def test_generate_output_folder_regular(self):
+    def test_generate_output_directory_regular(self):
         benchmark = self.tests[0]
-        self.assertEqual(b.generate_output_folder(
-            self.settings, benchmark), 'output_folder/device/4k')
+        self.assertEqual(b.generate_output_directory(
+            self.settings, benchmark), 'output_directory/device/4k')
 
-    def test_generate_output_folder_mixed(self):
+    def test_generate_output_directory_mixed(self):
         self.settings['mode'] = ['rw']
         tests = b.generate_test_list(self.settings)
         benchmark = tests[0]
-        self.assertEqual(b.generate_output_folder(
-            self.settings, benchmark), 'output_folder/device/rw75/4k')
+        self.assertEqual(b.generate_output_directory(
+            self.settings, benchmark), 'output_directory/device/rw75/4k')
 
 
 if __name__ == '__main__':
