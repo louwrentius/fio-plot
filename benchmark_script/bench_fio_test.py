@@ -50,7 +50,6 @@ class TestFunctions(unittest.TestCase):
         filtered_settings.sort()
         descriptions = list((b.get_argument_description()).keys())
         descriptions.sort()
-
         self.assertEqual(len(filtered_settings), len(descriptions))
 
 
