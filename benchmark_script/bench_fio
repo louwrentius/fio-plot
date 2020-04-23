@@ -270,6 +270,28 @@ def get_arguments(settings):
     return parser
 
 
+def get_argument_description(argument):
+    descriptions = {
+        'target': 'Test target',
+        'template': 'Job template',
+        'engine': 'I/O Engine',
+        'mode': 'Test mode (read/write)',
+        'iodepth': 'IOdepth to be tested',
+        'numjobs': 'NumJobs to be tested',
+        'block_size': 'Block size',
+        'direct': 'Direct I/O',
+        'size': 'Specified test data size',
+        'readmix': 'Read/write mix in %% read',
+        'duration': 'Time duration per test (s)',
+        'extra_opts': 'Extra custom options',
+        'loginterval': 'Log interval of perf data',
+        'invalidate': 'Invalidate buffer cache',
+        'type': 'Target type',
+        'output': 'Output folder',
+    }
+    return descriptions[argument]
+
+
 def get_default_settings():
     settings = {}
     settings['target'] = []
@@ -289,6 +311,8 @@ def get_default_settings():
     settings['invalidate'] = 1
     settings['loop_items'] = ['target', 'mode', 'iodepth',
                               'numjobs', 'block_size',  'readmix']
+    settings['filter_items'] = ['filter_items',
+                                'loop_items', 'dry_run', 'mixed', 'quiet']
     return settings
 
 
@@ -330,7 +354,7 @@ def check_if_mixed_workload(settings):
 
 def display_header(settings, tests):
     header = f"+++ Fio Benchmark Script +++"
-    blockchar = '='
+    blockchar = u'\u2588'
     data = parse_settings_for_display(settings)
     fl = 30  # Width of left column of text
     length = data['length']
@@ -343,22 +367,16 @@ def display_header(settings, tests):
         print()
         print(f" ====---> WARNING - DRY RUN <---==== ")
         print()
-    print(f"{'Job template:':<{fl}} {data['template']:<}")
-    print(f"{'I/O Engine:':<{fl}} {data['engine']:<}")
-    print(f"{'Number of benchmarks:':<{fl}} {len(tests):<}")
-    print(f"{'Estimated duration:':<{fl}} {duration:<}")
-    print(f"{'Devices to be tested:':<{fl}} {data['target']:<}")
-    print(f"{'Test mode (read/write):':<{fl}} {data['mode']:<}")
-    print(f"{'IOdepth to be tested:':<{fl}} {data['iodepth']:<}")
-    print(f"{'NumJobs to be tested:':<{fl}} {data['numjobs']:<}")
-    print(f"{'Block size(s) to be tested:':<{fl}} {data['block_size']:<}")
-    print(f"{'Time per test (s):':<{fl}} {data['duration']:<}")
-    if settings['size']:
-        print(f"{'File size:':<{fl}} {data['size']:<}")
-    if check_if_mixed_workload(settings):
-        print(f"{'Mixed workload (% Read):':<{fl}} {data['readmix']:<}")
-    if settings['extra_opts']:
-        print(f"{'Extra options:':<{fl}} {data['extra_opts']:<}")
+    estimated = "Estimated duration"
+    print(f"{estimated:<{fl}}: {duration:<}")
+    for item in settings.keys():
+        if item not in settings['filter_items']:
+            description = get_argument_description(item)
+            if item in data.keys():
+                print(f"{description:<{fl}}: {data[item]:<}")
+            else:
+                if settings[item]:
+                    print(f"{description}:<{fl}: {settings[item]:<}")
     print()
     print(f"{blockchar}" * (fl + width))
 
@@ -410,7 +428,20 @@ def check_settings(settings):
                 sys.exit(5)
 
 
+def check_encoding():
+    encoding = sys.getdefaultencoding()
+    if str(encoding) != "'utf-8'":
+        print()
+        print(
+            f"It seems your default encoding is {encoding}. This script requires UTF-8.")
+        print(f"You can change the default encoding with 'export PYTHONIOENCODING=UTF-8'")
+        print(f"Changing the default encoding could affect other applications, beware.")
+        print()
+        exit(90)
+
+
 def main():
+    check_encoding()
     settings = get_default_settings()
     args = check_args(settings)
     customsettings = vars(args)
