@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import unittest
 import bench_fio as b
+import pprint
 
 
 class TestFunctions(unittest.TestCase):
@@ -8,6 +9,7 @@ class TestFunctions(unittest.TestCase):
     def setUp(self):
         self.settings = b.get_default_settings()
         self.settings['target'] = ['device']
+        self.settings['type'] = ['directory']
         self.tests = b.generate_test_list(self.settings)
         self.settings['output'] = 'output_directory'
 
@@ -39,6 +41,17 @@ class TestFunctions(unittest.TestCase):
         benchmark = tests[0]
         self.assertEqual(b.generate_output_directory(
             self.settings, benchmark), 'output_directory/device/rw75/4k')
+
+    def test_number_of_settings(self):
+        filtered_settings = []
+        for setting in self.settings.keys():
+            if setting not in self.settings['filter_items']:
+                filtered_settings.append(str(setting))
+        filtered_settings.sort()
+        descriptions = list((b.get_argument_description()).keys())
+        descriptions.sort()
+
+        self.assertEqual(len(filtered_settings), len(descriptions))
 
 
 if __name__ == '__main__':
