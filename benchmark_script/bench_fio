@@ -429,12 +429,14 @@ def check_settings(settings):
 
 
 def check_encoding():
-    encoding = sys.getdefaultencoding()
-    if str(encoding) != "'utf-8'":
+    try:
+        print(u"\u3000")  # blank space
+    except UnicodeEncodeError:
         print()
         print(
-            f"It seems your default encoding is {encoding}. This script requires UTF-8.")
+            f"It seems your default encoding is not UTF-8. This script requires UTF-8.")
         print(f"You can change the default encoding with 'export PYTHONIOENCODING=UTF-8'")
+        print(f"Or you can run the script like: PYTHONIOENCODING=utf-8 ./bench_fio")
         print(f"Changing the default encoding could affect other applications, beware.")
         print()
         exit(90)
