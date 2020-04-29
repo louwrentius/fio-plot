@@ -102,10 +102,9 @@ def main():
         exit(1)
 
     if settings['iodepth_numjobs_3d']:
-        pprint.pprint(settings['type'])
         if settings['type'][0] not in ['iops', 'lat']:
             print(
-                "\nIf -L is specified (3D Chart) you can only select [iops,lat] for -t type")
+                "\nIf -L is specified (3D Chart) you can only select [iops,lat] for -t type\n")
             exit(1)
 
     option_found = False
