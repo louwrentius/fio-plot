@@ -238,7 +238,7 @@ def get_arguments(settings):
             ({settings['numjobs']}). Usage example: --numjobs 1 8 16", nargs='+', type=int, default=settings['numjobs'])
     ag.add_argument(
         "--duration", help=f"Override the default test duration per benchmark \
-            (default: {settings['duration']})", default=settings['duration'])
+            (default: {settings['duration']})", type=int, default=settings['duration'])
     ag.add_argument(
         "-m", "--mode", help=f"List of I/O load tests to run (default: \
             {settings['mode']})", default=settings['mode'], nargs='+', type=str)
