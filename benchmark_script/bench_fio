@@ -121,7 +121,9 @@ def check_target_type(target, filetype):
 
     check = test[filetype]
 
-    if check(target):
+    pathtarget = Path(target)
+
+    if check(pathtarget):
         return parameter[filetype]
     else:
         print(f"Target {filetype} {target} is not {filetype}.")
