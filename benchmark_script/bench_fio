@@ -18,6 +18,7 @@ import itertools
 import datetime
 import time
 from numpy import linspace
+import pathlib
 import pprint
 
 
@@ -99,9 +100,9 @@ def check_target_type(target, filetype):
     keys = ['file', 'device', 'directory']
 
     test = {
-        keys[0]: os.path.isfile,
-        keys[1]: os.path.isfile,
-        keys[2]: os.path.isdir
+        keys[0]: pathlib.Path.is_file,
+        keys[1]: pathlib.Path.is_block_device,
+        keys[2]: pathlib.Path.is_dir
     }
 
     parameter = {
