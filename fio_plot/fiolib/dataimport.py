@@ -72,6 +72,8 @@ def filterLogFiles(settings, file_list):
     else:
         print(
             f"\nNo log files found that matches the specified parameter {settings['rw']}\n")
+        print(
+            f"Check parameters iodepth {settings['iodepth']} and numjobs {settings['numjobs']}?\n")
         exit(1)
 
 
