@@ -23,7 +23,7 @@ We benchmark one device and pass extra custom parameters.
 
 An example with output:
 
-	./bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --readmix 75 90 
+	./bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --rwmixread 75 90 
 
 	████████████████████████████████████████████████████
 			+++ Fio Benchmark Script +++
@@ -88,7 +88,7 @@ Pure read/write/trim workloads will appear in the *device* folder.
 					[-b BLOCK_SIZE [BLOCK_SIZE ...]]
 					[--iodepth IODEPTH [IODEPTH ...]]
 					[--numjobs NUMJOBS [NUMJOBS ...]] [--duration DURATION]
-					[-m MODE [MODE ...]] [--readmix READMIX [READMIX ...]]
+					[-m MODE [MODE ...]] [--rwmixread RWMIXREAD [RWMIXREAD ...]]
 					[-e ENGINE] [--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]]
 					[--invalidate INVALIDATE] [--quiet]
 					[--loginterval LOGINTERVAL] [--dry-run]
@@ -127,7 +127,7 @@ Pure read/write/trim workloads will appear in the *device* folder.
 	-m MODE [MODE ...], --mode MODE [MODE ...]
 							List of I/O load tests to run (default: ['randread',
 							'randwrite'])
-	--readmix READMIX [READMIX ...]
+	--rwmixread RWMIXREAD [RWMIXREAD ...]
 							If a mix of read/writes is specified with --testmode,
 							the ratio of reads vs. writes can be specified with
 							this option. the parameter is an integer and
