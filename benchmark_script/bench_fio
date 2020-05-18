@@ -213,6 +213,7 @@ def generate_test_list(settings):
         dataset.append(result)
 
     benchmark_list = itertools.product(*dataset)
+    #pprint.pprint([x for x in benchmark_list])
     return [dict(zip(loop_items, item)) for item in benchmark_list]
 
 
@@ -317,7 +318,7 @@ def get_default_settings():
     settings['mixed'] = ['readwrite', 'rw', 'randrw']
     settings['invalidate'] = 1
     settings['loop_items'] = ['target', 'mode', 'iodepth',
-                              'numjobs', 'block_size', 'rwmixread']
+                              'numjobs', 'block_size']
     settings['filter_items'] = ['filter_items',
                                 'loop_items', 'dry_run', 'mixed', 'quiet']
     return settings
@@ -435,6 +436,19 @@ def check_settings(settings):
                 print()
                 sys.exit(5)
 
+    for mode in settings['mode']:
+        if mode in settings['mixed']:
+            if settings['rwmixread']:
+                settings['loop_items'].append('rwmixread')
+            else:
+                print()
+                print(
+                    f"If a mixed (read/write) mode is specified, please specify --rwmixread"
+                )
+                print()
+                sys.exit(6)
+        else:
+            settings['filter_items'].append('rwmixread')
 
 def check_encoding():
     try:
