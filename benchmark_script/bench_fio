@@ -148,7 +148,7 @@ def run_fio(settings, benchmark):
 
     command.append(f"{target_parameter}={target}")
 
-    if settings['rwmixread']:
+    if settings['rwmixread'] and benchmark['mode'] in settings['mixed']:
         command.append(f"--rwmixread={benchmark['rwmixread']}")
 
     if settings['extra_opts']:
@@ -430,10 +430,7 @@ def check_settings(settings):
     if settings['type'] == 'directory':
         for item in settings['target']:
             if not os.path.exists(item):
-                print()
-                print(
-                    f"The target directory ({item}) doesn't seem to exist.")
-                print()
+                print(f"\nThe target directory ({item}) doesn't seem to exist.\n")
                 sys.exit(5)
 
     for mode in settings['mode']:
@@ -441,15 +438,11 @@ def check_settings(settings):
             if settings['rwmixread']:
                 settings['loop_items'].append('rwmixread')
             else:
-                print()
-                print(
-                    f"If a mixed (read/write) mode is specified, please specify --rwmixread"
-                )
-                print()
+                print(f"\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n")
                 sys.exit(6)
         else:
             settings['filter_items'].append('rwmixread')
-
+    
 def check_encoding():
     try:
         print(u"\u3000")  # blank space
