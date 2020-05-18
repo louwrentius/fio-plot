@@ -37,6 +37,7 @@ def run_raw_command(command, env=None):
         stderr = result.stderr.decode("UTF-8").strip()
         print(f"\nAn error occurred: {stderr} - {stdout}")
         sys.exit(1)
+    
     return result
 
 
@@ -85,7 +86,7 @@ def make_directory(directory):
 def generate_output_directory(settings, benchmark):
 
     if benchmark['mode'] in settings['mixed']:
-        directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['mode']}{benchmark['readmix']}/{benchmark['block_size']}"
+        directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['mode']}{benchmark['rwmixread']}/{benchmark['block_size']}"
     else:
         directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['block_size']}"
     return directory
@@ -146,6 +147,9 @@ def run_fio(settings, benchmark):
     target_parameter = check_target_type(target, settings['type'])
 
     command.append(f"{target_parameter}={target}")
+
+    if settings['rwmixread']:
+        command.append(f"--rwmixread={benchmark['rwmixread']}")
 
     if settings['extra_opts']:
         for option in settings['extra_opts']:
@@ -245,13 +249,13 @@ def get_arguments(settings):
     ag.add_argument(
         "-m", "--mode", help=f"List of I/O load tests to run (default: \
             {settings['mode']})", default=settings['mode'], nargs='+', type=str)
-    ag.add_argument("--readmix", help=f"If a mix of read/writes is specified \
+    ag.add_argument("--rwmixread", help=f"If a mix of read/writes is specified \
         with --testmode, the ratio of reads vs. writes can be specified with this option.\
             the parameter is an integer and represents the percentage of reads.\
-             A read/write mix of 75%%/25%%  is specified as '75' (default: {settings['readmix']}).\
+             A read/write mix of 75%%/25%%  is specified as '75' (default: {settings['rwmixread']}).\
                 Multiple values can be specified and separate output directories will be created.\
                     This argument is only used if the benchmark is of type randrw. Otherwise \
-                        this option is ignored.", nargs='+', type=int, default=settings['readmix'])
+                        this option is ignored.", nargs='+', type=int, default=settings['rwmixread'])
     ag.add_argument(
         "-e", "--engine", help=f"Select the ioengine to use, see fio --enghelp \
             for an overview of supported engines. (Default: {settings['engine']}).", default=settings['engine'])
@@ -284,7 +288,7 @@ def get_argument_description():
         'block_size': 'Block size',
         'direct': 'Direct I/O',
         'size': 'Specified test data size',
-        'readmix': 'Read/write mix in %% read',
+        'rwmixread': 'Read/write mix in %% read',
         'duration': 'Time duration per test (s)',
         'extra_opts': 'Extra custom options',
         'loginterval': 'Log interval of perf data',
@@ -306,14 +310,14 @@ def get_default_settings():
     settings['block_size'] = ["4k"]
     settings['direct'] = 1
     settings['size'] = None
-    settings['readmix'] = [75]
+    settings['rwmixread'] = None
     settings['duration'] = 60
     settings['extra_opts'] = []
     settings['loginterval'] = 500
     settings['mixed'] = ['readwrite', 'rw', 'randrw']
     settings['invalidate'] = 1
     settings['loop_items'] = ['target', 'mode', 'iodepth',
-                              'numjobs', 'block_size',  'readmix']
+                              'numjobs', 'block_size', 'rwmixread']
     settings['filter_items'] = ['filter_items',
                                 'loop_items', 'dry_run', 'mixed', 'quiet']
     return settings
