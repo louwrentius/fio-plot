@@ -17,8 +17,8 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(len(b.generate_test_list(self.settings)), 98)
 
     def test_generate_benchmarks_big(self):
-        self.settings['target'] = ['a', 'b', 'c', 'd']
-        self.settings['block_size'] = ['a', 'b', 'c', 'd']
+        self.settings['target'] = ['filea', 'fileb', 'filec', 'filed']
+        self.settings['block_size'] = ['4k', '8k', '16k', '32k']
         self.assertEqual(len(b.generate_test_list(self.settings)), 1568)
 
     def test_are_loop_items_lists(self):
@@ -37,6 +37,8 @@ class TestFunctions(unittest.TestCase):
 
     def test_generate_output_directory_mixed(self):
         self.settings['mode'] = ['rw']
+        self.settings['rwmixread'] = [75]
+        self.settings['loop_items'].append('rwmixread')
         tests = b.generate_test_list(self.settings)
         benchmark = tests[0]
         self.assertEqual(b.generate_output_directory(
