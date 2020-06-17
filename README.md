@@ -90,72 +90,74 @@ Please note that Fio-plot has been tested on matplotlib version 3.2.1
 
 ### Usage
 
-	usage: fio_plot [-h] [-i INPUT_DIRECTORY] [-T TITLE] [-s SOURCE] [-L] [-l]
-					[-H] [--disable-grid] [--enable-markers] [--subtitle SUBTITLE]
-					[-d IODEPTH [IODEPTH ...]] [-M [MAXDEPTH]] [-D [DPI]]
-					[-p [PERCENTILE]] [-J [MAXJOBS]] [-n NUMJOBS [NUMJOBS ...]]
-					[-r {read,write,randread,randwrite,randrw}] [-m MAX]
-					[-y MAX_Y] [-g] [-e MOVING_AVERAGE]
-					[-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]]
-					[-f {read,write} [{read,write} ...]]
-
-	Generates charts/graphs from FIO JSON output or logdata.
-
-	optional arguments:
-	  -h, --help            show this help message and exit
-
-	Generic Settings:
-	  -i INPUT_DIRECTORY, --input-directory INPUT_DIRECTORY
-							input directory where JSON files can be found.
-	  -T TITLE, --title TITLE
-							specifies title to use in charts
-	  -s SOURCE, --source SOURCE
-							Author
-	  -L, --iodepth-numjobs-3d
-							Generates a 3D-chart with iodepth and numjobs on x/y
-							axis and iops or latency on the z-axis.
-	  -l, --latency-iops-2d
-							Generates a 2D barchart of IOPs and latency for a
-							particular queue depth and numjobs value.
-	  -H, --histogram       Generates a latency histogram for a particular queue
-							depth and numjobs value.
-	  --disable-grid        Disables the dotted grid in the output graph.
-	  --enable-markers      Enable markers for the plot lines.
-	  --subtitle SUBTITLE   Specify your own subtitle or leave it blank with
-							double quotes.
-	  -d IODEPTH [IODEPTH ...], --iodepth IODEPTH [IODEPTH ...]
-							The I/O queue depth to graph.
-	  -M [MAXDEPTH], --maxdepth [MAXDEPTH]
-							Maximum queue depth to graph in 3D graph.
-	  -D [DPI], --dpi [DPI]
-							The chart will be saved with this DPI setting. Higher
-							means larger image.
-	  -p [PERCENTILE], --percentile [PERCENTILE]
-							Calculate the percentile, default 99.99th.
-	  -J [MAXJOBS], --maxjobs [MAXJOBS]
-							Maximum number of jobs to graph in 3D graph.
-	  -n NUMJOBS [NUMJOBS ...], --numjobs NUMJOBS [NUMJOBS ...]
-							Specifies for which numjob parameter you want the 2d
-							graphs to be generated. You can specify multiple
-							values separated by spaces.
-	  -r {read,write,randread,randwrite,randrw}, --rw {read,write,randread,randwrite,randrw}
-							Specifies the kind of data you want to graph.
-	  -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
-	  -y MAX_Y, --max-y MAX_Y
-							Optional maximum value for y-axis.
-	  -g, --loggraph        This option generates a 2D graph of the log data
-							recorded by FIO.
-	  -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
-							The moving average helps to smooth out graphs, the
-							argument is the size of the moving window (default is
-							None to disable). Be carefull as this setting may
-							smooth out issues you may want to be aware of.
-	  -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
-							This setting specifies which kind of metric you want
-							to graph.
-	  -f {read,write} [{read,write} ...], --filter {read,write} [{read,write} ...]
-							filter should be read/write.
-
+    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE
+                    [-s SOURCE] (-L | -l | -H | -g) [--disable-grid]
+                    [--enable-markers] [--subtitle SUBTITLE]
+                    [-d IODEPTH [IODEPTH ...]] [-M [MAXDEPTH]] [-D [DPI]]
+                    [-p [PERCENTILE]] [-J [MAXJOBS]] [-n NUMJOBS [NUMJOBS ...]]
+                    [-r {read,write,randread,randwrite,randrw}] [-m MAX]
+                    [-y MAX_Y] [-e MOVING_AVERAGE]
+                    [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]]
+                    [-f {read,write} [{read,write} ...]]
+    
+    Generates charts/graphs from FIO JSON output or logdata.
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+    
+    Generic Settings:
+      -i INPUT_DIRECTORY [INPUT_DIRECTORY ...], --input-directory INPUT_DIRECTORY [INPUT_DIRECTORY ...]
+                            input directory where JSON files or log data (CSV) can
+                            be found.
+      -T TITLE, --title TITLE
+                            specifies title to use in charts
+      -s SOURCE, --source SOURCE
+                            Author
+      -L, --iodepth-numjobs-3d
+                            Generates a 3D-chart with iodepth and numjobs on x/y
+                            axis and iops or latency on the z-axis.
+      -l, --latency-iops-2d
+                            Generates a 2D barchart of IOPs and latency for a
+                            particular queue depth and numjobs value.
+      -H, --histogram       Generates a latency histogram for a particular queue
+                            depth and numjobs value.
+      -g, --loggraph        This option generates a 2D graph of the log data
+                            recorded by FIO.
+      --disable-grid        Disables the dotted grid in the output graph.
+      --enable-markers      Enable markers for the plot lines when graphing log
+                            data.
+      --subtitle SUBTITLE   Specify your own subtitle or leave it blank with
+                            double quotes.
+      -d IODEPTH [IODEPTH ...], --iodepth IODEPTH [IODEPTH ...]
+                            The I/O queue depth to graph.
+      -M [MAXDEPTH], --maxdepth [MAXDEPTH]
+                            Maximum queue depth to graph in 3D graph.
+      -D [DPI], --dpi [DPI]
+                            The chart will be saved with this DPI setting. Higher
+                            means larger image.
+      -p [PERCENTILE], --percentile [PERCENTILE]
+                            Calculate the percentile, default 99.99th.
+      -J [MAXJOBS], --maxjobs [MAXJOBS]
+                            Maximum number of jobs to graph in 3D graph.
+      -n NUMJOBS [NUMJOBS ...], --numjobs NUMJOBS [NUMJOBS ...]
+                            Specifies for which numjob parameter you want the 2d
+                            graphs to be generated. You can specify multiple
+                            values separated by spaces.
+      -r {read,write,randread,randwrite,randrw}, --rw {read,write,randread,randwrite,randrw}
+                            Specifies the kind of data you want to graph.
+      -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
+      -y MAX_Y, --max-y MAX_Y
+                            Optional maximum value for y-axis.
+      -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
+                            The moving average helps to smooth out graphs, the
+                            argument is the size of the moving window (default is
+                            None to disable). Be carefull as this setting may
+                            smooth out issues you may want to be aware of.
+      -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
+                            This setting specifies which kind of metric you want
+                            to graph.
+      -f {read,write} [{read,write} ...], --filter {read,write} [{read,write} ...]
+                                filter should be read/write.
 
 ### Example Usage
 
