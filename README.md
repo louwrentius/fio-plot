@@ -198,3 +198,26 @@ Please note that the folder names are used in the graph to distinguish the datas
 Command used: 
 
     ./fio_plot -i ../../RAID10 ../../RAID5 -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 
+
+### JSON / LOG file name requirements
+
+Fio-plot parses the filename of the generated .log files. The format is:
+
+    [rwmode]-iodepth-[iodepth]-nujobs-[numjobs]_[fio generated type].[numbjob job id].log
+
+An example:
+
+    randwrite-iodepth-8-numjobs-8_lat.1.log
+    randwrite-iodepth-8-numjobs-8_lat.2.log
+    randwrite-iodepth-8-numjobs-8_lat.3.log
+    randwrite-iodepth-8-numjobs-8_lat.4.log
+    randwrite-iodepth-8-numjobs-8_lat.5.log
+    randwrite-iodepth-8-numjobs-8_lat.6.log
+    randwrite-iodepth-8-numjobs-8_lat.7.log
+    randwrite-iodepth-8-numjobs-8_lat.8.log 
+
+In this example, there are 8 files because numjobs was set to 8. Fio autoamatically generates a file for each job.
+It's important that - if you don't use the included benchmark script - to make sure files are generated with the appropriate file name structure.
+
+
+
