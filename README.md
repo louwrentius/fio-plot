@@ -20,6 +20,8 @@ This kind of chart shows both IOPs and Latency for multiple queue depths.
 
 *Please note that these benchmark numbers are not representative of the capabilities of the SSD as the RAID controller is the bottleneck.*
 
+[queuedepthlowhigh01]: https://louwrentius.com/static/images/impactofqueuedepth.png
+
 ### 3D chart
 A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs.
 
@@ -32,6 +34,8 @@ A 3D bar chart that plots both queue depth an numjobs against either latency or 
 To create this graph, the FIO log data is parsed to show how the device / file
 performed during a benchmark run. Latency IOPS and bandwidth can be shown. 
 ![linechart][queuedepthlowhigh03]
+
+[queuedepthlowhigh03]: https://louwrentius.com/static/images/impactofqueuedepth03.png
 
 The command line options control which data is shown, so it is possible to
 customize the graph to only show the information you're interested in.
