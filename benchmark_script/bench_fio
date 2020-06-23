@@ -17,6 +17,7 @@ import subprocess
 import itertools
 import datetime
 import time
+import shutil
 from numpy import linspace
 from pathlib import Path
 import pprint
@@ -37,7 +38,7 @@ def run_raw_command(command, env=None):
         stderr = result.stderr.decode("UTF-8").strip()
         print(f"\nAn error occurred: {stderr} - {stdout}")
         sys.exit(1)
-    
+
     return result
 
 
@@ -430,7 +431,8 @@ def check_settings(settings):
     if settings['type'] == 'directory':
         for item in settings['target']:
             if not os.path.exists(item):
-                print(f"\nThe target directory ({item}) doesn't seem to exist.\n")
+                print(
+                    f"\nThe target directory ({item}) doesn't seem to exist.\n")
                 sys.exit(5)
 
     for mode in settings['mode']:
@@ -438,11 +440,13 @@ def check_settings(settings):
             if settings['rwmixread']:
                 settings['loop_items'].append('rwmixread')
             else:
-                print(f"\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n")
+                print(
+                    f"\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n")
                 sys.exit(6)
         else:
             settings['filter_items'].append('rwmixread')
-    
+
+
 def check_encoding():
     try:
         print(u"\u3000")  # blank space
@@ -457,8 +461,17 @@ def check_encoding():
         exit(90)
 
 
+def check_if_fio_exists():
+    command = 'fio'
+    if(shutil.which(command) is None):
+        print("Fio executable not found in path. Is Fio installed?")
+        print()
+        sys.exit(1)
+
+
 def main():
     check_encoding()
+    check_if_fio_exists()
     settings = get_default_settings()
     args = check_args(settings)
     customsettings = vars(args)
