@@ -89,7 +89,8 @@ Pure read/write/trim workloads will appear in the *device* folder.
 					[--iodepth IODEPTH [IODEPTH ...]]
 					[--numjobs NUMJOBS [NUMJOBS ...]] [--duration DURATION]
 					[-m MODE [MODE ...]] [--rwmixread RWMIXREAD [RWMIXREAD ...]]
-					[-e ENGINE] [--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]]
+					[-e ENGINE] [--direct DIRECT]
+					[--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]]
 					[--invalidate INVALIDATE] [--quiet]
 					[--loginterval LOGINTERVAL] [--dry-run]
 
@@ -132,7 +133,7 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							the ratio of reads vs. writes can be specified with
 							this option. the parameter is an integer and
 							represents the percentage of reads. A read/write mix
-							of 75%/25% is specified as '75' (default: [75]).
+							of 75%/25% is specified as '75' (default: None).
 							Multiple values can be specified and separate output
 							directories will be created. This argument is only
 							used if the benchmark is of type randrw. Otherwise
@@ -140,6 +141,7 @@ Pure read/write/trim workloads will appear in the *device* folder.
 	-e ENGINE, --engine ENGINE
 							Select the ioengine to use, see fio --enghelp for an
 							overview of supported engines. (Default: libaio).
+	--direct DIRECT       Use DIRECT I/O (default: 1)
 	--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]
 							Allows you to add extra options, for example, options
 							that are specific to the selected ioengine. It can be
@@ -155,3 +157,4 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							the .log files. (Default: 500
 	--dry-run             Simulates a benchmark, does everything except running
 							Fio.
+
