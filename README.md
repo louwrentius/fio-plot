@@ -205,6 +205,9 @@ Command used:
 
     ./fio_plot -i ../../RAID10 ../../RAID5 -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 
 
+Please note that you need to point to the 'root' directory of the data as per this example, and not to the folders inside, named after the used blocksize (example: 4k). 
+I'm assuming here that you generated the data with bench_fio.
+
 ### JSON / LOG file name requirements
 
 Fio-plot parses the filename of the generated .log files. The format is:
