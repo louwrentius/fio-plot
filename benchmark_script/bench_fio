@@ -261,6 +261,9 @@ def get_arguments(settings):
     ag.add_argument(
         "-e", "--engine", help=f"Select the ioengine to use, see fio --enghelp \
             for an overview of supported engines. (Default: {settings['engine']}).", default=settings['engine'])
+    ag.add_argument(
+        "--direct", help=f"Use DIRECT I/O \
+            (default: {settings['direct']})", type=int, default=settings['direct'])
     ag.add_argument("--extra-opts", help=f"Allows you to add extra options, \
         for example, options that are specific to the selected ioengine. It \
              can be any other Fio option. Example: --extra-opts norandommap=1 invalidate=0\
