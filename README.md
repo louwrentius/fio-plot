@@ -205,8 +205,19 @@ Command used:
 
     ./fio_plot -i ../../RAID10 ../../RAID5 -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 
 
-Please note that you need to point to the 'root' directory of the data as per this example, and not to the folders inside, named after the used blocksize (example: 4k). 
-I'm assuming here that you generated the data with bench_fio.
+If you use the bench_fio tool to generate benchmark data, you may notice that you end up with folders like:
+
+test_a/4k
+test_b/4k
+
+For the above command to work, you need to first rename the 4K folder to something distinct, like:
+
+test_a/test_a
+test_b/test_b
+
+Ten point -i to /test_a/test_a test_b/test_b 
+
+The name of the folder will show up in the legend, so choose the name wisely.
 
 ### JSON / LOG file name requirements
 
