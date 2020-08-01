@@ -19,6 +19,8 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     ax3 = ax1.twinx()
     fig.set_size_inches(10, 6)
 
+    #
+    # Puts in the credit source (often a name or url)
     if settings['source']:
         plt.text(1, -0.08, str(settings['source']), ha='right', va='top',
                  transform=ax1.transAxes, fontsize=9)
@@ -71,5 +73,5 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     title = settings['title'].replace(" ", '-')
     title = title.replace("/", '-')
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.tight_layout(rect=[0, 0, 1, 1])
     fig.savefig(f"{title}_{now}.png", dpi=settings['dpi'])
