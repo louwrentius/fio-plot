@@ -14,6 +14,8 @@ class Test3D(unittest.TestCase):
             # intentionally using prime numbers
             'iodepth': [2, 3],
             'numjobs': [5, 11],
+            'maxjobs': 32,
+            'maxdepth': 32
         }
         dataset = []
         for iodepth in settings['iodepth']:

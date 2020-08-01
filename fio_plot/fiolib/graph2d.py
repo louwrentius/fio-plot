@@ -141,5 +141,5 @@ def chart_2d_log_data(settings, dataset):
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     title = settings['title'].replace(" ", '-')
     title = title.replace("/", '-')
-    plt.tight_layout(rect=[0, 0.00, 0.95, 0.95])
+    plt.tight_layout()
     fig.savefig(f"{title}-{now}.png", dpi=settings['dpi'])
