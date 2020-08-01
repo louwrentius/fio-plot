@@ -146,10 +146,10 @@ def create_stddev_table(data, ax2):
                   ['stddev'], data['y2_axis']['stddev']]
 
     cols = len(data['x_axis'])
-    table = ax2.table(cellText=table_vals,  loc='center right', rowLabels=[
+    table = ax2.table(cellText=table_vals,  loc="lower right", rowLabels=[
         'IO queue depth', f'IOP/s \u03C3 %', f'Latency \u03C3 %'],
-        colLoc='center right',
-        cellLoc='center right', colWidths=[0.05] * cols,
+        colLoc="center",
+        cellLoc="center", colWidths=[0.05] * cols,
         rasterized=False)
     table.scale(1, 1.2)
 

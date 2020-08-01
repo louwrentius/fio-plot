@@ -9,6 +9,7 @@
 import sys
 import argparse
 import pprint
+import matplotlib
 import fiolib.dataimport as logdata
 import fiolib.graph2d as graph
 import fiolib.jsonimport as jsonimport
@@ -16,6 +17,14 @@ import fiolib.bar2d as bar2d
 import fiolib.bar3d as bar3d
 import fiolib.barhistogram as histogram
 
+def check_matplotlib_version(requiredversion):
+        
+    matplotlibversion = matplotlib.__version__
+    from pkg_resources import parse_version as V # nice
+    if V(matplotlibversion) < V(requiredversion):
+        print(f"Matplotlib version {requiredversion} is required but version {matplotlibversion} is installed.")
+        print(f"I'm sorry, but you'll have to update matplotlib.")
+        sys.exit(1)
 
 def set_arguments():
     """Parses all commandline arguments. Based on argparse."""
@@ -79,6 +88,7 @@ def set_arguments():
 
 
 def main():
+    check_matplotlib_version("3.3.0")
     settings = {}
     uses_json_files = {'iodepth_numjobs_3d': bar3d.plot_3d, 'latency_iops_2d':
                        bar2d.chart_2dbarchart_jsonlogdata,

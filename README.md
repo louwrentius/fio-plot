@@ -90,7 +90,7 @@ For more examples, please consult the separate [README.md][rm]
 
 Fio-plot requires 'matplotlib' and 'numpy' to be installed.
 
-Please note that Fio-plot has been tested on matplotlib version 3.2.1
+Please note that Fio-plot requires at least matplotlib version 3.3.0
 
 ### Usage
 

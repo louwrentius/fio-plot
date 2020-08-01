@@ -28,8 +28,10 @@ def plot_3d(settings, dataset):
                                     rw, metric)
 
     fig = plt.figure()
-    ax1 = fig.add_subplot(111, projection='3d')
+    ax1 = fig.add_subplot(projection='3d',elev=25)
     fig.set_size_inches(15, 10)
+    ax1.set_box_aspect((4, 4, 3), zoom=1.2)
+    
 
     lx = len(dataset_types['iodepth'])
     ly = len(dataset_types['numjobs'])
@@ -109,7 +111,7 @@ def plot_3d(settings, dataset):
     norm = mpl.colors.Normalize(vmin=0, vmax=dz.max())
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    res = fig.colorbar(sm, fraction=0.046, pad=0.04)
+    res = fig.colorbar(sm, fraction=0.046, pad=0.19)
     res.ax.set_title(z_axis_label)
 
     # Set tics for x/y axis
@@ -144,9 +146,10 @@ def plot_3d(settings, dataset):
 
     # title
     supporting.create_title_and_sub(
-        settings, plt, skip_keys=['iodepth', 'numjobs'],  sub_x_offset=0.57, sub_y_offset=1.05)
+        settings, plt, skip_keys=['iodepth', 'numjobs'],  sub_x_offset=0.57, sub_y_offset=1.15)
 
-    fig.text(0.75, 0.03, settings['source'])
+    # Source
+    fig.text(0.65, 0.075, settings['source'])
 
     plt.tight_layout()
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
