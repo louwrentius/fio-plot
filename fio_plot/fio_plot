@@ -7,6 +7,7 @@
 # Requires matplotib and numpy.
 #
 import sys
+import os.path
 import argparse
 import pprint
 import matplotlib
@@ -17,14 +18,27 @@ import fiolib.bar2d as bar2d
 import fiolib.bar3d as bar3d
 import fiolib.barhistogram as histogram
 
+
 def check_matplotlib_version(requiredversion):
-        
+
     matplotlibversion = matplotlib.__version__
-    from pkg_resources import parse_version as V # nice
+    from pkg_resources import parse_version as V  # nice
     if V(matplotlibversion) < V(requiredversion):
-        print(f"Matplotlib version {requiredversion} is required but version {matplotlibversion} is installed.")
+        print(
+            f"Matplotlib version {requiredversion} is required but version {matplotlibversion} is installed.")
         print(f"I'm sorry, but you'll have to update matplotlib.")
         sys.exit(1)
+
+
+def check_if_target_directory_exists(dirpath):
+    for directory in dirpath:
+        if not os.path.exists(directory):
+            print(f"Directory {directory} is not found.")
+            sys.exit(1)
+        elif not os.path.isdir(directory):
+            print(f"Direcory {directory} is not a directory.")
+            sys.exit(1)
+
 
 def set_arguments():
     """Parses all commandline arguments. Based on argparse."""
@@ -67,7 +81,7 @@ def set_arguments():
     ag.add_argument("-n", "--numjobs", nargs='+', help="\
             Specifies for which numjob parameter you want the 2d graphs to be\
                  generated. You can specify multiple values separated by spaces.", default=[1], type=int)
-    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw'],
+    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw'], required=True,
                     help="Specifies the kind of data you want to graph.")
     ag.add_argument("-m", "--max", default=None, type=int,
                     help="Optional maximum value for Z-axis in 3D graph.")
@@ -87,8 +101,23 @@ def set_arguments():
     return parser
 
 
-def main():
+def run_preflight_checks(settings):
     check_matplotlib_version("3.3.0")
+    check_if_target_directory_exists(settings['input_directory'])
+
+    if settings['loggraph'] and not settings['type']:
+        print(
+            "\nIf -g is specified, you must specify the type of data with -t (see help)\n")
+        sys.exit(1)
+
+    if settings['iodepth_numjobs_3d']:
+        if settings['type'][0] not in ['iops', 'lat']:
+            print(
+                "\nIf -L is specified (3D Chart) you can only select [iops,lat] for -t type\n")
+            sys.exit(1)
+
+
+def main():
     settings = {}
     uses_json_files = {'iodepth_numjobs_3d': bar3d.plot_3d, 'latency_iops_2d':
                        bar2d.chart_2dbarchart_jsonlogdata,
@@ -106,16 +135,7 @@ def main():
 
     settings = vars(args)
 
-    if settings['loggraph'] and not settings['type']:
-        print(
-            "\nIf -g is specified, you must specify the type of data with -t (see help)\n")
-        exit(1)
-
-    if settings['iodepth_numjobs_3d']:
-        if settings['type'][0] not in ['iops', 'lat']:
-            print(
-                "\nIf -L is specified (3D Chart) you can only select [iops,lat] for -t type\n")
-            exit(1)
+    run_preflight_checks(settings)
 
     option_found = False
     if settings['loggraph']:
