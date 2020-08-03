@@ -117,7 +117,9 @@ def chart_latency_histogram(settings, dataset):
     autolabel(rects2, ax1)
     autolabel(rects3, ax1)
 
-    fig.text(0.75, 0.03, settings['source'])
+    sourcelength = len(settings['source'])
+    offset = 1.0 - sourcelength / 120
+    fig.text(offset, 0.03, settings['source'])
 
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     title = settings['title'].replace(" ", '_')
