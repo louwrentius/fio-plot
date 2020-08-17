@@ -86,6 +86,8 @@ def set_arguments():
     ag.add_argument("-m", "--max", default=None, type=int,
                     help="Optional maximum value for Z-axis in 3D graph.")
     ag.add_argument("-y", "--max-y", help="Optional maximum value for y-axis.")
+    ag.add_argument(
+        "-x", "--min-y", help="Optional minimal value for y-axis. Use 'None' to disable.", type=str, default=0)
     ag.add_argument("-e", "--moving-average", default=None, type=int,
                     help="The moving average helps to smooth out graphs,\
                          the argument is the size of the moving window\
@@ -97,6 +99,12 @@ def set_arguments():
     ag.add_argument("-f", "--filter", nargs='+', help="\
             filter should be read/write.", type=str, default=('read', 'write'),
                     choices=['read', 'write'])
+    ag.add_argument("-c", "--label-depth", help="\
+            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Used with -g.", type=int, default=0)
+    ag.add_argument("--label-segment-size", help="\
+            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used with -g.", type=int, default=1000)
+    ag.add_argument("-w", "--line-width",
+                    help="Line width for line graphs. Can be a floating-point value. Used with -g.", type=float, default=1)
 
     return parser
 

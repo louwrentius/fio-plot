@@ -234,7 +234,7 @@ def get_arguments(settings):
                     help=f"Output directory for .json and .log output. If a read/write mix is specified,\
                     separate directories for each mix will be created.", required=True)
     ag.add_argument(
-        "-j", "--template", help=f"Fio job file in INI format. \
+        "-j", "--template", help=f"Fio job file in INI format. A file is already included and this parameter is only required if you create your own custom Fio job. \
             (Default: {settings['template']})", default=settings['template'])
     ag.add_argument("-b", "--block-size",
                     help=f"Specify block size(s). (Default: {settings['block_size']}", default=settings['block_size'], nargs='+')
@@ -305,6 +305,7 @@ def get_argument_description():
 
 
 def get_default_settings():
+
     settings = {}
     settings['target'] = []
     settings['template'] = "./fio-job-template.fio"
