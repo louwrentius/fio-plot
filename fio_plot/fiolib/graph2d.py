@@ -22,7 +22,7 @@ def chart_2d_log_data(settings, dataset):
     data = supporting.process_dataset(settings, dataset)
     datatypes = data['datatypes']
     directories = logdata.get_unique_directories(dataset)
-    print(directories)
+
     #
     # Create matplotlib figure and first axis. The 'host' axis is used for
     # x-axis and as a basis for the second and third y-axis
