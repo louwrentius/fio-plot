@@ -94,74 +94,70 @@ Please note that Fio-plot requires at least matplotlib version 3.3.0
 
 ### Usage
 
-    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE
-                    [-s SOURCE] (-L | -l | -H | -g) [--disable-grid]
-                    [--enable-markers] [--subtitle SUBTITLE]
-                    [-d IODEPTH [IODEPTH ...]] [-M [MAXDEPTH]] [-D [DPI]]
-                    [-p [PERCENTILE]] [-J [MAXJOBS]] [-n NUMJOBS [NUMJOBS ...]]
-                    [-r {read,write,randread,randwrite,randrw}] [-m MAX]
-                    [-y MAX_Y] [-e MOVING_AVERAGE]
-                    [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]]
-                    [-f {read,write} [{read,write} ...]]
-    
+    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -H | -g)
+                    [--disable-grid] [--enable-markers] [--subtitle SUBTITLE] [-d IODEPTH [IODEPTH ...]] [-M [MAXDEPTH]]
+                    [-D [DPI]] [-p [PERCENTILE]] [-J [MAXJOBS]] [-n NUMJOBS [NUMJOBS ...]] -r
+                    {read,write,randread,randwrite,randrw} [-m MAX] [-y MAX_Y] [-x MIN_Y] [-e MOVING_AVERAGE]
+                    [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]] [-f {read,write} [{read,write} ...]]
+                    [-c LABEL_DEPTH] [--label-segment-size LABEL_SEGMENT_SIZE] [-w LINE_WIDTH]
+
     Generates charts/graphs from FIO JSON output or logdata.
-    
+
     optional arguments:
-      -h, --help            show this help message and exit
-    
+    -h, --help            show this help message and exit
+
     Generic Settings:
-      -i INPUT_DIRECTORY [INPUT_DIRECTORY ...], --input-directory INPUT_DIRECTORY [INPUT_DIRECTORY ...]
-                            input directory where JSON files or log data (CSV) can
-                            be found.
-      -T TITLE, --title TITLE
+    -i INPUT_DIRECTORY [INPUT_DIRECTORY ...], --input-directory INPUT_DIRECTORY [INPUT_DIRECTORY ...]
+                            input directory where JSON files or log data (CSV) can be found.
+    -T TITLE, --title TITLE
                             specifies title to use in charts
-      -s SOURCE, --source SOURCE
+    -s SOURCE, --source SOURCE
                             Author
-      -L, --iodepth-numjobs-3d
-                            Generates a 3D-chart with iodepth and numjobs on x/y
-                            axis and iops or latency on the z-axis.
-      -l, --latency-iops-2d
-                            Generates a 2D barchart of IOPs and latency for a
-                            particular queue depth and numjobs value.
-      -H, --histogram       Generates a latency histogram for a particular queue
-                            depth and numjobs value.
-      -g, --loggraph        This option generates a 2D graph of the log data
-                            recorded by FIO.
-      --disable-grid        Disables the dotted grid in the output graph.
-      --enable-markers      Enable markers for the plot lines when graphing log
-                            data.
-      --subtitle SUBTITLE   Specify your own subtitle or leave it blank with
-                            double quotes.
-      -d IODEPTH [IODEPTH ...], --iodepth IODEPTH [IODEPTH ...]
+    -L, --iodepth-numjobs-3d
+                            Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.
+    -l, --latency-iops-2d
+                            Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value.
+    -H, --histogram       Generates a latency histogram for a particular queue depth and numjobs value.
+    -g, --loggraph        This option generates a 2D graph of the log data recorded by FIO.
+    --disable-grid        Disables the dotted grid in the output graph.
+    --enable-markers      Enable markers for the plot lines when graphing log data.
+    --subtitle SUBTITLE   Specify your own subtitle or leave it blank with double quotes.
+    -d IODEPTH [IODEPTH ...], --iodepth IODEPTH [IODEPTH ...]
                             The I/O queue depth to graph.
-      -M [MAXDEPTH], --maxdepth [MAXDEPTH]
+    -M [MAXDEPTH], --maxdepth [MAXDEPTH]
                             Maximum queue depth to graph in 3D graph.
-      -D [DPI], --dpi [DPI]
-                            The chart will be saved with this DPI setting. Higher
-                            means larger image.
-      -p [PERCENTILE], --percentile [PERCENTILE]
+    -D [DPI], --dpi [DPI]
+                            The chart will be saved with this DPI setting. Higher means larger image.
+    -p [PERCENTILE], --percentile [PERCENTILE]
                             Calculate the percentile, default 99.99th.
-      -J [MAXJOBS], --maxjobs [MAXJOBS]
+    -J [MAXJOBS], --maxjobs [MAXJOBS]
                             Maximum number of jobs to graph in 3D graph.
-      -n NUMJOBS [NUMJOBS ...], --numjobs NUMJOBS [NUMJOBS ...]
-                            Specifies for which numjob parameter you want the 2d
-                            graphs to be generated. You can specify multiple
-                            values separated by spaces.
-      -r {read,write,randread,randwrite,randrw}, --rw {read,write,randread,randwrite,randrw}
+    -n NUMJOBS [NUMJOBS ...], --numjobs NUMJOBS [NUMJOBS ...]
+                            Specifies for which numjob parameter you want the 2d graphs to be generated. You can specify
+                            multiple values separated by spaces.
+    -r {read,write,randread,randwrite,randrw}, --rw {read,write,randread,randwrite,randrw}
                             Specifies the kind of data you want to graph.
-      -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
-      -y MAX_Y, --max-y MAX_Y
+    -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
+    -y MAX_Y, --max-y MAX_Y
                             Optional maximum value for y-axis.
-      -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
-                            The moving average helps to smooth out graphs, the
-                            argument is the size of the moving window (default is
-                            None to disable). Be carefull as this setting may
-                            smooth out issues you may want to be aware of.
-      -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
-                            This setting specifies which kind of metric you want
-                            to graph.
-      -f {read,write} [{read,write} ...], --filter {read,write} [{read,write} ...]
-                                filter should be read/write.
+    -x MIN_Y, --min-y MIN_Y
+                            Optional minimal value for y-axis. Use 'None' to disable.
+    -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
+                            The moving average helps to smooth out graphs, the argument is the size of the moving window
+                            (default is None to disable). Be carefull as this setting may smooth out issues you may want
+                            to be aware of.
+    -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
+                            This setting specifies which kind of metric you want to graph.
+    -f {read,write} [{read,write} ...], --filter {read,write} [{read,write} ...]
+                            filter should be read/write.
+    -c LABEL_DEPTH, --label-depth LABEL_DEPTH
+                            use the parent folder(s) to make the label unique. The number represents how many folders up
+                            should be included. Used with -g.
+    --label-segment-size LABEL_SEGMENT_SIZE
+                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents
+                            how many characters per segment are preserved. Used with -g.
+    -w LINE_WIDTH, --line-width LINE_WIDTH
+                            Line width for line graphs. Can be a floating-point value. Used with -g.
 
 ### Example Usage
 
@@ -188,14 +184,18 @@ Creating a line chart from different benchmark runs in a single folder
 The same result but if you want markers to help distinguish between lines:
 
     ./fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1 --enable--markers
-    
+
+### Comparing two benchmarks in a single chart
+
 Create a line chart based on data from two different folders (but the same benchmark parameters)     
 
     ./fio_plot -i <benchmark_data_folder A> <benchmark_data_folder B>  -T "Test" -g -r randread -t iops lat -d 8 -n 1
-    
+
+I'm assuming that the benchmark was created with the (included) bench_fio tool.
+
 For example, you can run a benchmark on a RAID10 setup and store data in folder A. Store the benchmark data for a RAID5 setup in folder B and you can compare the results of both RAID setups in a single Line graph.
 
-Please note that the folder names are used in the graph to distinguish the datasets. Example:
+Please note that the folder names are used in the graph to distinguish the datasets. 
 
 [![multipledataset][multipledataset]][multipledataset]
 
@@ -203,21 +203,22 @@ Please note that the folder names are used in the graph to distinguish the datas
    
 Command used: 
 
-    ./fio_plot -i ../../RAID10 ../../RAID5 -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 
+    fio_plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1
 
 If you use the bench_fio tool to generate benchmark data, you may notice that you end up with folders like:
 
-test_a/4k
-test_b/4k
+    IBM1015/RAID10/4k
+    IBM1015/RAID5/4k
 
-For the above command to work, you need to first rename the 4K folder to something distinct, like:
+Those parent folders are used to distinguish and identify the lines from each other. The labels are based on the parent folder names as you can see in the graph. By default, we use only one level deep, so in this example only RAID10 or RAID5 are used. If we want to include the folder above that (IBM1015) we use the --label-depth parameter like so:
 
-test_a/test_a
-test_b/test_b
+    fio_plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 -w 1 --label-depth 1
 
-Ten point -i to /test_a/test_a test_b/test_b 
+This would look like: 
 
-The name of the folder will show up in the legend, so choose the name wisely.
+[![labellength][labellength]][labellength]
+
+[labellength]: https://louwrentius.com/static/images/labellength.png
 
 ### JSON / LOG file name requirements
 

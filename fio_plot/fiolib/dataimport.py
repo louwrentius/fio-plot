@@ -4,6 +4,7 @@ import csv
 import pprint as pprint
 import statistics
 import fiolib.supporting as supporting
+from pathlib import Path
 
 
 def list_fio_log_files(directory):
@@ -24,10 +25,24 @@ def list_fio_log_files(directory):
     return fiologfiles
 
 
-def return_folder_name(filename):
-    dirname = os.path.dirname(filename)
-    basename = os.path.basename(dirname)
-    return(basename)
+def limit_path_part_size(path, length):
+    parts = path.parts
+    raw_result = [x[:length] for x in parts]
+    result = '/'.join(raw_result)
+    return result
+
+
+def return_folder_name(filename, settings):
+
+    depth = settings['label_depth']
+    segment_size = settings['label_segment_size']
+    # cut off the blocksize folder because it's in the subtitle
+    raw_path = Path(filename).resolve().parents[1]
+    upperpath = raw_path.parents[depth]
+    relative_path = raw_path.relative_to(upperpath)
+    relative_path_processed = limit_path_part_size(
+        relative_path, segment_size)
+    return relative_path_processed
 
 
 def return_filename_filter_string(settings):
@@ -64,7 +79,7 @@ def filterLogFiles(settings, file_list):
             if searchstring['searchstring'] in item:
                 data = {'filename': item}
                 data.update(searchstring)
-                data['directory'] = return_folder_name(item)
+                data['directory'] = return_folder_name(item, settings)
                 result.append(data)
     # pprint.pprint(result)
     if len(result) > 0:

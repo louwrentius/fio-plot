@@ -22,6 +22,7 @@ def chart_2d_log_data(settings, dataset):
     data = supporting.process_dataset(settings, dataset)
     datatypes = data['datatypes']
     directories = logdata.get_unique_directories(dataset)
+    print(directories)
     #
     # Create matplotlib figure and first axis. The 'host' axis is used for
     # x-axis and as a basis for the second and third y-axis
@@ -92,7 +93,8 @@ def chart_2d_log_data(settings, dataset):
                                                          markevery=(len(
                                                              yvalues) / (len(yvalues) * 10)),
                                                          color=colors.pop(0),
-                                                         label=item[rw]['ylabel'])[0]
+                                                         label=item[rw]['ylabel'],
+                                                         linewidth=settings['line_width'])[0]
                 host.set_xlabel(item['xlabel'])
                 #
                 # Assure axes are scaled correctly, starting from zero.
@@ -108,7 +110,17 @@ def chart_2d_log_data(settings, dataset):
                     if max_yvalue > maximum[item['type']]:
                         maximum[item['type']] = max_yvalue
 
-                axes[item['type']].set_ylim(0, maximum[item['type']] * factor)
+                min_y = 0
+                if settings['min_y'] == "None":
+                    min_y = None
+                else:
+                    try:
+                        min_y = int(settings['min_y'])
+                    except ValueError:
+                        print(f"Min_y value is invalid (not None or integer).")
+
+                axes[item['type']].set_ylim(
+                    min_y, maximum[item['type']] * factor)
                 #
                 # Label Axis
                 #
