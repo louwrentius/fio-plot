@@ -210,9 +210,9 @@ If you use the bench_fio tool to generate benchmark data, you may notice that yo
     IBM1015/RAID10/4k
     IBM1015/RAID5/4k
 
-Those parent folders are used to distinguish and identify the lines from each other. The labels are based on the parent folder names as you can see in the graph. By default, we use only one level deep, so in this example only RAID10 or RAID5 are used. If we want to include the folder above that (IBM1015) we use the --label-depth parameter like so:
+Those parent folders are used to distinguish and identify the lines from each other. The labels are based on the parent folder names as you can see in the graph. By default, we use only one level deep, so in this example only RAID10/4k or RAID5/4k are used. If we want to include the folder above that (IBM1015) we use the --label-depth parameter like so:
 
-    fio_plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 -w 1 --label-depth 1
+    fio_plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 -w 1 --label-depth 2
 
 This would look like: 
 
