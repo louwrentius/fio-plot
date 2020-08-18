@@ -81,7 +81,7 @@ def set_arguments():
     ag.add_argument("-n", "--numjobs", nargs='+', help="\
             Specifies for which numjob parameter you want the 2d graphs to be\
                  generated. You can specify multiple values separated by spaces.", default=[1], type=int)
-    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw'], required=True,
+    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw', 'trim', 'rw', 'randtrim', 'trimwrite'], required=True,
                     help="Specifies the kind of data you want to graph.")
     ag.add_argument("-m", "--max", default=None, type=int,
                     help="Optional maximum value for Z-axis in 3D graph.")
