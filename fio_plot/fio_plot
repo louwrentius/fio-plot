@@ -100,7 +100,7 @@ def set_arguments():
             filter should be read/write.", type=str, default=('read', 'write'),
                     choices=['read', 'write'])
     ag.add_argument("-c", "--label-depth", help="\
-            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Used with -g.", type=int, default=0)
+            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Used with -g.", type=int, default=1)
     ag.add_argument("--label-segment-size", help="\
             Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used with -g.", type=int, default=1000)
     ag.add_argument("-w", "--line-width",
