@@ -2,6 +2,7 @@ import os
 import sys
 import csv
 import pprint as pprint
+import re
 import statistics
 import fiolib.supporting as supporting
 from pathlib import Path
@@ -76,7 +77,9 @@ def filterLogFiles(settings, file_list):
     result = []
     for item in file_list:
         for searchstring in searchstrings:
-            if searchstring['searchstring'] in item:
+            filename = os.path.basename(item)
+            # print(filename)
+            if re.search(r'^' + searchstring['searchstring'], filename):
                 data = {'filename': item}
                 data.update(searchstring)
                 data['directory'] = return_folder_name(item, settings)
