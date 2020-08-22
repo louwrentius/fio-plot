@@ -49,7 +49,7 @@ def get_scale_factor(dataset):
     mean = statistics.mean(dataset)
     scale_factors = [{'scale': 1000000, 'label': 'Latency (ms)'},
                      {'scale': 1000, 'label': 'Latency (\u03BCs)'},
-                     {'scale': 0, 'label': 'Latency (ns)'}]
+                     {'scale': 1, 'label': 'Latency (ns)'}]
     for item in scale_factors:
         """ Notice the factor, prevents scaling the graph up too soon if values
             are small, thus becomming almost unreadable """
