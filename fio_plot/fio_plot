@@ -85,7 +85,8 @@ def set_arguments():
                     help="Specifies the kind of data you want to graph.")
     ag.add_argument("-m", "--max", default=None, type=int,
                     help="Optional maximum value for Z-axis in 3D graph.")
-    ag.add_argument("-y", "--max-y", help="Optional maximum value for y-axis.")
+    ag.add_argument(
+        "-y", "--max-y", help="Optional maximum value for y-axis. Does not work on 3D graph.")
     ag.add_argument(
         "-x", "--min-y", help="Optional minimal value for y-axis. Use 'None' to disable.", type=str, default=0)
     ag.add_argument("-e", "--moving-average", default=None, type=int,

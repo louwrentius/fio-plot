@@ -28,10 +28,9 @@ def plot_3d(settings, dataset):
                                     rw, metric)
 
     fig = plt.figure()
-    ax1 = fig.add_subplot(projection='3d',elev=25)
+    ax1 = fig.add_subplot(projection='3d', elev=25)
     fig.set_size_inches(15, 10)
     ax1.set_box_aspect((4, 4, 3), zoom=1.2)
-    
 
     lx = len(dataset_types['iodepth'])
     ly = len(dataset_types['numjobs'])
@@ -100,7 +99,24 @@ def plot_3d(settings, dataset):
     dx = size * np.ones_like(zpos)
     dy = size * (ly/lx) * np.ones_like(zpos)
     dz = n.flatten(order='F')
-    values = dz / (dz.max()/1)
+    values = dz / (dz.max() / 1)
+
+    # Configure max value for z-axis
+    if settings['max']:
+        ax1.set_zlim(0, settings['max'])
+        cutoff_values = []
+        warning = False
+        for value in dz:
+            if value < settings['max']:
+                cutoff_values.append(value)
+            else:
+                warning = True
+                cutoff_values.append(settings['max'])
+        dz = np.array(cutoff_values)
+        if warning:
+            print(f"Warning: z-axis values above ")
+            warning_text = f"WARNING: values above {settings['max']} have been cutoff"
+            fig.text(0.55, 0.85, warning_text)
 
     # Create the 3D chart with positioning and colors
     cmap = plt.get_cmap('rainbow', xpos.ravel().shape[0])
