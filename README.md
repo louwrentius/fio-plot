@@ -92,6 +92,8 @@ Fio-plot requires 'matplotlib' and 'numpy' to be installed.
 
 Please note that Fio-plot requires at least matplotlib version 3.3.0
 
+Fio-plot also writes metadata to the PNG files using Pillow
+
 ### Usage
 
     usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -H | -g)
