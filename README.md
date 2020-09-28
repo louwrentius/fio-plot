@@ -240,5 +240,29 @@ An example:
 In this example, there are 8 files because numjobs was set to 8. Fio autoamatically generates a file for each job.
 It's important that - if you don't use the included benchmark script - to make sure files are generated with the appropriate file name structure.
 
+### PNG metadata
 
+All settings used to generate the PNG file are incorporated into the PNG file as metadata (tEXT).
+This metadata can be viewed with ImageMagick like this: 
 
+    identify -verbose filename.png
+
+This is a fragment of the output: 
+
+    Properties:
+        compare_graph: True
+        date:create: 2020-09-28T16:27:08+00:00
+        date:modify: 2020-09-28T16:27:07+00:00
+        disable_grid: False
+        dpi: 200
+        enable_markers: False
+        filter: ('read', 'write')
+        histogram: False
+        input_directory: /Users/MyUserName/data/WDRAID5/Users/MyUserName/data/WDRAID10
+        iodepth: 16
+        iodepth_numjobs_3d: False
+        latency_iops_2d: False
+        line_width: 1
+        loggraph: False
+        maxdepth: 64
+        maxjobs: 64
