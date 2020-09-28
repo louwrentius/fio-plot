@@ -245,6 +245,7 @@ It's important that - if you don't use the included benchmark script - to make s
 ### PNG metadata
 
 All settings used to generate the PNG file are incorporated into the PNG file as metadata (tEXT).
+This should help you to keep track of the exact parameters and data used to generate the graphs. 
 This metadata can be viewed with ImageMagick like this: 
 
     identify -verbose filename.png
