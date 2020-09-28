@@ -2,6 +2,7 @@
 import pprint as pprint
 import statistics
 import numpy as np
+from PIL.PngImagePlugin import PngImageFile, PngInfo
 
 
 def running_mean(l, N):
@@ -357,3 +358,21 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+
+def write_png_metadata(filename, settings):
+    targetImage = PngImageFile(filename)
+    metadata = PngInfo()
+    for (k, v) in settings.items():
+        if type(v) == list:
+            value = ""
+            for item in v:
+                value += str(item)
+            v = value
+        if type(v) == bool:
+            v = str(v)
+        if v == None:
+            continue
+        else:
+            metadata.add_text(k, str(v))
+    targetImage.save(filename, pnginfo=metadata)

@@ -169,6 +169,8 @@ def plot_3d(settings, dataset):
 
     plt.tight_layout()
     now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    plt.savefig('3d-' + str(metric) + '-jobs' +
-                str(settings['rw']) + "-" + str(now) + '.png')
+    savename = '3d-' + str(metric) + '-jobs' + \
+        str(settings['rw']) + "-" + str(now) + '.png'
+    plt.savefig(savename)
     plt.close('all')
+    supporting.write_png_metadata(savename, settings)

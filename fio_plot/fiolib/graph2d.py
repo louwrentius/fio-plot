@@ -154,4 +154,6 @@ def chart_2d_log_data(settings, dataset):
     title = settings['title'].replace(" ", '-')
     title = title.replace("/", '-')
     plt.tight_layout()
-    fig.savefig(f"{title}-{now}.png", dpi=settings['dpi'])
+    savename = f"{title}_{now}.png"
+    fig.savefig(savename, dpi=settings['dpi'])
+    supporting.write_png_metadata(savename, settings)

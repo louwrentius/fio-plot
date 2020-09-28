@@ -90,6 +90,8 @@ def set_arguments():
                          the argument is the size of the moving window\
                               (default is None to disable). Be carefull as this\
                                        setting may smooth out issues you may want to be aware of.")
+    ag.add_argument(
+        "-x", "--min-y", help="Optional minimal value for y-axis. Use 'None' to disable.", type=str, default=0)
     ag.add_argument("-t", "--type", nargs='+', help="\
             This setting specifies which kind of metric you want to graph.", type=str,
                     choices=['bw', 'iops', 'lat', 'slat', 'clat'])
