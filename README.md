@@ -138,10 +138,7 @@ Please note that Fio-plot requires at least matplotlib version 3.3.0
     -r {read,write,randread,randwrite,randrw}, --rw {read,write,randread,randwrite,randrw}
                             Specifies the kind of data you want to graph.
     -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
-    -y MAX_Y, --max-y MAX_Y
-                            Optional maximum value for y-axis.
-    -x MIN_Y, --min-y MIN_Y
-                            Optional minimal value for y-axis. Use 'None' to disable.
+    
     -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
                             The moving average helps to smooth out graphs, the argument is the size of the moving window
                             (default is None to disable). Be carefull as this setting may smooth out issues you may want
