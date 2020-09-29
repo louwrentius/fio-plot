@@ -104,11 +104,11 @@ Fio-plot also writes metadata to the PNG files using Pillow
 
 ### Usage
 
-    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -H | -g | -C) [--disable-grid] [--enable-markers]
-                [--subtitle SUBTITLE] [-d IODEPTH [IODEPTH ...]] [-n NUMJOBS [NUMJOBS ...]] [-M [MAXDEPTH]] [-J [MAXJOBS]] [-D [DPI]] [-p [PERCENTILE]] -r
-                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE] [-x MIN_Y]
-                [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]] [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH]
-                [--xlabel-parent XLABEL_PARENT] [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH] [--group-bars]
+    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -H | -g | -C) [--disable-grid] [--enable-markers] [--subtitle SUBTITLE]
+                [-d IODEPTH [IODEPTH ...]] [-n NUMJOBS [NUMJOBS ...]] [-M [MAXDEPTH]] [-J [MAXJOBS]] [-D [DPI]] [-p [PERCENTILE]] -r
+                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE] [-x MIN_Y] [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]]
+                [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH] [--xlabel-parent XLABEL_PARENT] [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH]
+                [--group-bars] [--show-cpu] [--table-lines]
 
     Generates charts/graphs from FIO JSON output or logdata.
 
@@ -148,8 +148,8 @@ Fio-plot also writes metadata to the PNG files using Pillow
                             Specifies the kind of data you want to graph.
     -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
     -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
-                            The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be
-                            carefull as this setting may smooth out issues you may want to be aware of.
+                            The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be carefull as this setting may
+                            smooth out issues you may want to be aware of.
     -x MIN_Y, --min-y MIN_Y
                             Optional minimal value for y-axis. Use 'None' to disable.
     -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
@@ -157,17 +157,17 @@ Fio-plot also writes metadata to the PNG files using Pillow
     -f {read,write} [{read,write} ...], --filter {read,write} [{read,write} ...]
                             filter should be read/write.
     --xlabel-depth XLABEL_DEPTH
-                            Can be used to truncate the most significant folder name from the label. Often used to strip off folders generated with benchfio
-                            (e.g. 4k)
+                            Can be used to truncate the most significant folder name from the label. Often used to strip off folders generated with benchfio (e.g. 4k)
     --xlabel-parent XLABEL_PARENT
-                            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a
-                            value of 0 to remove parent folder name.
+                            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a value of 0 to remove
+                            parent folder name.
     --xlabel-segment-size XLABEL_SEGMENT_SIZE
-                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are
-                            preserved. Used with -g.
+                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used with -g.
     -w LINE_WIDTH, --line-width LINE_WIDTH
                             Line width for line graphs. Can be a floating-point value. Used with -g.
     --group-bars          When using -l or -C, bars are grouped together by iops/lat type.
+    --show-cpu            When using the -C option, a table is added with cpu_usr and cpu_sys data.
+    --table-lines         Draw the lines within a table (cpu/stdev)
 
 ### Example Usage
 
