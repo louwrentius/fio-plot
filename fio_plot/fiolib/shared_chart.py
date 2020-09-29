@@ -308,13 +308,13 @@ def calculate_colwidths(cols, matrix):
     step5 = step4 / 2.1
 
     for item in matrix:
-        collist.append(step5 * (1 - 1 / int(item)))
+        collist.append(step5 * (1 - 1 / (int(item)) * 0.85))
 
     return collist
 
 
 def get_font():
-    font = font_manager.FontProperties(size=7)
+    font = font_manager.FontProperties(size=8)
     return font
 
 
