@@ -115,7 +115,10 @@ def set_arguments():
                     help="Line width for line graphs. Can be a floating-point value. Used with -g.", type=float, default=1),
     ag.add_argument("--group-bars",
                     help="When using -l or -C, bars are grouped together by iops/lat type.", action='store_true')
-
+    ag.add_argument("--show-cpu",
+                    help="When using the -C option, a table is added with cpu_usr and cpu_sys data.", action='store_true')
+    ag.add_argument("--table-lines",
+                    help="Draw the lines within a table (cpu/stdev)", action='store_true')
     return parser
 
 

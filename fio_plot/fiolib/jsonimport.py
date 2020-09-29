@@ -97,7 +97,9 @@ def get_json_mapping(mode):
         'lat_stddev': (data + ['lat_ns', 'stddev']),
         'latency_ms': (root + ['latency_ms']),
         'latency_us': (root + ['latency_us']),
-        'latency_ns': (root + ['latency_ns'])
+        'latency_ns': (root + ['latency_ns']),
+        'cpu_usr': (root + ['usr_cpu']),
+        'cpu_sys': (root + ['sys_cpu']),
     }
 
     return dictionary
@@ -132,7 +134,9 @@ def get_flat_json_mapping(settings, dataset):
                    'latency_ms': get_nested_value(record, m['latency_ms']),
                    'latency_us': get_nested_value(record, m['latency_us']),
                    'latency_ns': get_nested_value(record, m['latency_ns']),
-                   'type': mode}
+                   'type': mode,
+                   'cpu_sys': get_nested_value(record, m['cpu_sys']),
+                   'cpu_usr': get_nested_value(record, m['cpu_usr'])}
             item['data'].append(row)
         # item['rawdata'] = None # --> enable to throw away the data after parsing.
     return dataset

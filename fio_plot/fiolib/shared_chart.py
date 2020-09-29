@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import fiolib.supporting as supporting
 import fiolib.dataimport as dataimport
+import matplotlib.font_manager as font_manager
 import pprint
 
 
@@ -92,6 +93,8 @@ def get_record_set_improved(settings, dataset, dataset_types):
     iops_stddev_series_raw = []
     lat_series_raw = []
     lat_stddev_series_raw = []
+    cpu_sys = []
+    cpu_usr = []
 
     depth = settings['iodepth'][0]
     numjobs = settings['numjobs'][0]
@@ -111,6 +114,8 @@ def get_record_set_improved(settings, dataset, dataset_types):
                     lat_series_raw.append(record['lat'])
                     iops_stddev_series_raw.append(record['iops_stddev'])
                     lat_stddev_series_raw.append(record['lat_stddev'])
+                    cpu_sys.append(int(round(record['cpu_sys'], 0)))
+                    cpu_usr.append(int(round(record['cpu_usr'], 0)))
 
     #
     # Latency data must be scaled, IOPs will not be scaled.
@@ -157,7 +162,7 @@ def get_record_set_improved(settings, dataset, dataset_types):
     record_set['y1_axis'] = {'data': iops_series_rounded,
                              'format': "IOPS", 'stddev': iops_stdev_rounded_percent}
     record_set['y2_axis'] = scaled_latency_data
-
+    record_set['cpu'] = {'cpu_sys': cpu_sys, 'cpu_usr': cpu_usr}
     return record_set
 
 
@@ -265,17 +270,91 @@ def autolabel(rects, axis):
                   fontsize=8)
 
 
-def create_stddev_table(data, ax2):
+def get_widest_col(data):
+
+    sizes = []
+    for x in data:
+        s = str(x)
+        length = len(s)
+        sizes.append(length)
+    return sizes
+
+
+def get_max_width(dataset, cols):
+    matrix = []
+    returndata = []
+    for item in dataset:
+        matrix.append(get_widest_col(item))
+
+    col = 0
+    while col < cols:
+        column = 0
+        for item in matrix:
+            if item[col] > column:
+                column = item[col]
+        returndata.append(column)
+        col += 1
+    return returndata
+
+
+def calculate_colwidths(cols, matrix):
+
+    collist = []
+
+    step1 = (1 / cols)
+    step2 = (1 - step1)
+    step3 = step1 * step2
+    step4 = step3 * step2
+    step5 = step4 / 2.1
+
+    for item in matrix:
+        collist.append(step5 * (1 - 1 / int(item)))
+
+    return collist
+
+
+def get_font():
+    font = font_manager.FontProperties(size=7)
+    return font
+
+
+def create_generic_table(settings, table_vals, ax2, rowlabels, location):
+    cols = len(table_vals[0])
+    matrix = get_max_width(table_vals, cols)
+    colwidths = calculate_colwidths(cols, matrix)
+
+    table = ax2.table(cellText=table_vals,  loc=location, rowLabels=rowlabels,
+                      colLoc="center", colWidths=colwidths,
+                      cellLoc="center",
+                      rasterized=False)
+    table.auto_set_font_size(False)
+    table.set_fontsize(7)
+    table.scale(1, 1.2)
+
+    if settings['table_lines']:
+        linewidth = 0.25
+    else:
+        linewidth = 0
+
+    for key, cell in table.get_celld().items():
+        cell.set_linewidth(linewidth)
+        cell.set_text_props(fontproperties=get_font())
+
+
+def create_cpu_table(settings, data, ax2):
+    table_vals = [data['x_axis'],
+                  data['cpu']['cpu_usr'],
+                  data['cpu']['cpu_sys']]
+
+    rowlabels = ['CPU Usage', f'cpu_usr %', f'cpu_sys %']
+    location = "lower center"
+    create_generic_table(settings, table_vals, ax2, rowlabels, location)
+
+
+def create_stddev_table(settings, data, ax2):
     table_vals = [data['x_axis'], data['y1_axis']
                   ['stddev'], data['y2_axis']['stddev']]
 
-    cols = len(data['x_axis'])
-    table = ax2.table(cellText=table_vals,  loc="lower right", rowLabels=[
-        'IO queue depth', f'IOP/s \u03C3 %', f'Latency \u03C3 %'],
-        colLoc="center",
-        cellLoc="center", colWidths=[0.05] * cols,
-        rasterized=False)
-    table.scale(1, 1.2)
-
-    for key, cell in table.get_celld().items():
-        cell.set_linewidth(0)
+    rowlabels = ['IO queue depth', f'IOP/s \u03C3 %', f'Latency \u03C3 %']
+    location = "lower right"
+    create_generic_table(settings, table_vals, ax2, rowlabels, location)

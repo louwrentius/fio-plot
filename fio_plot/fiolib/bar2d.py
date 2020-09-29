@@ -59,7 +59,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     particular iodepth."""
     dataset_types = shared.get_dataset_types(dataset)
     data = shared.get_record_set(settings, dataset, dataset_types)
-    # pprint.pprint(data)
+    pprint.pprint(data)
 
     fig, (ax1, ax2) = plt.subplots(
         nrows=2, gridspec_kw={'height_ratios': [7, 1]})
@@ -95,9 +95,8 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     shared.autolabel(rects1, ax1)
     shared.autolabel(rects2, ax3)
     #
-    #
-    data['x_axis'] = data['x_axis']
-    shared.create_stddev_table(data, ax2)
+    # Draw the standard deviation table
+    shared.create_stddev_table(settings, data, ax2)
     #
     # Create legend
     ax2.legend((rects1[0], rects2[0]),
@@ -119,8 +118,6 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     """This function is responsible for creating bar charts that compare data."""
 
     dataset_types = shared.get_dataset_types(dataset)
-    # pprint.pprint(dataset_types)
-
     data = shared.get_record_set_improved(settings, dataset, dataset_types)
 
     pprint.pprint(data)
@@ -160,7 +157,11 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     shared.autolabel(rects1, ax1)
     shared.autolabel(rects2, ax3)
 
-    #
+    shared.create_stddev_table(settings, data, ax2)
+
+    if settings['show_cpu']:
+        shared.create_cpu_table(settings, data, ax2)
+
     # Create legend
     ax2.legend((rects1[0], rects2[0]),
                (data['y1_axis']['format'],
