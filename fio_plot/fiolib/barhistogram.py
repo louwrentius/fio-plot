@@ -56,6 +56,7 @@ def autolabel(rects, axis):
 def chart_latency_histogram(settings, dataset):
     """This function is responsible to draw the 2D latency histogram,
     (a bar chart)."""
+
     record_set = shared.get_record_set_histogram(settings, dataset)
 
     # We have to sort the data / axis from low to high

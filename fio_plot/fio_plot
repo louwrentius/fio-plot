@@ -60,6 +60,8 @@ def set_arguments():
             Generates a latency histogram for a particular queue depth and numjobs value.")
     exclusive_group.add_argument("-g", "--loggraph", action='store_true',
                                  help="This option generates a 2D graph of the log data recorded by FIO.")
+    exclusive_group.add_argument("-C", "--compare-graph", action='store_true',
+                                 help="This option generates a bar chart to compare results from different benchmark runs.")
 
     ag.add_argument("--disable-grid", action='store_true', help="\
             Disables the dotted grid in the output graph.")
@@ -67,21 +69,22 @@ def set_arguments():
             Enable markers for the plot lines when graphing log data.")
     ag.add_argument("--subtitle", help="\
             Specify your own subtitle or leave it blank with double quotes.", type=str, default=None)
-    ag.add_argument("-d", "--iodepth", type=int, nargs='+', default=[1], help="\
-            The I/O queue depth to graph.")
+    ag.add_argument("-d", "--iodepth", type=int, nargs='+', default=None, help="\
+            The I/O queue depth to graph. You can specify multiple values separated by spaces.")
+    ag.add_argument("-n", "--numjobs", nargs='+', help="\
+            Specifies for which numjob parameter you want the 2d graphs to be\
+                 generated. You can specify multiple values separated by spaces.", default=None, type=int)
     ag.add_argument("-M", "--maxdepth", nargs='?', default=64, type=int, help="\
             Maximum queue depth to graph in 3D graph.")
+    ag.add_argument("-J", "--maxjobs", help="\
+            Maximum number of jobs to graph in 3D graph.", nargs='?', default=64, type=int)
     ag.add_argument("-D", "--dpi", help="\
             The chart will be saved with this DPI setting. Higher means larger\
                      image.", nargs='?', default=200, type=int)
     ag.add_argument("-p", "--percentile", help="\
             Calculate the percentile, default 99.99th.", nargs='?', default=99.99, type=float)
-    ag.add_argument("-J", "--maxjobs", help="\
-            Maximum number of jobs to graph in 3D graph.", nargs='?', default=64, type=int)
-    ag.add_argument("-n", "--numjobs", nargs='+', help="\
-            Specifies for which numjob parameter you want the 2d graphs to be\
-                 generated. You can specify multiple values separated by spaces.", default=[1], type=int)
-    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw', 'trim', 'rw', 'randtrim', 'trimwrite'], required=True,
+    ag.add_argument("-r", "--rw", choices=['read', 'write', 'randread', 'randwrite', 'randrw',
+                                           'trim', 'rw', 'randtrim', 'trimwrite'], required=True,
                     help="Specifies the kind of data you want to graph.")
     ag.add_argument("-m", "--max", default=None, type=int,
                     help="Optional maximum value for Z-axis in 3D graph.")
@@ -98,12 +101,20 @@ def set_arguments():
     ag.add_argument("-f", "--filter", nargs='+', help="\
             filter should be read/write.", type=str, default=('read', 'write'),
                     choices=['read', 'write'])
-    ag.add_argument("-c", "--label-depth", help="\
-            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Used with -g.", type=int, default=1)
-    ag.add_argument("--label-segment-size", help="\
-            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used with -g.", type=int, default=1000)
+    ag.add_argument("--xlabel-depth", help="\
+            Can be used to truncate the most significant folder name from the label. \
+                Often used to strip off folders generated with benchfio (e.g. 4k)", type=int, default=0)
+    ag.add_argument("--xlabel-parent", help="\
+            use the parent folder(s) to make the label unique. The number\
+                 represents how many folders up should be included. Default is 1. Use a value of \
+                     0 to remove parent folder name.", type=int, default=1)
+    ag.add_argument("--xlabel-segment-size", help="\
+            Truncate folder names to make labels fit the graph. Disabled by default. \
+                The number represents how many characters per segment are preserved. Used with -g.", type=int, default=1000)
     ag.add_argument("-w", "--line-width",
-                    help="Line width for line graphs. Can be a floating-point value. Used with -g.", type=float, default=1)
+                    help="Line width for line graphs. Can be a floating-point value. Used with -g.", type=float, default=1),
+    ag.add_argument("--group-bars",
+                    help="When using -l or -C, bars are grouped together by iops/lat type.", action='store_true')
 
     return parser
 
@@ -127,12 +138,69 @@ def run_preflight_checks(settings):
                 "\nIf -L is specified (3D Chart) you can only select [iops,lat] for -t type\n")
             sys.exit(1)
 
+        if len(settings['input_directory']) > 1:
+            print("\nIf -L is specified, only one input directory can be used.\n")
+            sys.exit(1)
+
+    if settings['compare_graph']:
+        message = f"\nWhen creating a graph to compare values, iodepth or numjobs must be one value.\n"
+        pm = False
+
+        if settings['iodepth']:
+            if len(settings['iodepth']) > 1:
+                pm = True
+        if settings['numjobs']:
+            if len(settings['numjobs']) > 1:
+                pm = True
+        if pm:
+            print(message)
+            sys.exit(1)
+
+        if len(settings['input_directory']) < 2:
+            print("\n When you want to compare two datasets, please specify at least two directories with test data \
+            using the -i parameter\n")
+            sys.exit(1)
+
+    if settings['latency_iops_2d']:
+        if len(settings['input_directory']) > 1:
+            print("\nIf -l is specified, only one input directory can be used.\n")
+            sys.exit(1)
+
+    if settings['histogram']:
+        if len(settings['input_directory']) > 1:
+            print("\nIf -l is specified, only one input directory can be used.\n")
+            sys.exit(1)
+
+
+def configure_default_settings(settings, uses_json_files, key):
+    if not settings['iodepth']:
+        settings['iodepth'] = uses_json_files[key]['iodepth_default']
+    if not settings['numjobs']:
+        settings['numjobs'] = uses_json_files[key]['numjobs_default']
+    return settings
+
 
 def main():
     settings = {}
-    uses_json_files = {'iodepth_numjobs_3d': bar3d.plot_3d, 'latency_iops_2d':
-                       bar2d.chart_2dbarchart_jsonlogdata,
-                       'histogram': histogram.chart_latency_histogram}
+
+    uses_json_files = {'iodepth_numjobs_3d':
+                       {'function': bar3d.plot_3d,
+                        'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
+                        'numjobs_default': [1, 2, 4, 8, 16, 32, 64]},
+                       'latency_iops_2d':
+                       {'function': bar2d.chart_2dbarchart_jsonlogdata,
+                        'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
+                        'numjobs_default': [1]},
+                       'histogram':
+                       {'function': histogram.chart_latency_histogram,
+                        'iodepth_default': [1],
+                        'numjobs_default': [1]},
+                       'compare_graph':
+                       {'function': bar2d.compchart_2dbarchart_jsonlogdata,
+                        'iodepth_default': [1],
+                        'numjobs_default': [1]}
+                       }
+
     parser = set_arguments()
     try:
         args = parser.parse_args()
@@ -149,12 +217,18 @@ def main():
     run_preflight_checks(settings)
 
     option_found = False
+
     if settings['loggraph']:
+        if not settings['iodepth']:
+            settings['iodepth'] = [1]
+        if not settings['numjobs']:
+            settings['numjobs'] = [1]
+
         benchmarkfiles = []
         for input_dir in settings['input_directory']:
             benchmarkfiles.extend(logdata.list_fio_log_files(input_dir))
         logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
-        # pprint.pprint(logfiles)
+        pprint.pprint(logfiles)
         rawdata = logdata.readLogDataFromFiles(settings, logfiles)
         # pprint.pprint(rawdata)
         merged = logdata.mergeDataSet(settings, rawdata)
@@ -163,16 +237,19 @@ def main():
 
     for item in uses_json_files.keys():
         if settings[item]:
+            settings = configure_default_settings(
+                settings, uses_json_files, item)
             list_of_json_files = jsonimport.list_json_files(settings)
+            # print(list_of_json_files)
             dataset = jsonimport.import_json_dataset(list_of_json_files)
             parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
             # Which function to execute is specified in 'uses_json_files'
-            uses_json_files[item](settings, parsed_data)
+            uses_json_files[item]['function'](settings, parsed_data)
             option_found = True
 
     if not option_found:
         parser.print_help()
-        print("Specify -g, -l, -L or -H")
+        print("Specify -g, -l, -L, -C or -H")
         exit(1)
     else:
         exit(0)

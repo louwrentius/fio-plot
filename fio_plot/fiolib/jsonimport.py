@@ -4,22 +4,47 @@ import json
 import pprint
 
 
+def filter_json_files(settings, filename):
+    """ Filter the json files to only those we need.
+    My ambition is to learn to program and do this right one day.
+    """
+    basename = os.path.basename(filename)
+    splitone = str.split(basename, '.')
+    split = str.split(splitone[0], '-')
+    iodepth = int(split[1])
+    numjobs = int(split[2])
+
+    if iodepth in settings['iodepth'] and numjobs in settings['numjobs']:
+        return filename
+
+
 def list_json_files(settings):
     """List all JSON files that maches the command line settings."""
+    json_files = []
     for directory in settings['input_directory']:
         absolute_dir = os.path.abspath(directory)
+        dict_structure = {'directory': absolute_dir, 'files': []}
         files = os.listdir(absolute_dir)
-        json_files = []
         for item in files:
             if item.endswith(".json"):
                 if item.startswith(settings['rw']):
-                    json_files.append(os.path.join(absolute_dir, item))
+                    dict_structure['files'].append(
+                        os.path.join(absolute_dir, item))
+        json_files.append(dict_structure)
 
-    if len(json_files) == 0:
-        print(
-            "Could not find any (matching) JSON files in the specified directory " + str(absolute_dir))
-        sys.exit(1)
+    for item in json_files:
+        file_list = []
+        for f in item['files']:
+            result = filter_json_files(settings, f)
+            if result:
+                file_list.append(result)
+        item['files'] = file_list
+        if not item['files']:
+            print(
+                "Could not find any (matching) JSON files in the specified directory " + str(absolute_dir))
+            sys.exit(1)
 
+    # pprint.pprint(json_files)
     return json_files
 
 
@@ -34,13 +59,16 @@ def import_json_data(filename):
     return d
 
 
-def import_json_dataset(fileset):
-    """Returns a list of imported raw JSON data for every file in the fileset.
+def import_json_dataset(dataset):
+    """The dataset is a list of dicts containing the absolute path and the file list.
+    We need to add a third key/value pair with the ingested data of those files.
     """
-    d = []
-    for f in fileset:
-        d.append(import_json_data(f))
-    return d
+    for item in dataset:
+        item['rawdata'] = []
+        # pprint.pprint(item['files'])
+        for f in item['files']:
+            item['rawdata'].append(import_json_data(f))
+    return dataset
 
 
 def get_nested_value(dictionary, key):
@@ -78,31 +106,33 @@ def get_json_mapping(mode):
 def get_flat_json_mapping(settings, dataset):
     """This function returns a list of simplified dictionaries based on the
     data within the supplied json data."""
-    stats = []
-    for record in dataset:
-        if settings['rw'] == 'randrw':
-            if settings['filter'][0]:
-                mode = settings['filter'][0]
+    for item in dataset:
+        item['data'] = []
+        for record in item['rawdata']:
+            if settings['rw'] == 'randrw':
+                if settings['filter'][0]:
+                    mode = settings['filter'][0]
+                else:
+                    print(
+                        "When processing randrw data, a -f filter (read/write) must also be specified.")
+                    exit(1)
+            elif settings['rw'] == 'read' or settings['rw'] == 'write':
+                mode = settings['rw']
             else:
-                print(
-                    "When processing randrw data, a -f filter (read/write) must also be specified.")
-                exit(1)
-        elif settings['rw'] == 'read' or settings['rw'] == 'write':
-            mode = settings['rw']
-        else:
-            mode = get_nested_value(
-                record, ('jobs', 0, 'job options', 'rw'))[4:]
-        m = get_json_mapping(mode)
-        row = {'iodepth': get_nested_value(record, m['iodepth']),
-               'numjobs': get_nested_value(record, m['numjobs']),
-               'rw': get_nested_value(record, m['rw']),
-               'iops': get_nested_value(record, m['iops']),
-               'iops_stddev': get_nested_value(record, m['iops_stddev']),
-               'lat': get_nested_value(record, m['lat_ns']),
-               'lat_stddev': get_nested_value(record, m['lat_stddev']),
-               'latency_ms': get_nested_value(record, m['latency_ms']),
-               'latency_us': get_nested_value(record, m['latency_us']),
-               'latency_ns': get_nested_value(record, m['latency_ns']),
-               'type': mode}
-        stats.append(row)
-    return stats
+                mode = get_nested_value(
+                    record, ('jobs', 0, 'job options', 'rw'))[4:]
+            m = get_json_mapping(mode)
+            row = {'iodepth': get_nested_value(record, m['iodepth']),
+                   'numjobs': get_nested_value(record, m['numjobs']),
+                   'rw': get_nested_value(record, m['rw']),
+                   'iops': get_nested_value(record, m['iops']),
+                   'iops_stddev': get_nested_value(record, m['iops_stddev']),
+                   'lat': get_nested_value(record, m['lat_ns']),
+                   'lat_stddev': get_nested_value(record, m['lat_stddev']),
+                   'latency_ms': get_nested_value(record, m['latency_ms']),
+                   'latency_us': get_nested_value(record, m['latency_us']),
+                   'latency_ns': get_nested_value(record, m['latency_ns']),
+                   'type': mode}
+            item['data'].append(row)
+        # item['rawdata'] = None # --> enable to throw away the data after parsing.
+    return dataset

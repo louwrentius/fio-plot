@@ -48,6 +48,7 @@ def get_scale_factor(dataset):
     the scale factor and the y-axis label is returned in a dictionary.
     """
     mean = statistics.mean(dataset)
+
     scale_factors = [{'scale': 1000000, 'label': 'Latency (ms)'},
                      {'scale': 1000, 'label': 'Latency (\u03BCs)'},
                      {'scale': 1, 'label': 'Latency (ns)'}]
@@ -367,7 +368,7 @@ def write_png_metadata(filename, settings):
         if type(v) == list:
             value = ""
             for item in v:
-                value += str(item)
+                value += str(item) + " "
             v = value
         if type(v) == bool:
             v = str(v)

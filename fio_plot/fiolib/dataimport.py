@@ -33,13 +33,23 @@ def limit_path_part_size(path, length):
     return result
 
 
-def return_folder_name(filename, settings):
+def return_folder_name(filename, settings, override=False):
+    segment_size = settings['xlabel_segment_size']
+    parent = settings['xlabel_parent']
+    child = settings['xlabel_depth']
 
-    depth = settings['label_depth']
-    segment_size = settings['label_segment_size']
-    raw_path = Path(filename).resolve().parents[0]
-    upperpath = raw_path.parents[depth]
+    raw_path = Path(filename).resolve()
+
+    if override:
+        raw_path = raw_path.parent
+
+    if child > 0:
+        raw_path = raw_path.parents[child-1]
+
+    upperpath = raw_path.parents[parent]
+
     relative_path = raw_path.relative_to(upperpath)
+
     relative_path_processed = limit_path_part_size(
         relative_path, segment_size)
     return relative_path_processed
@@ -81,7 +91,8 @@ def filterLogFiles(settings, file_list):
             if re.search(r'^' + searchstring['searchstring'], filename):
                 data = {'filename': item}
                 data.update(searchstring)
-                data['directory'] = return_folder_name(item, settings)
+                data['directory'] = return_folder_name(
+                    item, settings, True)
                 result.append(data)
     # pprint.pprint(result)
     if len(result) > 0:

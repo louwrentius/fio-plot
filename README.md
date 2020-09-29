@@ -22,6 +22,14 @@ This kind of chart shows both IOPs and Latency for multiple queue depths.
 
 [queuedepthlowhigh01]: https://louwrentius.com/static/images/impactofqueuedepth.png
 
+### 2D chart to compare benchmark results
+
+The compare chart shows the results from multiple benchmarks in one graph. 
+
+![shortlabel][shortlabel]
+
+*Please note that the RAID10 results are skewed due to agressive write caching of the hard drives in this example*
+
 ### 3D chart
 A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs.
 
@@ -96,13 +104,11 @@ Fio-plot also writes metadata to the PNG files using Pillow
 
 ### Usage
 
-    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -H | -g)
-                [--disable-grid] [--enable-markers] [--subtitle SUBTITLE] [-d IODEPTH [IODEPTH ...]]
-                [-M [MAXDEPTH]] [-D [DPI]] [-p [PERCENTILE]] [-J [MAXJOBS]] [-n NUMJOBS [NUMJOBS ...]] -r
-                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE]
-                [-x MIN_Y] [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]]
-                [-f {read,write} [{read,write} ...]] [-c LABEL_DEPTH] [--label-segment-size LABEL_SEGMENT_SIZE]
-                [-w LINE_WIDTH]
+    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -H | -g | -C) [--disable-grid] [--enable-markers]
+                [--subtitle SUBTITLE] [-d IODEPTH [IODEPTH ...]] [-n NUMJOBS [NUMJOBS ...]] [-M [MAXDEPTH]] [-J [MAXJOBS]] [-D [DPI]] [-p [PERCENTILE]] -r
+                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE] [-x MIN_Y]
+                [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]] [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH]
+                [--xlabel-parent XLABEL_PARENT] [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH] [--group-bars]
 
     Generates charts/graphs from FIO JSON output or logdata.
 
@@ -117,55 +123,73 @@ Fio-plot also writes metadata to the PNG files using Pillow
     -s SOURCE, --source SOURCE
                             Author
     -L, --iodepth-numjobs-3d
-                            Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the
-                            z-axis.
+                            Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.
     -l, --latency-iops-2d
                             Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value.
     -H, --histogram       Generates a latency histogram for a particular queue depth and numjobs value.
     -g, --loggraph        This option generates a 2D graph of the log data recorded by FIO.
+    -C, --compare-graph   This option generates a bar chart to compare results from different benchmark runs.
     --disable-grid        Disables the dotted grid in the output graph.
     --enable-markers      Enable markers for the plot lines when graphing log data.
     --subtitle SUBTITLE   Specify your own subtitle or leave it blank with double quotes.
     -d IODEPTH [IODEPTH ...], --iodepth IODEPTH [IODEPTH ...]
-                            The I/O queue depth to graph.
+                            The I/O queue depth to graph. You can specify multiple values separated by spaces.
+    -n NUMJOBS [NUMJOBS ...], --numjobs NUMJOBS [NUMJOBS ...]
+                            Specifies for which numjob parameter you want the 2d graphs to be generated. You can specify multiple values separated by spaces.
     -M [MAXDEPTH], --maxdepth [MAXDEPTH]
                             Maximum queue depth to graph in 3D graph.
+    -J [MAXJOBS], --maxjobs [MAXJOBS]
+                            Maximum number of jobs to graph in 3D graph.
     -D [DPI], --dpi [DPI]
                             The chart will be saved with this DPI setting. Higher means larger image.
     -p [PERCENTILE], --percentile [PERCENTILE]
                             Calculate the percentile, default 99.99th.
-    -J [MAXJOBS], --maxjobs [MAXJOBS]
-                            Maximum number of jobs to graph in 3D graph.
-    -n NUMJOBS [NUMJOBS ...], --numjobs NUMJOBS [NUMJOBS ...]
-                            Specifies for which numjob parameter you want the 2d graphs to be generated. You can
-                            specify multiple values separated by spaces.
     -r {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite}, --rw {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite}
                             Specifies the kind of data you want to graph.
     -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
     -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
-                            The moving average helps to smooth out graphs, the argument is the size of the moving
-                            window (default is None to disable). Be carefull as this setting may smooth out issues you
-                            may want to be aware of.
+                            The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be
+                            carefull as this setting may smooth out issues you may want to be aware of.
     -x MIN_Y, --min-y MIN_Y
                             Optional minimal value for y-axis. Use 'None' to disable.
     -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
                             This setting specifies which kind of metric you want to graph.
     -f {read,write} [{read,write} ...], --filter {read,write} [{read,write} ...]
                             filter should be read/write.
-    -c LABEL_DEPTH, --label-depth LABEL_DEPTH
-                            use the parent folder(s) to make the label unique. The number represents how many folders
-                            up should be included. Used with -g.
-    --label-segment-size LABEL_SEGMENT_SIZE
-                            Truncate folder names to make labels fit the graph. Disabled by default. The number
-                            represents how many characters per segment are preserved. Used with -g.
+    --xlabel-depth XLABEL_DEPTH
+                            Can be used to truncate the most significant folder name from the label. Often used to strip off folders generated with benchfio
+                            (e.g. 4k)
+    --xlabel-parent XLABEL_PARENT
+                            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a
+                            value of 0 to remove parent folder name.
+    --xlabel-segment-size XLABEL_SEGMENT_SIZE
+                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are
+                            preserved. Used with -g.
     -w LINE_WIDTH, --line-width LINE_WIDTH
                             Line width for line graphs. Can be a floating-point value. Used with -g.
+    --group-bars          When using -l or -C, bars are grouped together by iops/lat type.
 
 ### Example Usage
 
-Creating a 2D Bar Chart based on randread data and numjobs = 1.
+Creating a 2D Bar Chart based on randread data and numjobs = 1 (default).
 
-    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -n 1 -r randread
+    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread
+
+![regularbars][regular]
+
+[regular]: https://louwrentius.com/static/images/iodepthregular.png
+
+Creating a 2D Bar Chart based on randread data and numjobs = 8.
+
+    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -n 8 -r randread
+
+Creating a 2D Bar Chart grouping iops and latency data together: 
+
+    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread --group-bars
+
+![groupedbars][grouped]
+
+[grouped]: https://louwrentius.com/static/images/iodepthgroupbars.png
 
 Creating a 3D graph showing IOPS. 
 
@@ -187,7 +211,23 @@ The same result but if you want markers to help distinguish between lines:
 
     ./fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1 --enable--markers
 
-### Comparing two benchmarks in a single chart
+### Comparing two or more benchmarks based on JSON data (2d Bar Chart):
+
+A simple example where we compare the iops and latency of a particular iodepth and numjobs value:
+
+    ./fio_plots -i <folder_a> <folder_b> <folder_c> -T "Test" -C -r randwrite -d 8 
+
+![compare01][compare01]
+
+[compare01]: https://louwrentius.com/static/images/compareexample01.png 
+
+The bars can also be grouped: 
+
+![compare03][compare03]
+
+[compare03]: https://louwrentius.com/static/images/compareexample03.png 
+
+### Comparing two or more benchmarks in a single line chart
 
 Create a line chart based on data from two different folders (but the same benchmark parameters)     
 
@@ -212,15 +252,42 @@ If you use the bench_fio tool to generate benchmark data, you may notice that yo
     IBM1015/RAID10/4k
     IBM1015/RAID5/4k
 
-Those parent folders are used to distinguish and identify the lines from each other. The labels are based on the parent folder names as you can see in the graph. By default, we use only one level deep, so in this example only RAID10/4k or RAID5/4k are used. If we want to include the folder above that (IBM1015) we use the --label-depth parameter like so:
+Those parent folders are used to distinguish and identify the lines from each other. The labels are based on the parent folder names as you can see in the graph. By default, we use only one level deep, so in this example only RAID10/4k or RAID5/4k are used. If we want to include the folder above that (IBM1015) we use the --xlabel-parent parameter like so:
 
-    fio_plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 -w 1 --label-depth 2
+    fio_plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 -w 1 --xlabel-parent 2
 
 This would look like: 
 
 [![labellength][labellength]][labellength]
 
 [labellength]: https://louwrentius.com/static/images/labellength.png
+
+Some additional examples to explain how you can trim the labels to contain exactly the directories you want:
+
+The default:
+
+    RAID10/4k
+
+Is equivalent to --xlabel-parent 1 --xlabel-depth 0. So by default, the parent folder is included. 
+If you strip off the 4k folder with --xlabel-depth 1, you'll notice that the label becomes:
+
+    IBM1015/RAID10 
+
+This is because the default --xlabel-parent is 1 and the index now starts at 'RAID10'. 
+
+If you want to strip off the 4k folder but not include the IBM1015 folder, you need to be explicit about that:
+
+    --xlabel-parent 0 --xlabel-depth 1 
+
+Results in:
+
+    RAID10
+
+Example:
+
+![shortlabel][shortlabel]
+
+[shortlabel]: https://louwrentius.com/static/images/shortlabel.png
 
 ### JSON / LOG file name requirements
 
@@ -242,6 +309,7 @@ An example:
 In this example, there are 8 files because numjobs was set to 8. Fio autoamatically generates a file for each job.
 It's important that - if you don't use the included benchmark script - to make sure files are generated with the appropriate file name structure.
 
+
 ### PNG metadata
 
 All settings used to generate the PNG file are incorporated into the PNG file as metadata (tEXT).
@@ -261,7 +329,7 @@ This is a fragment of the output:
         enable_markers: False
         filter: ('read', 'write')
         histogram: False
-        input_directory: /Users/MyUserName/data/WDRAID5/Users/MyUserName/data/WDRAID10
+        input_directory: /Users/MyUserName/data/WDRAID5 /Users/MyUserName/data/WDRAID10
         iodepth: 16
         iodepth_numjobs_3d: False
         latency_iops_2d: False
