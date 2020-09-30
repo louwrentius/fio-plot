@@ -98,6 +98,11 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     # Draw the standard deviation table
     shared.create_stddev_table(settings, data, ax2)
     #
+    # Draw the cpu usage table if requested
+    print(data)
+    if settings['show_cpu']:
+        shared.create_cpu_table(settings, data, ax2)
+    #
     # Create legend
     ax2.legend((rects1[0], rects2[0]),
                (data['y1_axis']['format'],

@@ -168,7 +168,10 @@ def get_record_set(settings, dataset, dataset_types):
                 datadict['iops_stddev_series_raw'].append(
                     record['iops_stddev'])
                 datadict['lat_stddev_series_raw'].append(record['lat_stddev'])
-
+                datadict['cpu']['cpu_sys'].append(
+                    int(round(record['cpu_sys'], 0)))
+                datadict['cpu']['cpu_usr'].append(
+                    int(round(record['cpu_usr'], 0)))
     return scale_data(datadict)
 
 
@@ -270,7 +273,7 @@ def get_max_width(dataset, cols):
 
     col = 0
     while col < cols:
-        column = 0
+        column = 2
         for item in matrix:
             if item[col] > column:
                 column = item[col]

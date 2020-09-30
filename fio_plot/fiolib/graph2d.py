@@ -132,12 +132,14 @@ def chart_2d_log_data(settings, dataset):
                 # Add line to legend
                 #
                 lines.append(axes[dataplot])
-                if len(directories) > 1:
-                    mydir = f"{item['directory']}-"
-                else:
-                    mydir = ""
+
+                maxlabelsize = get_max_label_size(
+                    settings, data, directories)
+                mylabel = create_label(settings, item, directories)
+                mylabel = get_padding(mylabel, maxlabelsize)
+
                 labels.append(
-                    f"|{mydir}{item['type']:>4}|{rw:>5}|qd: {item['iodepth']:>2}|nj: {item['numjobs']:>2}|mean: {item[rw]['mean']:>6}|std%: {item[rw]['stdv']:>6} |P{settings['percentile']}: {item[rw]['percentile']:>6}")
+                    f"|{mylabel:>4}|{rw:>5}|qd: {item['iodepth']:>2}|nj: {item['numjobs']:>2}|mean: {item[rw]['mean']:>6}|std%: {item[rw]['stdv']:>6} |P{settings['percentile']}: {item[rw]['percentile']:>6}")
 
     host.legend(lines, labels, prop=fontP,
                 bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
@@ -154,3 +156,43 @@ def chart_2d_log_data(settings, dataset):
     # Save graph to PNG file
     #
     supporting.save_png(settings, plt, fig)
+
+
+#
+# These functions below is just one big mess to get the legend labels to align.
+#
+
+def create_label(settings, item, directories):
+    if len(directories) > 1:
+        mydir = f"{item['directory']}-"
+    else:
+        mydir = ""
+
+    mylabel = f"{mydir}{item['type']}"
+    return mylabel
+
+
+def get_max_label_size(settings, data, directories):
+
+    labels = []
+    for item in data['dataset']:
+        for rw in settings['filter']:
+            if rw in item.keys():
+                label = create_label(settings, item, directories)
+                labels.append(label)
+
+    maxlabelsize = 0
+    for label in labels:
+        size = len(label)
+        if size > maxlabelsize:
+            maxlabelsize = size
+
+    return maxlabelsize
+
+
+def get_padding(label, maxlabelsize):
+    size = len(label)
+    diff = maxlabelsize - size
+    if diff > 0:
+        label = label + " " * diff
+    return label
