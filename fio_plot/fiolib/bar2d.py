@@ -99,7 +99,6 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     shared.create_stddev_table(settings, data, ax2)
     #
     # Draw the cpu usage table if requested
-    print(data)
     if settings['show_cpu']:
         shared.create_cpu_table(settings, data, ax2)
     #
@@ -119,7 +118,7 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     dataset_types = shared.get_dataset_types(dataset)
     data = shared.get_record_set_improved(settings, dataset, dataset_types)
 
-    pprint.pprint(data)
+    # pprint.pprint(data)
 
     fig, (ax1, ax2) = plt.subplots(
         nrows=2, gridspec_kw={'height_ratios': [7, 1]})
