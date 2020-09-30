@@ -227,6 +227,12 @@ The bars can also be grouped:
 
 [compare03]: https://louwrentius.com/static/images/compareexample03.png 
 
+There is also an option that includes a table with CPU usage:
+
+![comparecpu][comparecpu]
+
+[comparecpu]: https://louwrentius.com/static/images/comparecpu.png
+
 ### Comparing two or more benchmarks in a single line chart
 
 Create a line chart based on data from two different folders (but the same benchmark parameters)     
