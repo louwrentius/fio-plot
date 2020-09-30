@@ -211,6 +211,10 @@ The same result but if you want markers to help distinguish between lines:
 
     ./fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1 --enable--markers
 
+![markers][markers]
+
+[markers]: https://louwrentius.com/static/images/enablemarkers.png
+
 ### Comparing two or more benchmarks based on JSON data (2d Bar Chart):
 
 A simple example where we compare the iops and latency of a particular iodepth and numjobs value:

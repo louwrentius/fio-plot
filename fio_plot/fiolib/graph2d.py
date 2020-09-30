@@ -99,9 +99,10 @@ def chart_2d_log_data(settings, dataset):
                 #
                 # Assure axes are scaled correctly, starting from zero.
                 #
-                factor = 1.2
-                if item['type'] == 'bw':
-                    factor = 1.2
+                factordict = {'iops': 1,
+                              'lat': 1.25,
+                              'bw': 1.5
+                              }
 
                 if settings['max']:
                     maximum[item['type']] = settings['max']
@@ -120,7 +121,7 @@ def chart_2d_log_data(settings, dataset):
                         print(f"Min_y value is invalid (not None or integer).")
 
                 axes[item['type']].set_ylim(
-                    min_y, maximum[item['type']] * factor)
+                    min_y, maximum[item['type']] * factordict[item['type']])
                 #
                 # Label Axis
                 #
