@@ -290,10 +290,7 @@ def calculate_colwidths(cols, matrix):
 
     for item in matrix:
         value = step5
-        print(value)
         collist.append(value)
-
-    # print(collist)
 
     return collist
 
