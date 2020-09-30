@@ -286,14 +286,14 @@ def calculate_colwidths(cols, matrix):
 
     collist = []
 
-    step1 = (1 / cols)
-    step2 = (1 - step1)
-    step3 = step1 * step2
-    step4 = step3 * step2
-    step5 = step4 / 2.1
+    step5 = (cols / 120) * cols
 
     for item in matrix:
-        collist.append(step5 * (1 - 1 / (int(item)) * 0.85))
+        value = step5
+        print(value)
+        collist.append(value)
+
+    # print(collist)
 
     return collist
 
