@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pprint
 import fiolib.supporting as supporting
-from datetime import datetime
 import fiolib.shared_chart as shared
 
 
@@ -59,7 +58,8 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     particular iodepth."""
     dataset_types = shared.get_dataset_types(dataset)
     data = shared.get_record_set(settings, dataset, dataset_types)
-    pprint.pprint(data)
+
+    # pprint.pprint(data)
 
     fig, (ax1, ax2) = plt.subplots(
         nrows=2, gridspec_kw={'height_ratios': [7, 1]})
@@ -103,15 +103,9 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
                (data['y1_axis']['format'],
                 data['y2_axis']['format']), loc='center left', frameon=False)
     #
-    # Save graph to file
+    # Save graph to PNG file
     #
-    now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    title = settings['title'].replace(" ", '-')
-    title = title.replace("/", '-')
-    plt.tight_layout(rect=[0, 0, 1, 1])
-    savename = f"{title}_{now}.png"
-    fig.savefig(savename, dpi=settings['dpi'])
-    supporting.write_png_metadata(savename, settings)
+    supporting.save_png(settings, plt, fig)
 
 
 def compchart_2dbarchart_jsonlogdata(settings, dataset):
@@ -166,13 +160,8 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     ax2.legend((rects1[0], rects2[0]),
                (data['y1_axis']['format'],
                 data['y2_axis']['format']), loc='center left', frameon=False)
+
     #
-    # Save graph to file
+    # Save graph to PNG file
     #
-    now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    title = settings['title'].replace(" ", '-')
-    title = title.replace("/", '-')
-    plt.tight_layout(rect=[0, 0, 1, 1])
-    savename = f"{title}_{now}.png"
-    fig.savefig(savename, dpi=settings['dpi'])
-    supporting.write_png_metadata(savename, settings)
+    supporting.save_png(settings, plt, fig)

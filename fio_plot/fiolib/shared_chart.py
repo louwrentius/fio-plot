@@ -86,15 +86,17 @@ def get_record_set_improved(settings, dataset, dataset_types):
             record['directory'], settings)
         labels.append(record['label'])
 
-    record_set = {'x_axis': labels, 'y1_axis': None,
-                  'y2_axis': None}
-
-    iops_series_raw = []
-    iops_stddev_series_raw = []
-    lat_series_raw = []
-    lat_stddev_series_raw = []
-    cpu_sys = []
-    cpu_usr = []
+    datadict = {
+        'iops_series_raw': [],
+        'iops_stddev_series_raw': [],
+        'lat_series_raw': [],
+        'lat_stddev_series_raw': [],
+        'cpu': {'cpu_sys': [],
+                'cpu_usr': []},
+        'x_axis': labels,
+        'y1_axis': None,
+        'y2_axis': None
+    }
 
     depth = settings['iodepth'][0]
     numjobs = settings['numjobs'][0]
@@ -110,60 +112,18 @@ def get_record_set_improved(settings, dataset, dataset_types):
                     int(record['numjobs']) == int(numjobs) and \
                         record['rw'] == rw and \
                         record['type'] in settings['filter']:
-                    iops_series_raw.append(record['iops'])
-                    lat_series_raw.append(record['lat'])
-                    iops_stddev_series_raw.append(record['iops_stddev'])
-                    lat_stddev_series_raw.append(record['lat_stddev'])
-                    cpu_sys.append(int(round(record['cpu_sys'], 0)))
-                    cpu_usr.append(int(round(record['cpu_usr'], 0)))
+                    datadict['iops_series_raw'].append(record['iops'])
+                    datadict['lat_series_raw'].append(record['lat'])
+                    datadict['iops_stddev_series_raw'].append(
+                        record['iops_stddev'])
+                    datadict['lat_stddev_series_raw'].append(
+                        record['lat_stddev'])
+                    datadict['cpu']['cpu_sys'].append(
+                        int(round(record['cpu_sys'], 0)))
+                    datadict['cpu']['cpu_usr'].append(
+                        int(round(record['cpu_usr'], 0)))
 
-    #
-    # Latency data must be scaled, IOPs will not be scaled.
-    #
-    latency_scale_factor = supporting.get_scale_factor(lat_series_raw)
-    scaled_latency_data = supporting.scale_yaxis_latency(
-        lat_series_raw, latency_scale_factor)
-    #
-    # Latency data must be rounded.
-    #
-    scaled_latency_data_rounded = supporting.round_metric_series(
-        scaled_latency_data['data'])
-    scaled_latency_data['data'] = scaled_latency_data_rounded
-    #
-    # Latency stddev must be scaled with same scale factor as the data
-    #
-    lat_stdev_scaled = supporting.scale_yaxis_latency(
-        lat_stddev_series_raw, latency_scale_factor)
-
-    lat_stdev_scaled_rounded = supporting.round_metric_series(
-        lat_stdev_scaled['data'])
-
-    #
-    # Latency data is converted to percent.
-    #
-    lat_stddev_percent = supporting.raw_stddev_to_percent(
-        scaled_latency_data['data'], lat_stdev_scaled_rounded)
-
-    lat_stddev_percent = [int(x) for x in lat_stddev_percent]
-
-    scaled_latency_data['stddev'] = supporting.round_metric_series(
-        lat_stddev_percent)
-    #
-    # IOPS data is rounded
-    iops_series_rounded = supporting.round_metric_series(iops_series_raw)
-    #
-    # IOPS stddev is converted to percent
-    iops_stdev_rounded = supporting.round_metric_series(iops_stddev_series_raw)
-    iops_stdev_rounded_percent = supporting.raw_stddev_to_percent(
-        iops_series_rounded, iops_stdev_rounded)
-    iops_stdev_rounded_percent = [int(x) for x in iops_stdev_rounded_percent]
-    #
-    #
-    record_set['y1_axis'] = {'data': iops_series_rounded,
-                             'format': "IOPS", 'stddev': iops_stdev_rounded_percent}
-    record_set['y2_axis'] = scaled_latency_data
-    record_set['cpu'] = {'cpu_sys': cpu_sys, 'cpu_usr': cpu_usr}
-    return record_set
+    return scale_data(datadict)
 
 
 def get_record_set(settings, dataset, dataset_types):
@@ -183,13 +143,19 @@ def get_record_set(settings, dataset, dataset_types):
 
     labels = dataset_types['iodepth']
 
-    record_set = {'x_axis': labels, 'x_axis_format': 'Queue Depth', 'y1_axis': None,
-                  'y2_axis': None, 'numjobs': numjobs}
-
-    iops_series_raw = []
-    iops_stddev_series_raw = []
-    lat_series_raw = []
-    lat_stddev_series_raw = []
+    datadict = {
+        'iops_series_raw': [],
+        'iops_stddev_series_raw': [],
+        'lat_series_raw': [],
+        'lat_stddev_series_raw': [],
+        'cpu': {'cpu_sys': [],
+                'cpu_usr': []},
+        'x_axis': labels,
+        'y1_axis': None,
+        'y2_axis': None,
+        'numjobs': numjobs,
+        'x_axis_format': 'Queue Depth'
+    }
 
     # print(dataset.keys())
     # print(settings)
@@ -197,11 +163,25 @@ def get_record_set(settings, dataset, dataset_types):
     for depth in dataset_types['iodepth']:
         for record in dataset['data']:
             if (int(record['iodepth']) == int(depth)) and int(record['numjobs']) == int(numjobs[0]) and record['rw'] == rw and record['type'] in settings['filter']:
-                iops_series_raw.append(record['iops'])
-                lat_series_raw.append(record['lat'])
-                iops_stddev_series_raw.append(record['iops_stddev'])
-                lat_stddev_series_raw.append(record['lat_stddev'])
+                datadict['iops_series_raw'].append(record['iops'])
+                datadict['lat_series_raw'].append(record['lat'])
+                datadict['iops_stddev_series_raw'].append(
+                    record['iops_stddev'])
+                datadict['lat_stddev_series_raw'].append(record['lat_stddev'])
 
+    return scale_data(datadict)
+
+
+def scale_data(datadict):
+
+    iops_series_raw = datadict['iops_series_raw']
+    iops_stddev_series_raw = datadict['iops_stddev_series_raw']
+    lat_series_raw = datadict['lat_series_raw']
+    lat_stddev_series_raw = datadict['lat_stddev_series_raw']
+    cpu_usr = datadict['cpu']['cpu_usr']
+    cpu_sys = datadict['cpu']['cpu_sys']
+
+    #
     # Latency data must be scaled, IOPs will not be scaled.
     #
     latency_scale_factor = supporting.get_scale_factor(lat_series_raw)
@@ -243,11 +223,13 @@ def get_record_set(settings, dataset, dataset_types):
     iops_stdev_rounded_percent = [int(x) for x in iops_stdev_rounded_percent]
     #
     #
-    record_set['y1_axis'] = {'data': iops_series_rounded,
-                             'format': "IOPS", 'stddev': iops_stdev_rounded_percent}
-    record_set['y2_axis'] = scaled_latency_data
+    datadict['y1_axis'] = {'data': iops_series_rounded,
+                           'format': "IOPS", 'stddev': iops_stdev_rounded_percent}
+    datadict['y2_axis'] = scaled_latency_data
+    if cpu_sys and cpu_usr:
+        datadict['cpu'] = {'cpu_sys': cpu_sys, 'cpu_usr': cpu_usr}
 
-    return record_set
+    return datadict
 
 
 def autolabel(rects, axis):

@@ -150,10 +150,7 @@ def chart_2d_log_data(settings, dataset):
         plt.text(1, -0.10, str(settings['source']), ha='right', va='top',
                  transform=ax.transAxes, fontsize=8, fontfamily='monospace')
 
-    now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    title = settings['title'].replace(" ", '-')
-    title = title.replace("/", '-')
-    plt.tight_layout()
-    savename = f"{title}_{now}.png"
-    fig.savefig(savename, dpi=settings['dpi'])
-    supporting.write_png_metadata(savename, settings)
+    #
+    # Save graph to PNG file
+    #
+    supporting.save_png(settings, plt, fig)

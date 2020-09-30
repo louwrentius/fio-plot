@@ -6,7 +6,6 @@ import fiolib.shared_chart as shared
 from matplotlib import cm
 # The module required for the 3D graph.
 from mpl_toolkits.mplot3d import axes3d
-from datetime import datetime
 import matplotlib as mpl
 import fiolib.supporting as supporting
 
@@ -167,10 +166,7 @@ def plot_3d(settings, dataset):
     # Source
     fig.text(0.65, 0.075, settings['source'])
 
-    plt.tight_layout()
-    now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    savename = '3d-' + str(metric) + '-jobs' + \
-        str(settings['rw']) + "-" + str(now) + '.png'
-    plt.savefig(savename)
-    plt.close('all')
-    supporting.write_png_metadata(savename, settings)
+    #
+    # Save graph to PNG file
+    #
+    supporting.save_png(settings, plt, fig)

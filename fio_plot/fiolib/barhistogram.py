@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pprint
 import fiolib.shared_chart as shared
 import fiolib.supporting as supporting
-from datetime import datetime
 
 
 def sort_latency_keys(latency):
@@ -122,10 +121,7 @@ def chart_latency_histogram(settings, dataset):
     offset = 1.0 - sourcelength / 120
     fig.text(offset, 0.03, settings['source'])
 
-    now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    title = settings['title'].replace(" ", '_')
-    title = title.replace("/", '-')
-    plt.tight_layout()
-    savename = f"{title}_{now}.png"
-    fig.savefig(savename, dpi=settings['dpi'])
-    supporting.write_png_metadata(savename, settings)
+    #
+    # Save graph to PNG file
+    #
+    supporting.save_png(settings, plt, fig)

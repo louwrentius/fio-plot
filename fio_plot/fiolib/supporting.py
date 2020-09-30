@@ -2,6 +2,7 @@
 import pprint as pprint
 import statistics
 import numpy as np
+from datetime import datetime
 from PIL.PngImagePlugin import PngImageFile, PngInfo
 
 
@@ -359,6 +360,16 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+
+def save_png(settings, plt, fig):
+    now = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+    title = settings['title'].replace(" ", '-')
+    title = title.replace("/", '-')
+    plt.tight_layout(rect=[0, 0, 1, 1])
+    savename = f"{title}_{now}.png"
+    fig.savefig(savename, dpi=settings['dpi'])
+    write_png_metadata(savename, settings)
 
 
 def write_png_metadata(filename, settings):
