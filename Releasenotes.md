@@ -1,8 +1,12 @@
 ## Release Notes
 
-### v1.0.0 (2020-09-29)
+### v1.0.1 (2020-09-30)
 
-This release contains the following changes:
+- Added cpu usage table for 2D bar charts (-l and -C)
+
+- A lot of internal under-the-hood code improvements
+
+### v1.0.0 (2020-09-29)
 
 - New 'compare' option that generates 2D bar charts from multiple datasources to compare results. This allows you to compare the results of different benchmark parameters or different devices. 
 
