@@ -19,8 +19,11 @@ def list_fio_log_files(directory):
             fiologfiles.append(os.path.join(absolute_dir, f))
 
     if len(fiologfiles) == 0:
-        print("Could not find any log \
-             files in the specified directory " + str(absolute_dir))
+        print(
+            f"\nCould not find any log files in the specified directory {str(absolute_dir)}")
+        print(f"\nAre the correct directories specified?")
+        print(
+            f"\nIf so, please check the -d -n and -r parameters.\n")
         sys.exit(1)
 
     return fiologfiles

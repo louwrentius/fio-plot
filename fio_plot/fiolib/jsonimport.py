@@ -41,7 +41,10 @@ def list_json_files(settings):
         item['files'] = file_list
         if not item['files']:
             print(
-                "Could not find any (matching) JSON files in the specified directory " + str(absolute_dir))
+                f"\nCould not find any (matching) JSON files in the specified directory {str(absolute_dir)}\n")
+            print(f"Are the correct directories specified?\n")
+            print(
+                f"If so, please check the -d ({settings['iodepth']}) -n ({settings['numjobs']}) and -r ({settings['rw']}) parameters.\n")
             sys.exit(1)
 
     # pprint.pprint(json_files)
