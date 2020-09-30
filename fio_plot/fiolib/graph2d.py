@@ -99,7 +99,7 @@ def chart_2d_log_data(settings, dataset):
                 #
                 # Assure axes are scaled correctly, starting from zero.
                 #
-                factor = 1.1
+                factor = 1.2
                 if item['type'] == 'bw':
                     factor = 1.2
 
