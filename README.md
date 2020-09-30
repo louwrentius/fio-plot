@@ -227,7 +227,7 @@ The bars can also be grouped:
 
 [compare03]: https://louwrentius.com/static/images/compareexample03.png 
 
-There is also an option that includes a table with CPU usage:
+There is also an option (--show-cpu) that includes a table with CPU usage:
 
 ![comparecpu][comparecpu]
 
