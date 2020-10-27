@@ -117,10 +117,10 @@ def chart_latency_histogram(settings, dataset):
     autolabel(rects2, ax1)
     autolabel(rects3, ax1)
 
-    sourcelength = len(settings['source'])
-    offset = 1.0 - sourcelength / 120
-    fig.text(offset, 0.03, settings['source'])
-
+    if settings['source']:
+        sourcelength = len(settings['source'])
+        offset = 1.0 - sourcelength / 120
+        fig.text(offset, 0.03, settings['source'])
     #
     # Save graph to PNG file
     #
