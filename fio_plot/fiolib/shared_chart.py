@@ -286,10 +286,10 @@ def calculate_colwidths(cols, matrix):
 
     collist = []
 
-    step5 = (cols / 120) * cols
+    #step5 = (cols / 120) * cols
 
     for item in matrix:
-        value = step5
+        value = item * 0.01
         collist.append(value)
 
     return collist
@@ -303,7 +303,9 @@ def get_font():
 def create_generic_table(settings, table_vals, ax2, rowlabels, location):
     cols = len(table_vals[0])
     matrix = get_max_width(table_vals, cols)
+    print(matrix)
     colwidths = calculate_colwidths(cols, matrix)
+    print(colwidths)
 
     table = ax2.table(cellText=table_vals,  loc=location, rowLabels=rowlabels,
                       colLoc="center", colWidths=colwidths,
