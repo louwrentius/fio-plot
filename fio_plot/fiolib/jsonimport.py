@@ -38,7 +38,8 @@ def list_json_files(settings):
             result = filter_json_files(settings, f)
             if result:
                 file_list.append(result)
-        item['files'] = file_list
+
+        item['files'] = sorted(file_list)
         if not item['files']:
             print(
                 f"\nCould not find any (matching) JSON files in the specified directory {str(absolute_dir)}\n")
@@ -61,8 +62,7 @@ def import_json_data(filename):
             sys.exit(1)
     return d
 
-
-def import_json_dataset(dataset):
+def import_json_dataset(settings, dataset):
     """The dataset is a list of dicts containing the absolute path and the file list.
     We need to add a third key/value pair with the ingested data of those files.
     """
@@ -127,8 +127,8 @@ def get_flat_json_mapping(settings, dataset):
                 mode = get_nested_value(
                     record, ('jobs', 0, 'job options', 'rw'))[4:]
             m = get_json_mapping(mode)
-            row = {'iodepth': get_nested_value(record, m['iodepth']),
-                   'numjobs': get_nested_value(record, m['numjobs']),
+            row = {'iodepth': int(get_nested_value(record, m['iodepth'])),
+                   'numjobs': int(get_nested_value(record, m['numjobs'])),
                    'rw': get_nested_value(record, m['rw']),
                    'iops': get_nested_value(record, m['iops']),
                    'iops_stddev': get_nested_value(record, m['iops_stddev']),
@@ -141,5 +141,5 @@ def get_flat_json_mapping(settings, dataset):
                    'cpu_sys': get_nested_value(record, m['cpu_sys']),
                    'cpu_usr': get_nested_value(record, m['cpu_usr'])}
             item['data'].append(row)
-        # item['rawdata'] = None # --> enable to throw away the data after parsing.
+        item['rawdata'] = None  # --> enable to throw away the data after parsing.
     return dataset

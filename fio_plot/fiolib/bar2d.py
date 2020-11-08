@@ -58,7 +58,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     particular iodepth."""
     dataset_types = shared.get_dataset_types(dataset)
     data = shared.get_record_set(settings, dataset, dataset_types)
-
+    # pprint.pprint(data)
     # pprint.pprint(data)
 
     fig, (ax1, ax2) = plt.subplots(
@@ -84,12 +84,12 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     #
     # Set title
     settings['type'] = ""
-    settings['iodepth'] = dataset_types['iodepth']
+    settings[settings['query']] = dataset_types[settings['query']]
     if settings['rw'] == 'randrw':
-        supporting.create_title_and_sub(settings, plt, skip_keys=['iodepth'])
+        supporting.create_title_and_sub(settings, plt, skip_keys=[settings['query']])
     else:
         supporting.create_title_and_sub(
-            settings, plt, skip_keys=['iodepth', 'filter'])
+            settings, plt, skip_keys=[settings['query'], 'filter'])
     #
     # Labeling the top of the bars with their value
     shared.autolabel(rects1, ax1)

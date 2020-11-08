@@ -54,14 +54,18 @@ def set_arguments():
     exclusive_group = ag.add_mutually_exclusive_group(required=True)
     exclusive_group.add_argument("-L", "--iodepth-numjobs-3d", action='store_true', help="\
             Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.")
-    exclusive_group.add_argument("-l", "--latency-iops-2d", action='store_true', help="\
-            Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value.")
+    exclusive_group.add_argument("-l", "--latency-iops-2d-qd", action='store_true', help="\
+            Generates a 2D barchart of IOPs and latency for all queue depths given a particular numjobs value.")
+    exclusive_group.add_argument("-N", "--latency-iops-2d-nj", action='store_true', help="This graph type is like the \
+        latency-iops-2d-qd barchart but instead of plotting queue depths for a particular numjobs value, it plots \
+            numjobs values for a particular queue depth.")
     exclusive_group.add_argument("-H", "--histogram", action='store_true', help="\
             Generates a latency histogram for a particular queue depth and numjobs value.")
     exclusive_group.add_argument("-g", "--loggraph", action='store_true',
                                  help="This option generates a 2D graph of the log data recorded by FIO.")
     exclusive_group.add_argument("-C", "--compare-graph", action='store_true',
-                                 help="This option generates a bar chart to compare results from different benchmark runs.")
+                                 help="This option generates a bar chart to compare results from different\
+                                      benchmark runs.")
 
     ag.add_argument("--disable-grid", action='store_true', help="\
             Disables the dotted grid in the output graph.")
@@ -110,13 +114,16 @@ def set_arguments():
                      0 to remove parent folder name.", type=int, default=1)
     ag.add_argument("--xlabel-segment-size", help="\
             Truncate folder names to make labels fit the graph. Disabled by default. \
-                The number represents how many characters per segment are preserved. Used with -g.", type=int, default=1000)
+                The number represents how many characters per \
+                    segment are preserved. Used with -g.", type=int, default=1000)
     ag.add_argument("-w", "--line-width",
-                    help="Line width for line graphs. Can be a floating-point value. Used with -g.", type=float, default=1),
+                    help="Line width for line graphs. Can be a floating-point value. Used with -g.", type=float,
+                    default=1),
     ag.add_argument("--group-bars",
                     help="When using -l or -C, bars are grouped together by iops/lat type.", action='store_true')
     ag.add_argument("--show-cpu",
-                    help="When using the -C option, a table is added with cpu_usr and cpu_sys data.", action='store_true')
+                    help="When using the -C option, a table is added with cpu_usr and cpu_sys data.",
+                    action='store_true')
     ag.add_argument("--table-lines",
                     help="Draw the lines within a table (cpu/stdev)", action='store_true')
     return parser
@@ -164,7 +171,7 @@ def run_preflight_checks(settings):
             using the -i parameter\n")
             sys.exit(1)
 
-    if settings['latency_iops_2d']:
+    if settings['latency_iops_2d_qd']:
         if len(settings['input_directory']) > 1:
             print("\nIf -l is specified, only one input directory can be used.\n")
             sys.exit(1)
@@ -172,6 +179,16 @@ def run_preflight_checks(settings):
         if settings['numjobs']:
             if len(settings['numjobs']) > 1:
                 print("\n This graph type only supports one particular value for the numjobs parameter. \n \
+                Use the 3D graph type (-L) to plot both iodepth and numjobs for either iops or latency.\n")
+                sys.exit(1)
+    if settings['latency_iops_2d_nj']:
+        if len(settings['input_directory']) > 1:
+            print("\nIf -l is specified, only one input directory can be used.\n")
+            sys.exit(1)
+
+        if settings['iodepth']:
+            if len(settings['iodepth']) > 1:
+                print("\n This graph type only supports one particular value for the iodepth parameter. \n \
                 Use the 3D graph type (-L) to plot both iodepth and numjobs for either iops or latency.\n")
                 sys.exit(1)
 
@@ -186,6 +203,9 @@ def configure_default_settings(settings, uses_json_files, key):
         settings['iodepth'] = uses_json_files[key]['iodepth_default']
     if not settings['numjobs']:
         settings['numjobs'] = uses_json_files[key]['numjobs_default']
+    settings['query'] = uses_json_files[key]['query']
+    settings['stdev_table_name'] = uses_json_files[key]['stdev_table_name']
+
     return settings
 
 
@@ -195,19 +215,33 @@ def main():
     uses_json_files = {'iodepth_numjobs_3d':
                        {'function': bar3d.plot_3d,
                         'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
-                        'numjobs_default': [1, 2, 4, 8, 16, 32, 64]},
-                       'latency_iops_2d':
+                        'numjobs_default': [1, 2, 4, 8, 16, 32, 64],
+                        'query': None,
+                        'stdev_table_name': None},
+                       'latency_iops_2d_qd':
                        {'function': bar2d.chart_2dbarchart_jsonlogdata,
                         'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
-                        'numjobs_default': [1]},
+                        'numjobs_default': [1],
+                        'query': 'iodepth',
+                        'stdev_table_name': "IO queue depth"},
+                       'latency_iops_2d_nj':
+                       {'function': bar2d.chart_2dbarchart_jsonlogdata,
+                        'iodepth_default': [1],
+                        'numjobs_default': [1, 2, 4, 8, 16, 32, 64],
+                        'query': 'numjobs',
+                        'stdev_table_name': 'Number of jobs'},
                        'histogram':
                        {'function': histogram.chart_latency_histogram,
                         'iodepth_default': [1],
-                        'numjobs_default': [1]},
+                        'numjobs_default': [1],
+                        'query': None,
+                        'stdev_table_name': None},
                        'compare_graph':
                        {'function': bar2d.compchart_2dbarchart_jsonlogdata,
                         'iodepth_default': [1],
-                        'numjobs_default': [1]}
+                        'numjobs_default': [1],
+                        'query': None,
+                        'stdev_table_name': None}
                        }
 
     parser = set_arguments()
@@ -248,10 +282,12 @@ def main():
         if settings[item]:
             settings = configure_default_settings(
                 settings, uses_json_files, item)
+            # print(settings)
             list_of_json_files = jsonimport.list_json_files(settings)
-            # print(list_of_json_files)
-            dataset = jsonimport.import_json_dataset(list_of_json_files)
+            pprint.pprint(list_of_json_files)
+            dataset = jsonimport.import_json_dataset(settings, list_of_json_files)
             parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
+            # pprint.pprint(parsed_data)
             # Which function to execute is specified in 'uses_json_files'
             uses_json_files[item]['function'](settings, parsed_data)
             option_found = True
