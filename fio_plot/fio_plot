@@ -205,7 +205,6 @@ def configure_default_settings(settings, routing_dict, key):
         settings['numjobs'] = routing_dict[key]['numjobs_default']
     settings['query'] = routing_dict[key]['query']
     settings['stdev_table_name'] = routing_dict[key]['stdev_table_name']
-
     return settings
 
 
@@ -297,12 +296,22 @@ def get_command_line_arguments(parser):
     return args
 
 
+def post_flight_check(parser, option_found):
+    if not option_found:
+        parser.print_help()
+        print("Specify -g, -l, -L, -C or -H")
+        exit(1)
+    else:
+        exit(0)
+
+
 def main():
     settings = {}
     option_found = False
     routing_dict = get_routing_dict()
     parser = set_arguments()
     settings = vars(get_command_line_arguments(parser))
+    
     run_preflight_checks(settings)
 
     for item in routing_dict.keys():
@@ -313,12 +322,7 @@ def main():
             routing_dict[item]['function'](settings, data)
             option_found = True
 
-    if not option_found:
-        parser.print_help()
-        print("Specify -g, -l, -L, -C or -H")
-        exit(1)
-    else:
-        exit(0)
+    post_flight_check(parser, option_found)
 
 
 if __name__ == "__main__":
