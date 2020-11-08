@@ -175,6 +175,8 @@ Fio-plot also writes metadata to the PNG files using Pillow
 
 ## Example Usage
 
+### 2D Bar Charts
+
 Creating a 2D Bar Chart based on randread data and numjobs = 1 (default).
 
     ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread
@@ -195,6 +197,8 @@ Creating a 2D Bar Chart grouping iops and latency data together:
 
 [grouped]: https://louwrentius.com/static/images/iodepthgroupbars.png
 
+### 3D Bar Chart
+
 Creating a 3D graph showing IOPS. 
 
     ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
@@ -202,6 +206,8 @@ Creating a 3D graph showing IOPS.
 Creating a 3D graph with a subselection of data
 
     ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops -J 16 -M 16
+
+### 2D Bar Histogram
 
 Creating a latency histogram with a queue depth of 1 and numjobs is 1.
 
@@ -219,7 +225,7 @@ The same result but if you want markers to help distinguish between lines:
 
 [markers]: https://louwrentius.com/static/images/enablemarkers.png
 
-### Comparing two or more benchmarks based on JSON data (2d Bar Chart):
+### Comparing two or more benchmarks based on JSON data (2D Bar Chart):
 
 A simple example where we compare the iops and latency of a particular iodepth and numjobs value:
 
