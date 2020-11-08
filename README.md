@@ -1,4 +1,4 @@
-### fio-plot
+## fio-plot
 
 [FIO][fio] is a tool for benchmarking storage devices. FIO helps to assess the storage performance in terms of IOPS and latency.
 
@@ -14,7 +14,7 @@ To get to these charts, you need to follow this process:
 
 [bms]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
 
-### 2D chart 
+## 2D chart 
 This kind of chart shows both IOPs and Latency for multiple queue depths.
 ![barchart][queuedepthlowhigh01]
 
@@ -22,7 +22,7 @@ This kind of chart shows both IOPs and Latency for multiple queue depths.
 
 [queuedepthlowhigh01]: https://louwrentius.com/static/images/impactofqueuedepth.png
 
-### 2D chart to compare benchmark results
+## 2D chart to compare benchmark results
 
 The compare chart shows the results from multiple benchmarks in one graph. 
 
@@ -30,7 +30,7 @@ The compare chart shows the results from multiple benchmarks in one graph.
 
 *Please note that the RAID10 results are skewed due to agressive write caching of the hard drives in this example*
 
-### 3D chart
+## 3D chart
 A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs.
 
 ![3dbarchart][3dbarchart]
@@ -38,7 +38,7 @@ A 3D bar chart that plots both queue depth an numjobs against either latency or 
 [3dbarchart]: https://louwrentius.com/static/images/servermdadmraid5-3d.png
 
 
-### Line chart based on FIO log data
+## Line chart based on FIO log data
 To create this graph, the FIO log data is parsed to show how the device / file
 performed during a benchmark run. Latency IOPS and bandwidth can be shown. 
 ![linechart][queuedepthlowhigh03]
@@ -52,7 +52,7 @@ customize the graph to only show the information you're interested in.
 
 This could be very handy if you made some performance tweaks and want to compare results.
 
-### Latency histogram 
+## Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.
 ![histogram][histogram]
 
@@ -60,7 +60,7 @@ The FIO JSON output also contains latency histogram data. It's available in a ns
 
 This is the only chart type that requires / can only show the results of a single benchmark. 
 
-### Benchmark script
+## Benchmark script
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
 you to gather data for different queue depths and/or number of simultaneous jobs. The benchmark script shows progress in real-time.
 
@@ -94,7 +94,7 @@ For more examples, please consult the separate [README.md][rm]
 
 [rm]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
 
-### Dependancies
+## Dependancies
 
 Fio-plot requires 'matplotlib' and 'numpy' to be installed.
 
@@ -102,13 +102,13 @@ Please note that Fio-plot requires at least matplotlib version 3.3.0
 
 Fio-plot also writes metadata to the PNG files using Pillow
 
-### Usage
+## Usage
 
-    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -H | -g | -C) [--disable-grid] [--enable-markers] [--subtitle SUBTITLE]
+    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -N | -H | -g | -C) [--disable-grid] [--enable-markers] [--subtitle SUBTITLE]
                 [-d IODEPTH [IODEPTH ...]] [-n NUMJOBS [NUMJOBS ...]] [-M [MAXDEPTH]] [-J [MAXJOBS]] [-D [DPI]] [-p [PERCENTILE]] -r
-                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE] [-x MIN_Y] [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]]
-                [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH] [--xlabel-parent XLABEL_PARENT] [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH]
-                [--group-bars] [--show-cpu] [--table-lines]
+                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE] [-x MIN_Y]
+                [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]] [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH] [--xlabel-parent XLABEL_PARENT]
+                [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH] [--group-bars] [--show-cpu] [--table-lines]
 
     Generates charts/graphs from FIO JSON output or logdata.
 
@@ -124,8 +124,11 @@ Fio-plot also writes metadata to the PNG files using Pillow
                             Author
     -L, --iodepth-numjobs-3d
                             Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.
-    -l, --latency-iops-2d
-                            Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value.
+    -l, --latency-iops-2d-qd
+                            Generates a 2D barchart of IOPs and latency for all queue depths given a particular numjobs value.
+    -N, --latency-iops-2d-nj
+                            This graph type is like the latency-iops-2d-qd barchart but instead of plotting queue depths for a particular numjobs value, it plots numjobs values
+                            for a particular queue depth.
     -H, --histogram       Generates a latency histogram for a particular queue depth and numjobs value.
     -g, --loggraph        This option generates a 2D graph of the log data recorded by FIO.
     -C, --compare-graph   This option generates a bar chart to compare results from different benchmark runs.
@@ -148,8 +151,8 @@ Fio-plot also writes metadata to the PNG files using Pillow
                             Specifies the kind of data you want to graph.
     -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
     -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
-                            The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be carefull as this setting may
-                            smooth out issues you may want to be aware of.
+                            The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be carefull as this setting
+                            may smooth out issues you may want to be aware of.
     -x MIN_Y, --min-y MIN_Y
                             Optional minimal value for y-axis. Use 'None' to disable.
     -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
@@ -159,17 +162,18 @@ Fio-plot also writes metadata to the PNG files using Pillow
     --xlabel-depth XLABEL_DEPTH
                             Can be used to truncate the most significant folder name from the label. Often used to strip off folders generated with benchfio (e.g. 4k)
     --xlabel-parent XLABEL_PARENT
-                            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a value of 0 to remove
-                            parent folder name.
+                            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a value of 0 to
+                            remove parent folder name.
     --xlabel-segment-size XLABEL_SEGMENT_SIZE
-                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used with -g.
+                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used
+                            with -g.
     -w LINE_WIDTH, --line-width LINE_WIDTH
                             Line width for line graphs. Can be a floating-point value. Used with -g.
     --group-bars          When using -l or -C, bars are grouped together by iops/lat type.
     --show-cpu            When using the -C option, a table is added with cpu_usr and cpu_sys data.
     --table-lines         Draw the lines within a table (cpu/stdev)
 
-### Example Usage
+## Example Usage
 
 Creating a 2D Bar Chart based on randread data and numjobs = 1 (default).
 
@@ -299,7 +303,7 @@ Example:
 
 [shortlabel]: https://louwrentius.com/static/images/shortlabel.png
 
-### JSON / LOG file name requirements
+## JSON / LOG file name requirements
 
 Fio-plot parses the filename of the generated .log files. The format is:
 
@@ -320,7 +324,7 @@ In this example, there are 8 files because numjobs was set to 8. Fio autoamatica
 It's important that - if you don't use the included benchmark script - to make sure files are generated with the appropriate file name structure.
 
 
-### PNG metadata
+## PNG metadata
 
 All settings used to generate the PNG file are incorporated into the PNG file as metadata (tEXT).
 This should help you to keep track of the exact parameters and data used to generate the graphs. 
