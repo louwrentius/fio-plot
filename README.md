@@ -16,28 +16,46 @@ To get to these charts, you need to follow this process:
 
 ## 2D chart (iodepth)
 This kind of chart shows both IOPs and Latency for multiple queue depths.
-![barchart][queuedepthlowhigh01]
+![barchart][2dchartiodepth]
 
-[queuedepthlowhigh01]: https://louwrentius.com/static/images/impactofqueuedepth.png
+[2dchartiodepth]: https://louwrentius.com/static/images/fio-plot/fioplot0001.png
 
 This is the command-line used to generate this graph:
 
-  
-    
+    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -l -r randread
 
 ## 2D chart (numjobs)
 This kind of chart shows both IOPs and Latency for multiple queue depths.
-![barchart][numjobslowhigh01]
+![barchart][2dchartnumjobs]
 
-[numjobslowhigh01]: https://louwrentius.com/static/images/impactofnumjobs.png
+[2dchartnumjobs]: https://louwrentius.com/static/images/fio-plot/fioplot0002.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -N -r randread
 
 ## 2D chart to compare benchmark results
 
-The compare chart shows the results from multiple benchmarks in one graph. 
+The compare chart shows the results from multiple different benchmarks in one graph. The graph data is always for a specific queue depth and numjobs values (the examples use qd=1, nj=1 (the default)). 
 
-![shortlabel][shortlabel]
+![barchart][2dchartcompare]
 
-*Please note that the RAID10 results are skewed due to agressive write caching of the hard drives in this example*
+[2dchartcompare]: https://louwrentius.com/static/images/fio-plot/fioplot0003.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0
+
+It is also possible to group the bars for IOPs and Latency like this:
+
+![barchart][2dchartcomparegroup]
+
+[2dchartcomparegroup]: https://louwrentius.com/static/images/fio-plot/fioplot0004.png
+
+This is the command-line used to generate this graph:
+   
+   fio_plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0 --grou-bars
+
 
 ## 3D chart
 A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs.
