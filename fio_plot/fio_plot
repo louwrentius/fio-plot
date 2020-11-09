@@ -26,7 +26,7 @@ def check_matplotlib_version(requiredversion):
     if V(matplotlibversion) < V(requiredversion):
         print(
             f"Matplotlib version {requiredversion} is required but version {matplotlibversion} is installed.")
-        print(f"I'm sorry, but you'll have to update matplotlib.")
+        print("I'm sorry, but you'll have to update matplotlib.")
         sys.exit(1)
 
 
@@ -54,14 +54,18 @@ def set_arguments():
     exclusive_group = ag.add_mutually_exclusive_group(required=True)
     exclusive_group.add_argument("-L", "--iodepth-numjobs-3d", action='store_true', help="\
             Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.")
-    exclusive_group.add_argument("-l", "--latency-iops-2d", action='store_true', help="\
-            Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value.")
+    exclusive_group.add_argument("-l", "--latency-iops-2d-qd", action='store_true', help="\
+            Generates a 2D barchart of IOPs and latency for all queue depths given a particular numjobs value.")
+    exclusive_group.add_argument("-N", "--latency-iops-2d-nj", action='store_true', help="This graph type is like the \
+        latency-iops-2d-qd barchart but instead of plotting queue depths for a particular numjobs value, it plots \
+            numjobs values for a particular queue depth.")
     exclusive_group.add_argument("-H", "--histogram", action='store_true', help="\
             Generates a latency histogram for a particular queue depth and numjobs value.")
     exclusive_group.add_argument("-g", "--loggraph", action='store_true',
                                  help="This option generates a 2D graph of the log data recorded by FIO.")
     exclusive_group.add_argument("-C", "--compare-graph", action='store_true',
-                                 help="This option generates a bar chart to compare results from different benchmark runs.")
+                                 help="This option generates a bar chart to compare results from different\
+                                      benchmark runs.")
 
     ag.add_argument("--disable-grid", action='store_true', help="\
             Disables the dotted grid in the output graph.")
@@ -110,19 +114,24 @@ def set_arguments():
                      0 to remove parent folder name.", type=int, default=1)
     ag.add_argument("--xlabel-segment-size", help="\
             Truncate folder names to make labels fit the graph. Disabled by default. \
-                The number represents how many characters per segment are preserved. Used with -g.", type=int, default=1000)
+                The number represents how many characters per \
+                    segment are preserved. Used with -g.", type=int, default=1000)
     ag.add_argument("-w", "--line-width",
-                    help="Line width for line graphs. Can be a floating-point value. Used with -g.", type=float, default=1),
+                    help="Line width for line graphs. Can be a floating-point value. Used with -g.", type=float,
+                    default=1),
     ag.add_argument("--group-bars",
                     help="When using -l or -C, bars are grouped together by iops/lat type.", action='store_true')
     ag.add_argument("--show-cpu",
-                    help="When using the -C option, a table is added with cpu_usr and cpu_sys data.", action='store_true')
+                    help="When using the -C option, a table is added with cpu_usr and cpu_sys data.",
+                    action='store_true')
     ag.add_argument("--table-lines",
                     help="Draw the lines within a table (cpu/stdev)", action='store_true')
     return parser
 
 
 def run_preflight_checks(settings):
+    """ This a very large function with all kinds of business logic checks.
+    I don't have a good idea to clean this up yet, if that is possible."""
     check_matplotlib_version("3.3.0")
     check_if_target_directory_exists(settings['input_directory'])
 
@@ -146,7 +155,7 @@ def run_preflight_checks(settings):
             sys.exit(1)
 
     if settings['compare_graph']:
-        message = f"\nWhen creating a graph to compare values, iodepth or numjobs must be one value.\n"
+        message = "\nWhen creating a graph to compare values, iodepth or numjobs must be one value.\n"
         pm = False
 
         if settings['iodepth']:
@@ -164,7 +173,7 @@ def run_preflight_checks(settings):
             using the -i parameter\n")
             sys.exit(1)
 
-    if settings['latency_iops_2d']:
+    if settings['latency_iops_2d_qd']:
         if len(settings['input_directory']) > 1:
             print("\nIf -l is specified, only one input directory can be used.\n")
             sys.exit(1)
@@ -174,6 +183,16 @@ def run_preflight_checks(settings):
                 print("\n This graph type only supports one particular value for the numjobs parameter. \n \
                 Use the 3D graph type (-L) to plot both iodepth and numjobs for either iops or latency.\n")
                 sys.exit(1)
+    if settings['latency_iops_2d_nj']:
+        if len(settings['input_directory']) > 1:
+            print("\nIf -l is specified, only one input directory can be used.\n")
+            sys.exit(1)
+
+        if settings['iodepth']:
+            if len(settings['iodepth']) > 1:
+                print("\n This graph type only supports one particular value for the iodepth parameter. \n \
+                Use the 3D graph type (-L) to plot both iodepth and numjobs for either iops or latency.\n")
+                sys.exit(1)
 
     if settings['histogram']:
         if len(settings['input_directory']) > 1:
@@ -181,35 +200,89 @@ def run_preflight_checks(settings):
             sys.exit(1)
 
 
-def configure_default_settings(settings, uses_json_files, key):
+def configure_default_settings(settings, routing_dict, key):
     if not settings['iodepth']:
-        settings['iodepth'] = uses_json_files[key]['iodepth_default']
+        settings['iodepth'] = routing_dict[key]['iodepth_default']
     if not settings['numjobs']:
-        settings['numjobs'] = uses_json_files[key]['numjobs_default']
+        settings['numjobs'] = routing_dict[key]['numjobs_default']
+    settings['query'] = routing_dict[key]['query']
+    settings['label'] = routing_dict[key]['label']
     return settings
 
 
-def main():
-    settings = {}
+def get_log_data(settings):
+    if not settings['iodepth']:
+        settings['iodepth'] = [1]
+    if not settings['numjobs']:
+        settings['numjobs'] = [1]
 
-    uses_json_files = {'iodepth_numjobs_3d':
-                       {'function': bar3d.plot_3d,
-                        'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
-                        'numjobs_default': [1, 2, 4, 8, 16, 32, 64]},
-                       'latency_iops_2d':
-                       {'function': bar2d.chart_2dbarchart_jsonlogdata,
-                        'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
-                        'numjobs_default': [1]},
-                       'histogram':
-                       {'function': histogram.chart_latency_histogram,
-                        'iodepth_default': [1],
-                        'numjobs_default': [1]},
-                       'compare_graph':
-                       {'function': bar2d.compchart_2dbarchart_jsonlogdata,
-                        'iodepth_default': [1],
-                        'numjobs_default': [1]}
-                       }
+    benchmarkfiles = []
+    for input_dir in settings['input_directory']:
+        benchmarkfiles.extend(logdata.list_fio_log_files(input_dir))
+    logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
+    # pprint.pprint(logfiles)
+    rawdata = logdata.readLogDataFromFiles(settings, logfiles)
+    # pprint.pprint(rawdata)
+    merged = logdata.mergeDataSet(settings, rawdata)
+    return merged
 
+
+def get_json_data(settings):
+    list_of_json_files = jsonimport.list_json_files(settings)
+    # pprint.pprint(list_of_json_files)
+    dataset = jsonimport.import_json_dataset(settings, list_of_json_files)
+    parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
+    # pprint.pprint(parsed_data)
+    return parsed_data
+
+
+def get_routing_dict():
+    routing_dict = {'loggraph':
+                    {'function': graph.chart_2d_log_data,
+                        'get_data': get_log_data,
+                        'iodepth_default': [1],
+                        'numjobs_default': [1],
+                        'query': None,
+                        'label': None},
+                    'iodepth_numjobs_3d':
+                    {'function': bar3d.plot_3d,
+                        'get_data': get_json_data,
+                        'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
+                        'numjobs_default': [1, 2, 4, 8, 16, 32, 64],
+                        'query': None,
+                        'label': None},
+                    'latency_iops_2d_qd':
+                    {'function': bar2d.chart_2dbarchart_jsonlogdata,
+                        'get_data': get_json_data,
+                        'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
+                        'numjobs_default': [1],
+                        'query': 'iodepth',
+                        'label': "Queue depth"},
+                    'latency_iops_2d_nj':
+                    {'function': bar2d.chart_2dbarchart_jsonlogdata,
+                        'get_data': get_json_data,
+                        'iodepth_default': [1],
+                        'numjobs_default': [1, 2, 4, 8, 16, 32, 64],
+                        'query': 'numjobs',
+                        'label': 'Number of jobs'},
+                    'histogram':
+                    {'function': histogram.chart_latency_histogram,
+                        'get_data': get_json_data,
+                        'iodepth_default': [1],
+                        'numjobs_default': [1],
+                        'query': None,
+                        'label': None},
+                    'compare_graph':
+                    {'function': bar2d.compchart_2dbarchart_jsonlogdata,
+                        'get_data': get_json_data,
+                        'iodepth_default': [1],
+                        'numjobs_default': [1],
+                        'query': None,
+                        'label': None}}
+    return routing_dict
+
+
+def get_command_line_arguments(parser):
     parser = set_arguments()
     try:
         args = parser.parse_args()
@@ -220,48 +293,35 @@ def main():
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
+    return args
 
-    settings = vars(args)
 
-    run_preflight_checks(settings)
-
-    option_found = False
-
-    if settings['loggraph']:
-        if not settings['iodepth']:
-            settings['iodepth'] = [1]
-        if not settings['numjobs']:
-            settings['numjobs'] = [1]
-
-        benchmarkfiles = []
-        for input_dir in settings['input_directory']:
-            benchmarkfiles.extend(logdata.list_fio_log_files(input_dir))
-        logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
-        # pprint.pprint(logfiles)
-        rawdata = logdata.readLogDataFromFiles(settings, logfiles)
-        # pprint.pprint(rawdata)
-        merged = logdata.mergeDataSet(settings, rawdata)
-        graph.chart_2d_log_data(settings, merged)
-        option_found = True
-
-    for item in uses_json_files.keys():
-        if settings[item]:
-            settings = configure_default_settings(
-                settings, uses_json_files, item)
-            list_of_json_files = jsonimport.list_json_files(settings)
-            # print(list_of_json_files)
-            dataset = jsonimport.import_json_dataset(list_of_json_files)
-            parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
-            # Which function to execute is specified in 'uses_json_files'
-            uses_json_files[item]['function'](settings, parsed_data)
-            option_found = True
-
+def post_flight_check(parser, option_found):
     if not option_found:
         parser.print_help()
         print("Specify -g, -l, -L, -C or -H")
         exit(1)
     else:
         exit(0)
+
+
+def main():
+    settings = {}
+    option_found = False
+    parser = set_arguments()
+    settings = vars(get_command_line_arguments(parser))
+    run_preflight_checks(settings)
+    routing_dict = get_routing_dict()
+
+    for item in routing_dict.keys():
+        if settings[item]:
+            settings = configure_default_settings(settings, routing_dict, item)
+            # print(settings)
+            data = routing_dict[item]['get_data'](settings)
+            routing_dict[item]['function'](settings, data)
+            option_found = True
+
+    post_flight_check(parser, option_found)
 
 
 if __name__ == "__main__":

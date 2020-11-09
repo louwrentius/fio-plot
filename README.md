@@ -1,4 +1,4 @@
-### fio-plot
+## fio-plot
 
 [FIO][fio] is a tool for benchmarking storage devices. FIO helps to assess the storage performance in terms of IOPS and latency.
 
@@ -14,53 +14,127 @@ To get to these charts, you need to follow this process:
 
 [bms]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
 
-### 2D chart 
-This kind of chart shows both IOPs and Latency for multiple queue depths.
-![barchart][queuedepthlowhigh01]
+## 2D chart (iodepth)
+This kind of chart shows both IOPs and Latency for different queue depths.
+![barchart][2dchartiodepth]
 
-*Please note that these benchmark numbers are not representative of the capabilities of the SSD as the RAID controller is the bottleneck.*
+[2dchartiodepth]: https://louwrentius.com/static/images/fio-plot/fioplot0001.png
 
-[queuedepthlowhigh01]: https://louwrentius.com/static/images/impactofqueuedepth.png
+This is the command-line used to generate this graph:
 
-### 2D chart to compare benchmark results
+    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -l -r randread
 
-The compare chart shows the results from multiple benchmarks in one graph. 
+## 2D chart (numjobs)
+This kind of chart shows both IOPs and Latency for diffent simultaneous number of jobs.
+![barchart][2dchartnumjobs]
 
-![shortlabel][shortlabel]
+[2dchartnumjobs]: https://louwrentius.com/static/images/fio-plot/fioplot0002.png
 
-*Please note that the RAID10 results are skewed due to agressive write caching of the hard drives in this example*
+This is the command-line used to generate this graph:
 
-### 3D chart
-A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs.
+    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -N -r randread
 
-![3dbarchart][3dbarchart]
+## 2D chart to compare benchmark results
 
-[3dbarchart]: https://louwrentius.com/static/images/servermdadmraid5-3d.png
+The compare chart shows the results from multiple different benchmarks in one graph. The graph data is always for a specific queue depth and numjobs values (the examples use qd=1, nj=1 (the default)). 
+
+![barchart][2dchartcompare]
+
+[2dchartcompare]: https://louwrentius.com/static/images/fio-plot/fioplot0003.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0
+
+It is also possible to group the bars for IOPs and Latency like this:
+
+![barchart][2dchartcomparegroup]
+
+[2dchartcomparegroup]: https://louwrentius.com/static/images/fio-plot/fioplot0004.png
+
+This is the command-line used to generate this graph:
+   
+    fio_plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0 --group-bars
 
 
-### Line chart based on FIO log data
-To create this graph, the FIO log data is parsed to show how the device / file
-performed during a benchmark run. Latency IOPS and bandwidth can be shown. 
-![linechart][queuedepthlowhigh03]
+## 3D chart
+A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs. This example shows IOPs.
 
-[queuedepthlowhigh03]: https://louwrentius.com/static/images/impactofqueuedepth03.png
+![3dbarchart][3dbarchartiops]
 
-The command line options control which data is shown, so it is possible to
-customize the graph to only show the information you're interested in.
+[3dbarchartiops]: https://louwrentius.com/static/images/fio-plot/fioplot0005.png
 
-*tip:* with the latest version of fio-plot, you can combine log data with the same properties by specifying multiple directories with the -i option. 
+This is the command-line used to generate this graph:
 
-This could be very handy if you made some performance tweaks and want to compare results.
+    ~/projects/fio-plot/fio_plot/fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t iops -r randread
 
-### Latency histogram 
+It is also possible to chart the latency:
+
+![3dbarchart][3dbarchartlat]
+
+[3dbarchartlat]: https://louwrentius.com/static/images/fio-plot/fioplot0006.png
+
+This is the command-line used to generate this graph:
+
+    ~/projects/fio-plot/fio_plot/fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t lat -r randread
+
+## Line chart based on FIO log data
+
+Fio records a 'performance trace' of various metrics, such as IOPs and latency over time in plain-text .log 
+files. If you use the benchmark tool included with fio-plot, this data is logged every 0.5 seconds.
+
+This data can be parsed and graphed over time. In this example, we plot the data for four different solid state drives in one chart. 
+
+![linechart][linegraph01]
+
+[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0007.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing IOPs performance of multiple SSDs" -g -t iops -r randread --xlabel-parent 0
+
+It is also possible to chart the latency instead of IOPs.
+
+![linechart][linegraph02]
+
+[linegraph02]: https://louwrentius.com/static/images/fio-plot/fioplot0008.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing latency performance of multiple SSDs" -g -t lat -r randread --xlabel-parent 0
+
+You can also include all information in one graph:
+
+![linechart][linegraph03]
+
+[linegraph03]: https://louwrentius.com/static/images/fio-plot/fioplot0009.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ --source "https://louwrentius.com"  -T "Comparing performance of multiple SSDs" -g -t iops lat -r randread --xlabel-parent 0    
+
+And this is an example with a single benchmark run, comparing the performance of multiple queue depths.
+
+![linechart][linegraph04]
+
+[linegraph04]: https://louwrentius.com/static/images/fio-plot/fioplot0010.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com"  -T "Comparing multiple queue depths" -g -t iops lat -r randread -d 1 8 16  --xlabel-parent 0    
+
+## Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.
-![histogram][histogram]
 
-[histogram]: https://louwrentius.com/static/images/histogram01.png
+![histogram][histogram01]
 
-This is the only chart type that requires / can only show the results of a single benchmark. 
+[histogram01]: https://louwrentius.com/static/images/fio-plot/fioplot0011.png
 
-### Benchmark script
+This is the command-line used to generate this graph:
+
+    fio_plot -i SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Historgram of SSD" -H -r randread -d 16 -n 16
+
+## Benchmark script
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
 you to gather data for different queue depths and/or number of simultaneous jobs. The benchmark script shows progress in real-time.
 
@@ -94,7 +168,7 @@ For more examples, please consult the separate [README.md][rm]
 
 [rm]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
 
-### Dependancies
+## Dependancies
 
 Fio-plot requires 'matplotlib' and 'numpy' to be installed.
 
@@ -102,13 +176,13 @@ Please note that Fio-plot requires at least matplotlib version 3.3.0
 
 Fio-plot also writes metadata to the PNG files using Pillow
 
-### Usage
+## Usage
 
-    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -H | -g | -C) [--disable-grid] [--enable-markers] [--subtitle SUBTITLE]
+    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -N | -H | -g | -C) [--disable-grid] [--enable-markers] [--subtitle SUBTITLE]
                 [-d IODEPTH [IODEPTH ...]] [-n NUMJOBS [NUMJOBS ...]] [-M [MAXDEPTH]] [-J [MAXJOBS]] [-D [DPI]] [-p [PERCENTILE]] -r
-                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE] [-x MIN_Y] [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]]
-                [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH] [--xlabel-parent XLABEL_PARENT] [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH]
-                [--group-bars] [--show-cpu] [--table-lines]
+                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE] [-x MIN_Y]
+                [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]] [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH] [--xlabel-parent XLABEL_PARENT]
+                [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH] [--group-bars] [--show-cpu] [--table-lines]
 
     Generates charts/graphs from FIO JSON output or logdata.
 
@@ -124,8 +198,11 @@ Fio-plot also writes metadata to the PNG files using Pillow
                             Author
     -L, --iodepth-numjobs-3d
                             Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.
-    -l, --latency-iops-2d
-                            Generates a 2D barchart of IOPs and latency for a particular queue depth and numjobs value.
+    -l, --latency-iops-2d-qd
+                            Generates a 2D barchart of IOPs and latency for all queue depths given a particular numjobs value.
+    -N, --latency-iops-2d-nj
+                            This graph type is like the latency-iops-2d-qd barchart but instead of plotting queue depths for a particular numjobs value, it plots numjobs values
+                            for a particular queue depth.
     -H, --histogram       Generates a latency histogram for a particular queue depth and numjobs value.
     -g, --loggraph        This option generates a 2D graph of the log data recorded by FIO.
     -C, --compare-graph   This option generates a bar chart to compare results from different benchmark runs.
@@ -148,8 +225,8 @@ Fio-plot also writes metadata to the PNG files using Pillow
                             Specifies the kind of data you want to graph.
     -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
     -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
-                            The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be carefull as this setting may
-                            smooth out issues you may want to be aware of.
+                            The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be carefull as this setting
+                            may smooth out issues you may want to be aware of.
     -x MIN_Y, --min-y MIN_Y
                             Optional minimal value for y-axis. Use 'None' to disable.
     -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
@@ -159,17 +236,20 @@ Fio-plot also writes metadata to the PNG files using Pillow
     --xlabel-depth XLABEL_DEPTH
                             Can be used to truncate the most significant folder name from the label. Often used to strip off folders generated with benchfio (e.g. 4k)
     --xlabel-parent XLABEL_PARENT
-                            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a value of 0 to remove
-                            parent folder name.
+                            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a value of 0 to
+                            remove parent folder name.
     --xlabel-segment-size XLABEL_SEGMENT_SIZE
-                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used with -g.
+                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used
+                            with -g.
     -w LINE_WIDTH, --line-width LINE_WIDTH
                             Line width for line graphs. Can be a floating-point value. Used with -g.
     --group-bars          When using -l or -C, bars are grouped together by iops/lat type.
     --show-cpu            When using the -C option, a table is added with cpu_usr and cpu_sys data.
     --table-lines         Draw the lines within a table (cpu/stdev)
 
-### Example Usage
+## Example Usage
+
+### 2D Bar Charts
 
 Creating a 2D Bar Chart based on randread data and numjobs = 1 (default).
 
@@ -191,6 +271,8 @@ Creating a 2D Bar Chart grouping iops and latency data together:
 
 [grouped]: https://louwrentius.com/static/images/iodepthgroupbars.png
 
+### 3D Bar Chart
+
 Creating a 3D graph showing IOPS. 
 
     ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
@@ -198,6 +280,8 @@ Creating a 3D graph showing IOPS.
 Creating a 3D graph with a subselection of data
 
     ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops -J 16 -M 16
+
+### 2D Bar Histogram
 
 Creating a latency histogram with a queue depth of 1 and numjobs is 1.
 
@@ -215,7 +299,7 @@ The same result but if you want markers to help distinguish between lines:
 
 [markers]: https://louwrentius.com/static/images/enablemarkers.png
 
-### Comparing two or more benchmarks based on JSON data (2d Bar Chart):
+### Comparing two or more benchmarks based on JSON data (2D Bar Chart):
 
 A simple example where we compare the iops and latency of a particular iodepth and numjobs value:
 
@@ -299,7 +383,7 @@ Example:
 
 [shortlabel]: https://louwrentius.com/static/images/shortlabel.png
 
-### JSON / LOG file name requirements
+## JSON / LOG file name requirements
 
 Fio-plot parses the filename of the generated .log files. The format is:
 
@@ -320,7 +404,7 @@ In this example, there are 8 files because numjobs was set to 8. Fio autoamatica
 It's important that - if you don't use the included benchmark script - to make sure files are generated with the appropriate file name structure.
 
 
-### PNG metadata
+## PNG metadata
 
 All settings used to generate the PNG file are incorporated into the PNG file as metadata (tEXT).
 This should help you to keep track of the exact parameters and data used to generate the graphs. 

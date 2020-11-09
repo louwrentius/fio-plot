@@ -3,7 +3,7 @@ import fiolib.supporting as supporting
 import fiolib.dataimport as dataimport
 import matplotlib.font_manager as font_manager
 import pprint
-
+from operator import itemgetter
 
 def get_dataset_types(dataset):
     """ This code is probably insane.
@@ -141,7 +141,7 @@ def get_record_set(settings, dataset, dataset_types):
                 "Since we are processing randrw data, you must specify a filter for either read or write data, not both.")
             exit(1)
 
-    labels = dataset_types['iodepth']
+    labels = dataset_types[settings['query']]
 
     datadict = {
         'iops_series_raw': [],
@@ -154,24 +154,21 @@ def get_record_set(settings, dataset, dataset_types):
         'y1_axis': None,
         'y2_axis': None,
         'numjobs': numjobs,
-        'x_axis_format': 'Queue Depth'
     }
+    newlist = sorted(dataset['data'], key=itemgetter(settings['query']))
+    # pprint.pprint(newlist)
 
-    # print(dataset.keys())
-    # print(settings)
+    for record in newlist:
+        for x in settings['iodepth']:
+            for y in settings['numjobs']:
+                if (int(record['iodepth']) == int(x)) and int(record['numjobs']) == int(y) and record['rw'] == rw and record['type'] in settings['filter']:
+                    datadict['iops_series_raw'].append(record['iops'])
+                    datadict['lat_series_raw'].append(record['lat'])
+                    datadict['iops_stddev_series_raw'].append(record['iops_stddev'])
+                    datadict['lat_stddev_series_raw'].append(record['lat_stddev'])
+                    datadict['cpu']['cpu_sys'].append(int(round(record['cpu_sys'], 0)))
+                    datadict['cpu']['cpu_usr'].append(int(round(record['cpu_usr'], 0)))
 
-    for depth in dataset_types['iodepth']:
-        for record in dataset['data']:
-            if (int(record['iodepth']) == int(depth)) and int(record['numjobs']) == int(numjobs[0]) and record['rw'] == rw and record['type'] in settings['filter']:
-                datadict['iops_series_raw'].append(record['iops'])
-                datadict['lat_series_raw'].append(record['lat'])
-                datadict['iops_stddev_series_raw'].append(
-                    record['iops_stddev'])
-                datadict['lat_stddev_series_raw'].append(record['lat_stddev'])
-                datadict['cpu']['cpu_sys'].append(
-                    int(round(record['cpu_sys'], 0)))
-                datadict['cpu']['cpu_usr'].append(
-                    int(round(record['cpu_usr'], 0)))
     return scale_data(datadict)
 
 
@@ -330,7 +327,7 @@ def create_cpu_table(settings, data, ax2):
                   data['cpu']['cpu_usr'],
                   data['cpu']['cpu_sys']]
 
-    rowlabels = ['CPU Usage', f'cpu_usr %', f'cpu_sys %']
+    rowlabels = ['CPU Usage', 'cpu_usr %', 'cpu_sys %']
     location = "lower center"
     create_generic_table(settings, table_vals, ax2, rowlabels, location)
 
@@ -339,6 +336,8 @@ def create_stddev_table(settings, data, ax2):
     table_vals = [data['x_axis'], data['y1_axis']
                   ['stddev'], data['y2_axis']['stddev']]
 
-    rowlabels = ['IO queue depth', f'IOP/s \u03C3 %', f'Latency \u03C3 %']
+    table_name = settings['label']
+
+    rowlabels = [table_name, 'IOP/s \u03C3 %', f'Latency \u03C3 %']
     location = "lower right"
     create_generic_table(settings, table_vals, ax2, rowlabels, location)
