@@ -62,7 +62,7 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
 
     ax1.set_ylabel(data['y1_axis']['format'])
     ax3.set_ylabel(data['y2_axis']['format'])
-
+    ax1.set_xlabel(settings['label'])
     ax1.set_xticks(ltest)
 
     if settings['compare_graph']:

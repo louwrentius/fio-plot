@@ -206,7 +206,7 @@ def configure_default_settings(settings, routing_dict, key):
     if not settings['numjobs']:
         settings['numjobs'] = routing_dict[key]['numjobs_default']
     settings['query'] = routing_dict[key]['query']
-    settings['stdev_table_name'] = routing_dict[key]['stdev_table_name']
+    settings['label'] = routing_dict[key]['label']
     return settings
 
 
@@ -243,42 +243,42 @@ def get_routing_dict():
                         'iodepth_default': [1],
                         'numjobs_default': [1],
                         'query': None,
-                        'stdev_table_name': None},
+                        'label': None},
                     'iodepth_numjobs_3d':
                     {'function': bar3d.plot_3d,
                         'get_data': get_json_data,
                         'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
                         'numjobs_default': [1, 2, 4, 8, 16, 32, 64],
                         'query': None,
-                        'stdev_table_name': None},
+                        'label': None},
                     'latency_iops_2d_qd':
                     {'function': bar2d.chart_2dbarchart_jsonlogdata,
                         'get_data': get_json_data,
                         'iodepth_default': [1, 2, 4, 8, 16, 32, 64],
                         'numjobs_default': [1],
                         'query': 'iodepth',
-                        'stdev_table_name': "IO queue depth"},
+                        'label': "Queue depth"},
                     'latency_iops_2d_nj':
                     {'function': bar2d.chart_2dbarchart_jsonlogdata,
                         'get_data': get_json_data,
                         'iodepth_default': [1],
                         'numjobs_default': [1, 2, 4, 8, 16, 32, 64],
                         'query': 'numjobs',
-                        'stdev_table_name': 'Number of jobs'},
+                        'label': 'Number of jobs'},
                     'histogram':
                     {'function': histogram.chart_latency_histogram,
                         'get_data': get_json_data,
                         'iodepth_default': [1],
                         'numjobs_default': [1],
                         'query': None,
-                        'stdev_table_name': None},
+                        'label': None},
                     'compare_graph':
                     {'function': bar2d.compchart_2dbarchart_jsonlogdata,
                         'get_data': get_json_data,
                         'iodepth_default': [1],
                         'numjobs_default': [1],
                         'query': None,
-                        'stdev_table_name': None}}
+                        'label': None}}
     return routing_dict
 
 

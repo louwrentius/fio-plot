@@ -143,11 +143,6 @@ def get_record_set(settings, dataset, dataset_types):
 
     labels = dataset_types[settings['query']]
 
-    formats = {'iodepth': 'Queue Depth',
-               'numjobs': 'Number of jobs'}
-
-    x_axis_format = formats[settings['query']]
-
     datadict = {
         'iops_series_raw': [],
         'iops_stddev_series_raw': [],
@@ -159,7 +154,6 @@ def get_record_set(settings, dataset, dataset_types):
         'y1_axis': None,
         'y2_axis': None,
         'numjobs': numjobs,
-        'x_axis_format': x_axis_format
     }
     newlist = sorted(dataset['data'], key=itemgetter(settings['query']))
     # pprint.pprint(newlist)
@@ -342,7 +336,7 @@ def create_stddev_table(settings, data, ax2):
     table_vals = [data['x_axis'], data['y1_axis']
                   ['stddev'], data['y2_axis']['stddev']]
 
-    table_name = settings['stdev_table_name']
+    table_name = settings['label']
 
     rowlabels = [table_name, 'IOP/s \u03C3 %', f'Latency \u03C3 %']
     location = "lower right"

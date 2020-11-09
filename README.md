@@ -14,13 +14,22 @@ To get to these charts, you need to follow this process:
 
 [bms]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
 
-## 2D chart 
+## 2D chart (iodepth)
 This kind of chart shows both IOPs and Latency for multiple queue depths.
 ![barchart][queuedepthlowhigh01]
 
-*Please note that these benchmark numbers are not representative of the capabilities of the SSD as the RAID controller is the bottleneck.*
-
 [queuedepthlowhigh01]: https://louwrentius.com/static/images/impactofqueuedepth.png
+
+This is the command-line used to generate this graph:
+
+  
+    
+
+## 2D chart (numjobs)
+This kind of chart shows both IOPs and Latency for multiple queue depths.
+![barchart][numjobslowhigh01]
+
+[numjobslowhigh01]: https://louwrentius.com/static/images/impactofnumjobs.png
 
 ## 2D chart to compare benchmark results
 
