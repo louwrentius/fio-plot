@@ -159,7 +159,7 @@ This particular example benchmark was run with these parameters:
 
     ./bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
 
-In this example, we run a mixed random read/write benchmark. We have two runs, one with a 75%/25 read/write mix and one with a 90%/10% mix. 
+In this example, we run a mixed random read/write benchmark. We have two runs, one with a 75% / 25% read/write mix and one with a 90% / 10% mix. 
 
 You can run the benchmark against an entire device or a file/folder.
 Alongside the benchmark script, a Fio job template file is supplied (fio-job-template.fio). This file can be customised as desired.
