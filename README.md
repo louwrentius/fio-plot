@@ -54,7 +54,7 @@ It is also possible to group the bars for IOPs and Latency like this:
 
 This is the command-line used to generate this graph:
    
-   fio_plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0 --grou-bars
+    fio_plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0 --group-bars
 
 
 ## 3D chart
