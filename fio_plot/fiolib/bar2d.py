@@ -43,7 +43,30 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
     ax3.set_ylabel(data['y2_axis']['format'])
 
     ax1.set_xticks(ltest)
-    ax1.set_xticklabels(x_axis)
+   
+    if settings['compare_graph']:
+        max_label_width = max(shared.get_max_width([x_axis], len(x_axis)))
+        # cols = len(x_axis)
+        print(max_label_width)
+        print(len(x_axis))
+        fontsize = 0
+        # This is ugly but if somebody knows a better algorithm...
+        if settings['group_bars']:
+            if max_label_width > 10:
+                fontsize = 6
+            elif max_label_width > 15:
+                fontsize = 5
+            else:
+                fontsize = 8
+        else:
+            if max_label_width > 18:
+                fontsize = 5
+            else:
+                fontsize = 8
+                
+        ax1.set_xticklabels(labels=x_axis, fontsize=fontsize)
+    else:
+        ax1.set_xticklabels(labels=x_axis)
 
     return_data['rects1'] = rects1
     return_data['rects2'] = rects2
@@ -133,9 +156,6 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
 
     ax2.axis('off')
 
-    iops = data['y1_axis']['data']
-    latency = np.array(data['y2_axis']['data'], dtype=float)
-
     return_data = create_bars_and_xlabels(settings, data, ax1, ax3)
     rects1 = return_data['rects1']
     rects2 = return_data['rects2']
@@ -150,6 +170,7 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     else:
         supporting.create_title_and_sub(
             settings, plt, skip_keys=[])
+
     #
     # Labeling the top of the bars with their value
     shared.autolabel(rects1, ax1)
