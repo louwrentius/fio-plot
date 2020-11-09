@@ -58,12 +58,24 @@ This is the command-line used to generate this graph:
 
 
 ## 3D chart
-A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs.
+A 3D bar chart that plots both queue depth an numjobs against either latency or IOPs. This example shows IOPs.
 
-![3dbarchart][3dbarchart]
+![3dbarchart][3dbarchartiops]
 
-[3dbarchart]: https://louwrentius.com/static/images/servermdadmraid5-3d.png
+[3dbarchartiops]: https://louwrentius.com/static/images/fio-plot/fioplot0005.png
 
+This is the command-line used to generate this graph:
+
+    ~/projects/fio-plot/fio_plot/fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t iops -r randread
+
+It is also possible to chart the latency:
+
+![3dbarchart][3dbarchartlat]
+[3dbarchartlat]: https://louwrentius.com/static/images/fio-plot/fioplot0006.png
+
+This is the command-line used to generate this graph:
+
+    ~/projects/fio-plot/fio_plot/fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t lat -r randread
 
 ## Line chart based on FIO log data
 To create this graph, the FIO log data is parsed to show how the device / file
