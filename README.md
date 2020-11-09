@@ -103,6 +103,24 @@ This is the command-line used to generate this graph:
 
     fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing latency performance of multiple SSDs" -g -t lat -r randread --xlabel-parent 0
 
+You can also include all information in one graph:
+
+![linechart][linegraph03]
+
+[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0009.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ --source "https://louwrentius.com"  -T "Comparing performance of multiple SSDs" -g -t iops lat -r randread --xlabel-parent 0    
+
+And this is an example with a single benchmark run, comparing the performance of multiple queue depths.
+
+![linechart][linegraph04]
+
+[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0010.png
+
+    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com"  -T "Comparing multiple queue depths" -g -t iops lat -r randread -d 1 8 16  --xlabel-parent 0    
+
 ## Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.
 ![histogram][histogram]
