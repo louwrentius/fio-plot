@@ -79,18 +79,29 @@ This is the command-line used to generate this graph:
     ~/projects/fio-plot/fio_plot/fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t lat -r randread
 
 ## Line chart based on FIO log data
-To create this graph, the FIO log data is parsed to show how the device / file
-performed during a benchmark run. Latency IOPS and bandwidth can be shown. 
-![linechart][queuedepthlowhigh03]
 
-[queuedepthlowhigh03]: https://louwrentius.com/static/images/impactofqueuedepth03.png
+Fio records a 'performance trace' of various metrics, such as IOPs and latency over time in plain-text .log 
+files. If you use the benchmark tool included with fio-plot, this data is logged every 0.5 seconds.
 
-The command line options control which data is shown, so it is possible to
-customize the graph to only show the information you're interested in.
+This data can be parsed and graphed over time. In this example, we plot the data for four different solid state drives in one chart. 
 
-*tip:* with the latest version of fio-plot, you can combine log data with the same properties by specifying multiple directories with the -i option. 
+![linechart][linegraph01]
 
-This could be very handy if you made some performance tweaks and want to compare results.
+[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0007.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing IOPs performance of multiple SSDs" -g -t iops -r randread --xlabel-parent 0
+
+It is also possible to chart the latency instead of IOPs.
+
+![linechart][linegraph02]
+
+[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0008.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing latency performance of multiple SSDs" -g -t lat -r randread --xlabel-parent 0
 
 ## Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.

@@ -99,7 +99,7 @@ def chart_2d_log_data(settings, dataset):
                 #
                 # Assure axes are scaled correctly, starting from zero.
                 #
-                factordict = {'iops': 1,
+                factordict = {'iops': 1.05,
                               'lat': 1.25,
                               'bw': 1.5
                               }
