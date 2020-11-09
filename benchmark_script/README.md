@@ -6,6 +6,12 @@ Bench_fio requires Python3. The 'numpy' python module is required.
 
 You can also use apt/yum to satisfy this requirement.
 
+
+### Notes on IO queue depth and number of jobs
+
+As discussed in issue #41 each job has its own I/O queue. If qd=1 and nj=5, you will have 5 IOs in flight.
+If you have qd=4 and nj=4 you will have 4 x 4 = 16 IOs in flight. 
+
 ### Examples
  
 We benchmark two devices with a randread/randrwite workload. 
