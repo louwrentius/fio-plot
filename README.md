@@ -71,6 +71,7 @@ This is the command-line used to generate this graph:
 It is also possible to chart the latency:
 
 ![3dbarchart][3dbarchartlat]
+
 [3dbarchartlat]: https://louwrentius.com/static/images/fio-plot/fioplot0006.png
 
 This is the command-line used to generate this graph:
