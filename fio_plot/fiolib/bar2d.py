@@ -6,6 +6,27 @@ import fiolib.supporting as supporting
 import fiolib.shared_chart as shared
 
 
+def calculate_font_size(settings, x_axis):
+    max_label_width = max(shared.get_max_width([x_axis], len(x_axis)))
+    fontsize = 0
+    #
+    # This hard-coded font sizing is ugly but if somebody knows a better algorithm...
+    #
+    if settings['group_bars']:
+        if max_label_width > 10:
+            fontsize = 6
+        elif max_label_width > 15:
+            fontsize = 5
+        else:
+            fontsize = 8
+    else:
+        if max_label_width > 18:
+            fontsize = 5
+        else:
+            fontsize = 8
+    return fontsize
+
+
 def create_bars_and_xlabels(settings, data, ax1, ax3):
 
     return_data = {'ax1': None,
@@ -43,27 +64,9 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
     ax3.set_ylabel(data['y2_axis']['format'])
 
     ax1.set_xticks(ltest)
-   
+
     if settings['compare_graph']:
-        max_label_width = max(shared.get_max_width([x_axis], len(x_axis)))
-        # cols = len(x_axis)
-        print(max_label_width)
-        print(len(x_axis))
-        fontsize = 0
-        # This is ugly but if somebody knows a better algorithm...
-        if settings['group_bars']:
-            if max_label_width > 10:
-                fontsize = 6
-            elif max_label_width > 15:
-                fontsize = 5
-            else:
-                fontsize = 8
-        else:
-            if max_label_width > 18:
-                fontsize = 5
-            else:
-                fontsize = 8
-                
+        fontsize = calculate_font_size(settings, x_axis)
         ax1.set_xticklabels(labels=x_axis, fontsize=fontsize)
     else:
         ax1.set_xticklabels(labels=x_axis)
