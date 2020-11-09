@@ -15,7 +15,7 @@ To get to these charts, you need to follow this process:
 [bms]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
 
 ## 2D chart (iodepth)
-This kind of chart shows both IOPs and Latency for multiple queue depths.
+This kind of chart shows both IOPs and Latency for different queue depths.
 ![barchart][2dchartiodepth]
 
 [2dchartiodepth]: https://louwrentius.com/static/images/fio-plot/fioplot0001.png
@@ -25,7 +25,7 @@ This is the command-line used to generate this graph:
     fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -l -r randread
 
 ## 2D chart (numjobs)
-This kind of chart shows both IOPs and Latency for multiple queue depths.
+This kind of chart shows both IOPs and Latency for diffent simultaneous number of jobs.
 ![barchart][2dchartnumjobs]
 
 [2dchartnumjobs]: https://louwrentius.com/static/images/fio-plot/fioplot0002.png
