@@ -209,8 +209,12 @@ def parse_raw_cvs_data(dataset):
             distance_list.append(distance)
     mean = statistics.mean(distance_list)
     if mean > 1000:
-        print(f"{supporting.bcolors.WARNING} WARNING: the storage could not "
+        print(f"\n{supporting.bcolors.WARNING} WARNING: the storage could not "
               f"keep up with the configured I/O request size. Data is interpolated.{supporting.bcolors.ENDC}")
+        print("\nIO is logged every 0.5 seconds by default. "
+              "\nThis message will apear if no IO has been issued within such an interval. "
+              "\nThis can happen with very slow storage devices like floppy drives or bad SD cards.\n")
+            
         for index, item in enumerate(dataset):
             if index == 0:
                 average_value = int(item['value']) / \
