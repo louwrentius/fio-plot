@@ -119,15 +119,20 @@ And this is an example with a single benchmark run, comparing the performance of
 
 [linegraph04]: https://louwrentius.com/static/images/fio-plot/fioplot0010.png
 
+This is the command-line used to generate this graph:
+
     fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com"  -T "Comparing multiple queue depths" -g -t iops lat -r randread -d 1 8 16  --xlabel-parent 0    
 
 ## Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.
-![histogram][histogram]
 
-[histogram]: https://louwrentius.com/static/images/histogram01.png
+![histogram][histogram01]
 
-This is the only chart type that requires / can only show the results of a single benchmark. 
+[histogram01]: https://louwrentius.com/static/images/fio-plot/fioplot0011.png
+
+This is the command-line used to generate this graph:
+
+    fio_plot -i SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Historgram of SSD" -H -r randread -d 16 -n 16
 
 ## Benchmark script
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
