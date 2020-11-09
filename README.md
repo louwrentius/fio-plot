@@ -97,7 +97,7 @@ It is also possible to chart the latency instead of IOPs.
 
 ![linechart][linegraph02]
 
-[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0008.png
+[linegraph02]: https://louwrentius.com/static/images/fio-plot/fioplot0008.png
 
 This is the command-line used to generate this graph:
 
@@ -107,7 +107,7 @@ You can also include all information in one graph:
 
 ![linechart][linegraph03]
 
-[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0009.png
+[linegraph03]: https://louwrentius.com/static/images/fio-plot/fioplot0009.png
 
 This is the command-line used to generate this graph:
 
@@ -117,7 +117,7 @@ And this is an example with a single benchmark run, comparing the performance of
 
 ![linechart][linegraph04]
 
-[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0010.png
+[linegraph04]: https://louwrentius.com/static/images/fio-plot/fioplot0010.png
 
     fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com"  -T "Comparing multiple queue depths" -g -t iops lat -r randread -d 1 8 16  --xlabel-parent 0    
 
