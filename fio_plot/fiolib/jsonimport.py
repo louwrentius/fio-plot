@@ -62,6 +62,7 @@ def import_json_data(filename):
             sys.exit(1)
     return d
 
+
 def import_json_dataset(settings, dataset):
     """The dataset is a list of dicts containing the absolute path and the file list.
     We need to add a third key/value pair with the ingested data of those files.
@@ -103,6 +104,7 @@ def get_json_mapping(mode):
         'latency_ns': (root + ['latency_ns']),
         'cpu_usr': (root + ['usr_cpu']),
         'cpu_sys': (root + ['sys_cpu']),
+        'bw': (data + ['bw']),
     }
 
     return dictionary
@@ -137,6 +139,7 @@ def get_flat_json_mapping(settings, dataset):
                    'latency_ms': get_nested_value(record, m['latency_ms']),
                    'latency_us': get_nested_value(record, m['latency_us']),
                    'latency_ns': get_nested_value(record, m['latency_ns']),
+                   'bw': get_nested_value(record, m['bw']),
                    'type': mode,
                    'cpu_sys': get_nested_value(record, m['cpu_sys']),
                    'cpu_usr': get_nested_value(record, m['cpu_usr'])}

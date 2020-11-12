@@ -48,7 +48,8 @@ def get_record_set_histogram(settings, dataset):
 
 def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
     record_set = {'iodepth': dataset_types['iodepth'],
-                  'numjobs': dataset_types['numjobs'], 'values': []}
+                  'numjobs': dataset_types['numjobs'], 
+                  'values': []}
     # pprint.pprint(dataset)
     if settings['rw'] == 'randrw':
         if len(settings['filter']) > 1 or not settings['filter']:

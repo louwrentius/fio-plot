@@ -152,9 +152,9 @@ def run_preflight_checks(settings):
             print("\nIf -L is specified (3D Chart) you must specify -t (iops or lat)\n")
             sys.exit(1)
 
-        if settings['type'][0] not in ['iops', 'lat']:
+        if settings['type'][0] not in ['iops', 'lat', 'bw']:
             print(
-                "\nIf -L is specified (3D Chart) you can only select [iops,lat] for -t type\n")
+                "\nIf -L is specified (3D Chart) you can only select [iops,lat,bw] for -t type\n")
             sys.exit(1)
 
         if len(settings['input_directory']) > 1:

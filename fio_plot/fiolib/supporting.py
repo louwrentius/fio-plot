@@ -79,6 +79,17 @@ def scale_yaxis_latency(dataset, scale):
     return result
 
 
+def get_scale_factor_bw(dataset):
+    mean = statistics.mean(dataset)
+    scale_factors = [{'scale': 1048576, 'label': "GB/s"},
+                     {'scale': 1024, 'label': "MB/s"},
+                     {'scale': 1, 'label': "KB/s"}]
+
+    for item in scale_factors:
+        if mean > item['scale']*5:
+            return item
+
+
 def get_colors():
     """ This is a fixed list of colors that are used to color the different
     lines in a graph."""

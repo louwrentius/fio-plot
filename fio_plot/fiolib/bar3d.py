@@ -15,7 +15,7 @@ def plot_3d(settings, dataset):
     """
 
     if not settings['type']:
-        print("The type of data must be specified with -t (iops/lat).")
+        print("The type of data must be specified with -t (iops/lat/bw).")
         exit(1)
 
     dataset_types = shared.get_dataset_types(dataset)
@@ -55,11 +55,14 @@ def plot_3d(settings, dataset):
         data['numjobs'] = numjobs
         data['values'] = temp_x
 
-    # Ton of code to scale latency
-    if metric == 'lat':
+    # Ton of code to scale latency or bandwidth
+    if metric == 'lat' or metric == 'bw':
         scale_factors = []
         for row in data['values']:
-            scale_factor = supporting.get_scale_factor(row)
+            if metric == 'lat':
+                scale_factor = supporting.get_scale_factor(row)
+            if metric == 'bw':
+                scale_factor = supporting.get_scale_factor_bw(row)
             scale_factors.append(scale_factor)
         largest_scale_factor = supporting.get_largest_scale_factor(
             scale_factors)
@@ -71,6 +74,7 @@ def plot_3d(settings, dataset):
                 row, largest_scale_factor)
             scaled_values.append(result['data'])
         z_axis_label = largest_scale_factor['label']
+
     else:
         scaled_values = data['values']
         z_axis_label = metric
