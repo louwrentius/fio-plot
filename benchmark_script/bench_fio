@@ -430,13 +430,7 @@ def get_default_settings():
     settings["loginterval"] = 500
     settings["mixed"] = ["readwrite", "rw", "randrw"]
     settings["invalidate"] = 1
-    settings["loop_items"] = [
-        "target",
-        "mode",
-        "iodepth",
-        "numjobs",
-        "block_size",
-    ]
+    settings["loop_items"] = ["target", "mode", "iodepth", "numjobs", "block_size"]
     settings["filter_items"] = [
         "filter_items",
         "loop_items",
