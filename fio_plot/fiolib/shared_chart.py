@@ -186,7 +186,7 @@ def scale_data(datadict):
     #
     # Latency data must be scaled, IOPs will not be scaled.
     #
-    latency_scale_factor = supporting.get_scale_factor(lat_series_raw)
+    latency_scale_factor = supporting.get_scale_factor_lat(lat_series_raw)
     scaled_latency_data = supporting.scale_yaxis_latency(
         lat_series_raw, latency_scale_factor)
     #

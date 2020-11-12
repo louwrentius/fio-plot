@@ -60,7 +60,7 @@ def plot_3d(settings, dataset):
         scale_factors = []
         for row in data['values']:
             if metric == 'lat':
-                scale_factor = supporting.get_scale_factor(row)
+                scale_factor = supporting.get_scale_factor_lat(row)
             if metric == 'bw':
                 scale_factor = supporting.get_scale_factor_bw(row)
             scale_factors.append(scale_factor)

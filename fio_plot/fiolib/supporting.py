@@ -43,7 +43,7 @@ def scale_xaxis_time(dataset):
     return result
 
 
-def get_scale_factor(dataset):
+def get_scale_factor_lat(dataset):
     """The mean of the dataset is calculated. The size of the mean will determine
     which scale factor should be used on the data. The data is not scaled, only
     the scale factor and the y-axis label is returned in a dictionary.
@@ -271,7 +271,7 @@ def process_dataset(settings, dataset):
 
                 if 'lat' in item['type']:
                     scale_factors.append(
-                        get_scale_factor(item[rw]['yvalues']))
+                        get_scale_factor_lat(item[rw]['yvalues']))
         item.pop('data')
         new_list.append(item)
 
