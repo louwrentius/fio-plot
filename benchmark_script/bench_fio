@@ -21,7 +21,7 @@ import shutil
 from numpy import linspace
 from pathlib import Path
 
-# import pprint
+import pprint
 
 
 def convert_dict_vals_to_str(dictionary):
@@ -220,7 +220,7 @@ def generate_test_list(settings):
         dataset.append(result)
 
     benchmark_list = itertools.product(*dataset)
-    # pprint.pprint([x for x in benchmark_list])
+    pprint.pprint([x for x in benchmark_list])
     return [dict(zip(loop_items, item)) for item in benchmark_list]
 
 
@@ -300,12 +300,14 @@ def get_arguments(settings):
 
     ag.add_argument(
         "-r",
-        "--sequential-precondition",
-        help=f"Precondition an SSD by writing to it twice. \
-            {settings['mode']})",
-        default=settings["mode"],
-        nargs="+",
-        type=str,
+        "--number-of-runs",
+        help=(
+            "Each benchmark will be run this number of times. This option is meant for benchmarking SSDs so they"
+            f"can be preconditioned (default: {settings['runs']}). You may have to run benchmarks 5+ times to reach"
+            "steady state."
+        ),
+        default=settings["runs"],
+        type=int,
     )
     ag.add_argument(
         "-m",
@@ -391,6 +393,7 @@ def get_argument_description():
         "size": "Specified test data size",
         "rwmixread": "Read/write mix in %% read",
         "duration": "Time duration per test (s)",
+        "runs": "How many times each test is run",
         "extra_opts": "Extra custom options",
         "loginterval": "Log interval of perf data",
         "invalidate": "Invalidate buffer cache",
@@ -418,7 +421,14 @@ def get_default_settings():
     settings["loginterval"] = 500
     settings["mixed"] = ["readwrite", "rw", "randrw"]
     settings["invalidate"] = 1
-    settings["loop_items"] = ["target", "mode", "iodepth", "numjobs", "block_size"]
+    settings["loop_items"] = [
+        "target",
+        "mode",
+        "iodepth",
+        "numjobs",
+        "block_size",
+        "runs",
+    ]
     settings["filter_items"] = [
         "filter_items",
         "loop_items",
