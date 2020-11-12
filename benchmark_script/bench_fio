@@ -92,6 +92,10 @@ def generate_output_directory(settings, benchmark):
         )
     else:
         directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['block_size']}"
+
+    if settings["runs"] > 1:
+        directory = f"{directory}-run-{benchmark['run']}"
+
     return directory
 
 
@@ -592,6 +596,7 @@ def main():
     settings = {**settings, **customsettings}
     check_settings(settings)
     tests = generate_test_list(settings)
+    pprint.pprint(tests)
     display_header(settings, tests)
     if not settings["dry_run"]:
         run_benchmarks(settings, tests)
