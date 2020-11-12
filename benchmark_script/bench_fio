@@ -226,8 +226,10 @@ def generate_test_list(settings):
         dataset.append(result)
 
     benchmark_list = itertools.product(*dataset)
+    pprint.pprint(loop_items)
     pprint.pprint([x for x in benchmark_list])
-    return [dict(zip(loop_items, item)) for item in benchmark_list]
+    result = [dict(zip(loop_items, item)) for item in benchmark_list]
+    return result
 
 
 def get_arguments(settings):
