@@ -261,7 +261,7 @@ def process_dataset(settings, dataset):
                 if 'lat' in item['type']:
                     scale_factors.append(
                         get_scale_factor(item[rw]['yvalues']))
-
+        item.pop('data')
         new_list.append(item)
 
     """
@@ -281,6 +281,7 @@ def process_dataset(settings, dataset):
                 else:
                     item[rw]['ylabel'] = lookupTable(item['type'])['ylabel']
 
+                max = np.max(item[rw]['yvalues'])
                 mean = np.mean(item[rw]['yvalues'])
                 stdv = round((np.std(item[rw]['yvalues']) / mean) * 100, 2)
                 percentile = round(np.percentile(
@@ -300,6 +301,7 @@ def process_dataset(settings, dataset):
                 if percentile >= 20:
                     percentile = int(round(percentile, 0))
 
+                item[rw]['max'] = max
                 item[rw]['mean'] = mean
                 item[rw]['stdv'] = stdv
                 item[rw]['percentile'] = percentile
@@ -309,6 +311,16 @@ def process_dataset(settings, dataset):
     new_structure['datatypes'] = list(set(datatypes))
     new_structure['dataset'] = final_list
     return new_structure
+
+
+def get_highest_maximum(settings, data):
+    highest_max = {"read": {"iops": 0, "lat": 0, "bw": 0}, "write": {"iops": 0, "lat": 0, "bw": 0}}
+    for item in data['dataset']:
+        for rw in settings['filter']:
+            if rw in item.keys():
+                if item[rw]['max'] > highest_max[rw][item['type']]:
+                    highest_max[rw][item['type']] = item[rw]['max']
+    return highest_max
 
 
 def create_title_and_sub(settings, plt, skip_keys=[], sub_x_offset=0, sub_y_offset=0):

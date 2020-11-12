@@ -22,7 +22,7 @@ def chart_2d_log_data(settings, dataset):
     data = supporting.process_dataset(settings, dataset)
     datatypes = data['datatypes']
     directories = logdata.get_unique_directories(dataset)
-
+    
     #
     # Create matplotlib figure and first axis. The 'host' axis is used for
     # x-axis and as a basis for the second and third y-axis
@@ -63,7 +63,10 @@ def chart_2d_log_data(settings, dataset):
     marker_list = list(markers.MarkerStyle.markers.keys())
     fontP = FontProperties(family='monospace')
     fontP.set_size('xx-small')
-    maximum = dict.fromkeys(settings['type'], 0)
+    # maximum = dict.fromkeys(settings['type'], 0)
+
+    maximum = supporting.get_highest_maximum(settings, data)
+    # pprint.pprint(maximum)
 
     for item in data['dataset']:
         for rw in settings['filter']:
@@ -75,7 +78,7 @@ def chart_2d_log_data(settings, dataset):
 
                 xvalues = item[rw]['xvalues']
                 yvalues = item[rw]['yvalues']
-
+                
                 #
                 # Use a moving average as configured by the commandline option
                 # to smooth out the graph for better readability.
@@ -104,13 +107,9 @@ def chart_2d_log_data(settings, dataset):
                               'bw': 1.5
                               }
 
-                if settings['max']:
-                    maximum[item['type']] = settings['max']
-                else:
-                    max_yvalue = max(yvalues)
-                    if max_yvalue > maximum[item['type']]:
-                        maximum[item['type']] = max_yvalue
-
+                #
+                # Set minimum and maximum values for y-axis where applicable.
+                #
                 min_y = 0
                 if settings['min_y'] == "None":
                     min_y = None
@@ -118,10 +117,15 @@ def chart_2d_log_data(settings, dataset):
                     try:
                         min_y = int(settings['min_y'])
                     except ValueError:
-                        print(f"Min_y value is invalid (not None or integer).")
+                        print("Min_y value is invalid (not None or integer).")
+
+                max_y = maximum[rw][item['type']] * factordict[item['type']]
+                
+                if settings[f"max_{item['type']}"]:
+                    max_y = settings[f"max_{item['type']}"]
 
                 axes[item['type']].set_ylim(
-                    min_y, maximum[item['type']] * factordict[item['type']])
+                    min_y, max_y)
                 #
                 # Label Axis
                 #

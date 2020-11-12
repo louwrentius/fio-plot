@@ -5,6 +5,7 @@ import matplotlib.font_manager as font_manager
 import pprint
 from operator import itemgetter
 
+
 def get_dataset_types(dataset):
     """ This code is probably insane.
     Using only the first item in a list to return because all items should be equal.
@@ -282,8 +283,6 @@ def get_max_width(dataset, cols):
 def calculate_colwidths(cols, matrix):
 
     collist = []
-
-    #step5 = (cols / 120) * cols
 
     for item in matrix:
         value = item * 0.01

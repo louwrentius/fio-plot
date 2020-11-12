@@ -126,6 +126,13 @@ def set_arguments():
                     action='store_true')
     ag.add_argument("--table-lines",
                     help="Draw the lines within a table (cpu/stdev)", action='store_true')
+    ag.add_argument("--max-lat",
+                    help="Maximum latency value on y-axis", type=int, default=None)
+    ag.add_argument("--max-iops",
+                    help="Maximum IOPs value on y-axis", type=int, default=None)
+    ag.add_argument("--max-bw",
+                    help="Maximum bandwidth on y-axis", type=int, default=None)
+
     return parser
 
 
