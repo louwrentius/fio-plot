@@ -94,7 +94,7 @@ def generate_output_directory(settings, benchmark):
         directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['block_size']}"
 
     if settings["runs"] > 1:
-        directory = f"{directory}-run-{benchmark['run']}"
+        directory = f"{directory}/run-{benchmark['runs']}"
 
     return directory
 
@@ -219,16 +219,17 @@ def generate_test_list(settings):
     loop_items = settings["loop_items"]
     dataset = []
 
-    # settings["runs"] = list(range(1, settings["runs"] + 1))
+    settings_copy = settings.copy()
+
+    settings_copy["runs"] = list(range(1, settings_copy["runs"] + 1))
 
     for item in loop_items:
-        result = settings[item]
+        result = settings_copy[item]
         dataset.append(result)
 
-    benchmark_list = itertools.product(*dataset)
-    pprint.pprint(loop_items)
-    pprint.pprint([x for x in benchmark_list])
+    benchmark_list = list(itertools.product(*dataset))
     result = [dict(zip(loop_items, item)) for item in benchmark_list]
+    pprint.pprint(result)
     return result
 
 
@@ -423,14 +424,21 @@ def get_default_settings():
     settings["block_size"] = ["4k"]
     settings["direct"] = 1
     settings["size"] = None
-    settings["runs"] = [1]
+    settings["runs"] = 1
     settings["rwmixread"] = None
     settings["duration"] = 60
     settings["extra_opts"] = []
     settings["loginterval"] = 500
     settings["mixed"] = ["readwrite", "rw", "randrw"]
     settings["invalidate"] = 1
-    settings["loop_items"] = ["target", "mode", "iodepth", "numjobs", "block_size"]
+    settings["loop_items"] = [
+        "target",
+        "mode",
+        "iodepth",
+        "numjobs",
+        "block_size",
+        "runs",
+    ]
     settings["filter_items"] = [
         "filter_items",
         "loop_items",
@@ -590,7 +598,6 @@ def main():
     settings = {**settings, **customsettings}
     check_settings(settings)
     tests = generate_test_list(settings)
-    pprint.pprint(tests)
     display_header(settings, tests)
     if not settings["dry_run"]:
         run_benchmarks(settings, tests)
