@@ -215,9 +215,15 @@ def generate_test_list(settings):
     loop_items = settings["loop_items"]
 
     dataset = []
+    runs = []
+
     for item in loop_items:
         result = settings[item]
         dataset.append(result)
+
+    if settings["runs"] > 1:
+        runs = list(range(1, settings["runs"] + 1))
+        dataset.append(runs)
 
     benchmark_list = itertools.product(*dataset)
     pprint.pprint([x for x in benchmark_list])
@@ -415,7 +421,7 @@ def get_default_settings():
     settings["block_size"] = ["4k"]
     settings["direct"] = 1
     settings["size"] = None
-    settings["runs"] = [1]
+    settings["runs"] = 1
     settings["rwmixread"] = None
     settings["duration"] = 60
     settings["extra_opts"] = []
@@ -428,7 +434,6 @@ def get_default_settings():
         "iodepth",
         "numjobs",
         "block_size",
-        "runs",
     ]
     settings["filter_items"] = [
         "filter_items",
@@ -436,6 +441,7 @@ def get_default_settings():
         "dry_run",
         "mixed",
         "quiet",
+        "runs",
     ]
     return settings
 
