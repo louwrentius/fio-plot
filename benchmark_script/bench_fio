@@ -393,7 +393,7 @@ def get_argument_description():
         "size": "Specified test data size",
         "rwmixread": "Read/write mix in %% read",
         "duration": "Time duration per test (s)",
-        "runs": "How many times each test is run",
+        "runs": "Each test is repeated x times",
         "extra_opts": "Extra custom options",
         "loginterval": "Log interval of perf data",
         "invalidate": "Invalidate buffer cache",
