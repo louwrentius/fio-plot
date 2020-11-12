@@ -217,15 +217,13 @@ def generate_test_list(settings):
     need to be run.
     """
     loop_items = settings["loop_items"]
-
     dataset = []
+
+    settings["runs"] = list(range(1, settings["runs"] + 1))
 
     for item in loop_items:
         result = settings[item]
         dataset.append(result)
-
-    runs = list(range(1, settings["runs"] + 1))
-    dataset.append(runs)
 
     benchmark_list = itertools.product(*dataset)
     pprint.pprint([x for x in benchmark_list])
