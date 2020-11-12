@@ -441,7 +441,6 @@ def get_default_settings():
         "dry_run",
         "mixed",
         "quiet",
-        "runs",
     ]
     return settings
 
