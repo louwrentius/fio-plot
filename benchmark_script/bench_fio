@@ -300,7 +300,7 @@ def get_arguments(settings):
 
     ag.add_argument(
         "-r",
-        "--number-of-runs",
+        "--runs",
         help=(
             "Each benchmark will be run this number of times. This option is meant for benchmarking SSDs so they"
             f"can be preconditioned (default: {settings['runs']}). You may have to run benchmarks 5+ times to reach"
