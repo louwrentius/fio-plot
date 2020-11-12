@@ -164,3 +164,14 @@ Pure read/write/trim workloads will appear in the *device* folder.
 	--dry-run             Simulates a benchmark, does everything except running
 							Fio.
 
+### SSD Preconditioning
+
+If you don't precondition an SSD, you may observe inconsistent write performance. 
+
+I found [this presentation][intelpresentation] from Intel that provides guidance for benchmarking SSDs. 
+It points out that you need to precondition the SSD before benchmarking. 
+
+[intelpresentation]: https://s3.us-east-2.amazonaws.com/intel-builders/day_2_spdk_best_practices_performance_benchmarking_tuning.pdf
+
+
+   
