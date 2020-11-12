@@ -415,6 +415,7 @@ def get_default_settings():
     settings["block_size"] = ["4k"]
     settings["direct"] = 1
     settings["size"] = None
+    settings["runs"] = 1
     settings["rwmixread"] = None
     settings["duration"] = 60
     settings["extra_opts"] = []
