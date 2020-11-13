@@ -70,10 +70,9 @@ def chart_2d_log_data(settings, dataset):
     marker_list = list(markers.MarkerStyle.markers.keys())
     fontP = FontProperties(family="monospace")
     fontP.set_size("xx-small")
-    # maximum = dict.fromkeys(settings['type'], 0)
 
     maximum = supporting.get_highest_maximum(settings, data)
-    # pprint.pprint(maximum)
+
     for item in data["dataset"]:
         for rw in settings["filter"]:
             if rw in item.keys():
@@ -147,39 +146,28 @@ def chart_2d_log_data(settings, dataset):
                 labelset = {
                     "name": mylabel,
                     "rw": rw,
-                    "iodepth": item["iodepth"],
-                    "numjobs": item["numjobs"],
+                    "type": item["type"],
+                    "qd": item["iodepth"],
+                    "nj": item["numjobs"],
                     "mean": item[rw]["mean"],
                     "std%": item[rw]["stdv"],
                     f"P{settings['percentile']}": item[rw]["percentile"],
                 }
-                pprint.pprint(labelset)
+                # pprint.pprint(labelset)
                 labels.append(labelset)
-                # labels.append(
-                #    f"|{mylabel:>4}|{rw:>5}|qd: {item['iodepth']:>2}|nj:"
-                #    f"{item['numjobs']:>2}|mean: {item[rw]['mean']:>6}"
-                #    f"|std%: {item[rw]['stdv']:>6} |P{settings['percentile']}: {item[rw]['percentile']:>6}"
-                # )
-
-                # labels.append(
-                #    f"|{mylabel:>4}|{rw:>5}|{item['iodepth']:>2}|"
-                #    f"{item['numjobs']:>2}|{item[rw]['mean']:>6}"
-                #    f"|{item[rw]['stdv']:>6} | {item[rw]['percentile']:>6}"
-                # )
 
     master_padding = {
         "name": 0,
         "rw": 5,
-        "iodepth": 8,
-        "numjobs": 8,
+        "type": 4,
+        "qd": 2,
+        "nj": 2,
         "mean": 0,
         "std%": 0,
         f"P{settings['percentile']}": 0,
-        "bw": 0,
     }
 
     for label in labels:
-        print(label.keys())
         for key in label.keys():
             label_length = len(str(label[key]))
             master_length = master_padding[key]
@@ -187,8 +175,6 @@ def chart_2d_log_data(settings, dataset):
                 master_padding[key] = label_length
                 if label_length % 2 != 0:
                     master_padding[key] = master_padding[key] + 1
-
-    pprint.pprint(master_padding)
 
     red_patch = mpatches.Patch(color="white", label="Just filler")
     lines.insert(0, red_patch)
@@ -207,18 +193,18 @@ def chart_2d_log_data(settings, dataset):
     values.insert(0, header)
 
     ncol = 1
-    if len(labels) > 5:
+    if len(values) > 3:
         ncol = 2
-        number = len(labels)
+        number = len(values)
         position = int(number / 2) + 1
         lines.insert(position, red_patch)
-        labels.insert(position, header)
+        values.insert(position, header)
 
     host.legend(
         lines,
         values,
         prop=fontP,
-        bbox_to_anchor=(0.5, -0.15),
+        bbox_to_anchor=(0.5, -0.18),
         loc="upper center",
         ncol=ncol,
         frameon=False,
@@ -239,7 +225,6 @@ def chart_2d_log_data(settings, dataset):
             fontsize=8,
             fontfamily="monospace",
         )
-
     #
     # Save graph to PNG file
     #
@@ -252,9 +237,8 @@ def chart_2d_log_data(settings, dataset):
 
 
 def create_label(settings, item, directories):
-    mydir = f"{item['directory']}-"
-    mylabel = f"{mydir}{item['type']}"
-    return mylabel
+    mydir = f"{item['directory']}"
+    return mydir
 
 
 def get_max_label_size(settings, data, directories):
