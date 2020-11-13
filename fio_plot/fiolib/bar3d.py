@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
-import pprint
+# import pprint
 import fiolib.shared_chart as shared
 from matplotlib import cm
-# The module required for the 3D graph.
-from mpl_toolkits.mplot3d import axes3d
 import matplotlib as mpl
 import fiolib.supporting as supporting
 
@@ -117,7 +115,7 @@ def plot_3d(settings, dataset):
                 cutoff_values.append(settings['max'])
         dz = np.array(cutoff_values)
         if warning:
-            print(f"Warning: z-axis values above ")
+            print("Warning: z-axis values above ")
             warning_text = f"WARNING: values above {settings['max']} have been cutoff"
             fig.text(0.55, 0.85, warning_text)
 

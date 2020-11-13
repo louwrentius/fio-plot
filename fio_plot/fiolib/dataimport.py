@@ -1,7 +1,7 @@
 import os
 import sys
 import csv
-import pprint as pprint
+# import pprint as pprint
 import re
 import statistics
 import fiolib.supporting as supporting
@@ -20,10 +20,10 @@ def list_fio_log_files(directory):
 
     if len(fiologfiles) == 0:
         print(
-            f"\nCould not find any log files in the specified directory {str(absolute_dir)}")
-        print(f"\nAre the correct directories specified?")
+            "\nCould not find any log files in the specified directory {str(absolute_dir)}")
+        print("\nAre the correct directories specified?")
         print(
-            f"\nIf so, please check the -d -n and -r parameters.\n")
+            "\nIf so, please check the -d -n and -r parameters.\n")
         sys.exit(1)
 
     return fiologfiles

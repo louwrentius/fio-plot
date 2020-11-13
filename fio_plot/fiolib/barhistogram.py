@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
-import pprint
+# import pprint
 import fiolib.shared_chart as shared
 import fiolib.supporting as supporting
 
