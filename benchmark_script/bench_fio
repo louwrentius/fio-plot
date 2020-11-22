@@ -163,6 +163,8 @@ def run_fio(settings, benchmark, preconditioning=False):
     target_parameter = check_target_type(target, settings["type"])
     command.append(f"{target_parameter}={target}")
 
+    pprint.pprint(command)
+
     run_command(settings, benchmark, command)
 
 
