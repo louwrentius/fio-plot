@@ -469,7 +469,7 @@ def get_argument_description():
         "invalidate": "Invalidate buffer cache",
         "type": "Target type",
         "output": "Output folder",
-        "time_based": "Time based"
+        "time_based": "Time based",
         "benchmarks": "Number of benchmarks",
         "precondition": "Run precondition workload",
         "precondition_template": "Precondition template",
