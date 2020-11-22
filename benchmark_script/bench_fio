@@ -182,7 +182,7 @@ def run_fio(settings, benchmark):
 def import_fio_template(template):
     config = configparser.ConfigParser()
     config.read(template)
-    return config
+    return dict(config)
 
 
 def run_precondition_benchmark(settings):
