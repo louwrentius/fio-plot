@@ -127,12 +127,12 @@ def check_target_type(target, filetype):
         sys.exit(10)
 
 
-def expand_command_line(command, settings):
+def expand_command_line(command, settings, benchmark):
     if settings["size"]:
-        command.append(f"--size={settings["size"]}")
+        command.append(f"--size={settings['size']}")
 
     if settings["runtime"]:
-        command.append(f"--runtime={settings["runtime"]}")
+        command.append(f"--runtime={settings['runtime']}")
 
     if settings["rwmixread"] and benchmark["mode"] in settings["mixed"]:
         command.append(f"--rwmixread={benchmark['rwmixread']}")
@@ -157,7 +157,7 @@ def run_fio(settings, benchmark, preconditioning=False):
         settings["template"],
     ]
 
-    command = expand_command_line(command, settings)
+    command = expand_command_line(command, settings, benchmark)
 
     target = benchmark["target"]
     target_parameter = check_target_type(target, settings["type"])
