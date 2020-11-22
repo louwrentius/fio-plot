@@ -185,10 +185,6 @@ def import_fio_template(template):
     return config
 
 
-with open("FILE.INI", "w") as configfile:  # save
-    config.write(configfile)
-
-
 def run_precondition_benchmark(settings):
 
     if settings["precondition"] and settings["type"] == "device":
