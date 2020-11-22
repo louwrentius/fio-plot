@@ -173,6 +173,8 @@ def run_fio(settings, benchmark, preconditioning=False):
     command.append(f"{target_parameter}={benchmark['target']}")
     if not settings["dry_run"]:
         run_command(settings, benchmark, command)
+    else:
+        pprint.pprint(command)
 
 
 def run_precondition_benchmark(settings, benchmark):
