@@ -2,8 +2,8 @@
 name=4k
 ioengine=libaio
 direct=1
-bs=4k
-rw=randwrite
+bs=1m
+rw=write
 iodepth=4
 numjobs=32
 buffered=0

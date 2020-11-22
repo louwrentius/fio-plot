@@ -171,8 +171,8 @@ def run_fio(settings, benchmark, preconditioning=False):
 
     target_parameter = check_target_type(benchmark["target"], settings["type"])
     command.append(f"{target_parameter}={benchmark['target']}")
-
-    run_command(settings, benchmark, command)
+    if not settings["dry_run"]:
+        run_command(settings, benchmark, command)
 
 
 def run_precondition_benchmark(settings, benchmark):
@@ -673,8 +673,7 @@ def main():
     check_settings(settings)
     tests = generate_test_list(settings)
     display_header(settings, tests)
-    if not settings["dry_run"]:
-        run_benchmarks(settings, tests)
+    run_benchmarks(settings, tests)
 
 
 if __name__ == "__main__":
