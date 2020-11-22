@@ -310,7 +310,7 @@ def get_arguments(settings):
         "--duration",
         help=f"Override the default test duration per benchmark \
             (default: {settings['duration']})",
-        type=int,
+        store_true,
         default=settings["duration"],
     )
 
@@ -331,10 +331,10 @@ def get_arguments(settings):
         help=(
             "With this option you can specify an SSD precondition workload prior to performing actual"
             "benchmarks. If you don't precondition SSDs before running a benchmark, results may not"
-            f"reflect actual real-life performance under sustained load. (default: {settings['runs']})."
+            f"reflect actual real-life performance under sustained load. (default: {str(settings['precondition'])})."
         ),
-        default=None,
-        type=int,
+        action='store_true'
+        
     )
 
     ag.add_argument(
