@@ -201,7 +201,7 @@ def run_precondition_benchmark(settings):
                 "mode": template["precondition"]["rw"],
                 "iodepth": template["precondition"]["iodepth"],
                 "block_size": template["precondition"]["bs"],
-                "num_jobs": template["precondition"]["numjobs"],
+                "numjobs": template["precondition"]["numjobs"],
             }
             run_fio(settings, benchmark)
 
