@@ -93,9 +93,6 @@ def generate_output_directory(settings, benchmark):
     else:
         directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['block_size']}"
 
-    if settings["runs"] > 1:
-        directory = f"{directory}/run-{benchmark['runs']}"
-
     return directory
 
 
@@ -225,12 +222,8 @@ def generate_test_list(settings):
     loop_items = settings["loop_items"]
     dataset = []
 
-    settings_copy = settings.copy()
-
-    settings_copy["runs"] = list(range(1, settings_copy["runs"] + 1))
-
     for item in loop_items:
-        result = settings_copy[item]
+        result = settings[item]
         dataset.append(result)
 
     benchmark_list = list(itertools.product(*dataset))
@@ -312,17 +305,6 @@ def get_arguments(settings):
         help=f"Override the default test duration per benchmark"
         f"(default: {settings['duration']})",
         default=settings["duration"],
-    )
-
-    ag.add_argument(
-        "-r",
-        "--runs",
-        help=(
-            "Each benchmark will be run this number of times. By running benchmarks multiple times you can be"
-            f"assured that results are consistent. (default: {settings['runs']})."
-        ),
-        default=settings["runs"],
-        type=int,
     )
 
     ag.add_argument(
@@ -480,7 +462,6 @@ def get_default_settings():
         "iodepth",
         "numjobs",
         "block_size",
-        "runs",
     ]
     settings["filter_items"] = [
         "filter_items",
