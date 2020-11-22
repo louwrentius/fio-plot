@@ -378,6 +378,31 @@ def get_arguments(settings):
         type=int,
         default=settings["direct"],
     )
+
+    ag.add_argument(
+        "--ss",
+        help=f"Detect and exit on achieving steady state (spefial Fio feature, 'man fio' for more detials) \
+            (default: {settings['ss']})",
+        type=str,
+        default=settings["ss"],
+    )
+
+    ag.add_argument(
+        "--ss_dur",
+        help=f"Steady state window \
+            (default: {settings['ss_dur']})",
+        type=int,
+        default=settings["ss_dur"],
+    )
+
+    ag.add_argument(
+        "--ss_ramp",
+        help=f"Steady state ramp time \
+            (default: {settings['ss_ramp']})",
+        type=str,
+        default=settings["ss_ramp"],
+    )
+
     ag.add_argument(
         "--extra-opts",
         help="Allows you to add extra options, \
