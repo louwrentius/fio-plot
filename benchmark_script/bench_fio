@@ -186,7 +186,7 @@ def run_precondition_benchmark(settings):
         settings_copy["template"] = settings["precondition_template"]
 
         for device in settings_copy["target"]:
-            benchmark = device
+            benchmark = {"target": device, "mode": None}
             run_fio(settings, benchmark)
 
 
