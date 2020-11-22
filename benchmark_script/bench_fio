@@ -135,7 +135,7 @@ def expand_command_line(command, settings, benchmark):
         command.append(f"--runtime={settings['runtime']}")
 
     if settings["time_based"]:
-        command.append(f"--time_based")
+        command.append("--time_based")
 
     if settings["rwmixread"] and benchmark["mode"] in settings["mixed"]:
         command.append(f"--rwmixread={benchmark['rwmixread']}")
@@ -386,8 +386,8 @@ def get_arguments(settings):
         "--time-based",
         action="store_true",
         help=(
-            "All benchmarks are time-based, even if a test size is specified"
-            "Lookt at the Fio timebased option for more information."
+            "All benchmarks are time based, even if a test size is specified"
+            "Lookt at the Fio time based option for more information."
             f"(default: {str(settings['time_based'])})."
         ),
     )

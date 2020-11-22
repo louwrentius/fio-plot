@@ -6,7 +6,6 @@ iodepth=${IODEPTH}
 numjobs=${NUMJOBS}
 direct=${DIRECT}
 group_reporting=1
-time_based=${TIMEBASED}
 invalidate=${INVALIDATE}
 write_bw_log=${OUTPUT}/${MODE}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
 write_lat_log=${OUTPUT}/${MODE}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
