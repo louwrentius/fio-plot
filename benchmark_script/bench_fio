@@ -159,7 +159,6 @@ def expand_command_line(command, settings, benchmark):
 
 def run_fio(settings, benchmark):
     output_directory = generate_output_directory(settings, benchmark)
-    make_directory(output_directory)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
 
     command = [
@@ -174,6 +173,7 @@ def run_fio(settings, benchmark):
     target_parameter = check_target_type(benchmark["target"], settings["type"])
     command.append(f"{target_parameter}={benchmark['target']}")
     if not settings["dry_run"]:
+        make_directory(output_directory)
         run_command(settings, benchmark, command)
     else:
         pprint.pprint(command)
@@ -193,7 +193,6 @@ def run_precondition_benchmark(settings):
         settings_copy["template"] = settings["precondition_template"]
 
         template = import_fio_template(settings["precondition_template"])
-        pprint.pprint(template["precondition"])
 
         for device in settings_copy["target"]:
             benchmark = {
