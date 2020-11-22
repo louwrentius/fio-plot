@@ -430,7 +430,6 @@ def get_argument_description():
         "size": "Specified test data size",
         "rwmixread": "Read/write mix in %% read",
         "duration": "Time duration per test (s)",
-        "runs": "Each test is repeated x times",
         "extra_opts": "Extra custom options",
         "loginterval": "Log interval of perf data",
         "invalidate": "Invalidate buffer cache",
@@ -439,6 +438,12 @@ def get_argument_description():
         "benchmarks": "Number of benchmarks",
         "precondition": "Run precondition workload",
         "precondition_template": "Precondition template",
+        "steady_state": "Detect steady state",
+        "steady_state_iops": "Steady state iops",
+        "steady_state_iops_slope": "Steady state iops slope",
+        "steady_state_bw": "Steady state bw",
+        "steady_state_bw_slope": "Steady state bw slope",
+        "entire_device": "Benchmark entire device",
     }
     return descriptions
 
@@ -455,9 +460,14 @@ def get_default_settings():
     settings["block_size"] = ["4k"]
     settings["direct"] = 1
     settings["size"] = None
-    settings["runs"] = 1
     settings["precondition"] = False
     settings["precondition_template"] = "precondition.fio"
+    settings["entire_device"] = False
+    settings["steady_state"] = False
+    settings["steady_state_iops"] = None
+    settings["steady_state_iops_slope"] = None
+    settings["steady_state_bw"] = None
+    settings["steady_state_bw_slope"] = None
     settings["rwmixread"] = None
     settings["duration"] = 60
     settings["extra_opts"] = []
