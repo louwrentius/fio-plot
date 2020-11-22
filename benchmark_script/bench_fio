@@ -193,6 +193,7 @@ def run_precondition_benchmark(settings):
         settings_copy["template"] = settings["precondition_template"]
 
         template = import_fio_template(settings["precondition_template"])
+        pprint.pprint(template["precondition"])
 
         for device in settings_copy["target"]:
             benchmark = {
