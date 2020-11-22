@@ -21,6 +21,7 @@ import shutil
 from numpy import linspace
 from pathlib import Path
 import copy
+import configparser
 
 import pprint
 
@@ -178,6 +179,16 @@ def run_fio(settings, benchmark):
         pprint.pprint(command)
 
 
+def import_fio_template(template):
+    config = configparser.ConfigParser()
+    config.read(template)
+    return config
+
+
+with open("FILE.INI", "w") as configfile:  # save
+    config.write(configfile)
+
+
 def run_precondition_benchmark(settings):
 
     if settings["precondition"] and settings["type"] == "device":
@@ -185,8 +196,11 @@ def run_precondition_benchmark(settings):
         settings_copy = copy.deepcopy(settings)
         settings_copy["template"] = settings["precondition_template"]
 
+        template = import_fio_template(settings["precondition_template"])
+        pprint.pprint(template)
+
         for device in settings_copy["target"]:
-            benchmark = {"target": device, "mode": None}
+            benchmark = {"target": device, "mode": "precondition", "block_size": None}
             run_fio(settings, benchmark)
 
 
