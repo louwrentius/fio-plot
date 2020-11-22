@@ -10,8 +10,8 @@ buffered=0
 size=100%
 loops=2
 randrepeat=0
-norandommap
-refill_buffers
+norandommap=1
+refill_buffers=1
 write_bw_log=${OUTPUT}/${MODE}-iodepth-4-numjobs-32
 write_lat_log=${OUTPUT}/${MODE}-iodepth-4-numjobs-32
 write_iops_log=${OUTPUT}/${MODE}-iodepth-4-numjobs-32
