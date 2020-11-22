@@ -155,7 +155,7 @@ def expand_command_line(command, settings, benchmark):
     return command
 
 
-def run_fio(settings, benchmark, preconditioning=False):
+def run_fio(settings, benchmark):
     output_directory = generate_output_directory(settings, benchmark)
     make_directory(output_directory)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
@@ -177,11 +177,12 @@ def run_fio(settings, benchmark, preconditioning=False):
         pprint.pprint(command)
 
 
-def run_precondition_benchmark(settings, benchmark):
+def run_precondition_benchmark(settings):
     run_fio(settings, benchmark, preconditioning=True)
 
 
 def run_benchmarks(settings, benchmarks):
+    pprint.pprint(benchmarks)
     if not settings["quiet"]:
         for benchmark in ProgressBar(benchmarks):
             if settings["precondition"]:
