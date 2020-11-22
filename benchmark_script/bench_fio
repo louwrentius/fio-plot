@@ -182,7 +182,7 @@ def run_fio(settings, benchmark):
 def import_fio_template(template):
     config = configparser.ConfigParser()
     config.read(template)
-    return dict(config)
+    return config
 
 
 def run_precondition_benchmark(settings):
@@ -193,10 +193,14 @@ def run_precondition_benchmark(settings):
         settings_copy["template"] = settings["precondition_template"]
 
         template = import_fio_template(settings["precondition_template"])
-        pprint.pprint(template)
 
         for device in settings_copy["target"]:
-            benchmark = {"target": device, "mode": "precondition", "block_size": None}
+            benchmark = {
+                "target": device,
+                "mode": template["precondition"]["rw"],
+                "iodepth": template["precondition"]["iodepth"],
+                "block_size": template["precondition"]["bs"],
+            }
             run_fio(settings, benchmark)
 
 
