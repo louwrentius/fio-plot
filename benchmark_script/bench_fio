@@ -127,6 +127,24 @@ def check_target_type(target, filetype):
         sys.exit(10)
 
 
+def expand_command_line(command, settings):
+    if settings["size"]:
+        command.append(f"--size={settings["size"]}")
+
+    if settings["runtime"]:
+        command.append(f"--runtime={settings["runtime"]}")
+
+    if settings["rwmixread"] and benchmark["mode"] in settings["mixed"]:
+        command.append(f"--rwmixread={benchmark['rwmixread']}")
+
+    if settings["extra_opts"]:
+        for option in settings["extra_opts"]:
+            option = str(option)
+            command.append("--" + option)
+
+    return command
+
+
 def run_fio(settings, benchmark, preconditioning=False):
     output_directory = generate_output_directory(settings, benchmark)
     make_directory(output_directory)
@@ -139,22 +157,12 @@ def run_fio(settings, benchmark, preconditioning=False):
         settings["template"],
     ]
 
+    command = expand_command_line(command, settings)
+
     target = benchmark["target"]
-
-    if settings["size"]:
-        command.append(f"--size={settings['size']}")
-
     target_parameter = check_target_type(target, settings["type"])
-
     command.append(f"{target_parameter}={target}")
 
-    if settings["rwmixread"] and benchmark["mode"] in settings["mixed"]:
-        command.append(f"--rwmixread={benchmark['rwmixread']}")
-
-    if settings["extra_opts"]:
-        for option in settings["extra_opts"]:
-            option = str(option)
-            command.append("--" + option)
     run_command(settings, benchmark, command)
 
 
@@ -301,10 +309,10 @@ def get_arguments(settings):
     )
 
     ag.add_argument(
-        "--duration",
-        help=f"Override the default test duration per benchmark"
-        f"(default: {settings['duration']})",
-        default=settings["duration"],
+        "--runtime",
+        help=f"Override the default test runtime per benchmark"
+        f"(default: {settings['runtime']})",
+        default=settings["runtime"],
     )
 
     ag.add_argument(
@@ -411,7 +419,7 @@ def get_argument_description():
         "direct": "Direct I/O",
         "size": "Specified test data size",
         "rwmixread": "Read/write mix in %% read",
-        "duration": "Time duration per test (s)",
+        "runtime": "Time duration per test (s)",
         "extra_opts": "Extra custom options",
         "loginterval": "Log interval of perf data",
         "invalidate": "Invalidate buffer cache",
@@ -451,7 +459,7 @@ def get_default_settings():
     settings["steady_state_bw"] = None
     settings["steady_state_bw_slope"] = None
     settings["rwmixread"] = None
-    settings["duration"] = 60
+    settings["runtime"] = 60
     settings["extra_opts"] = []
     settings["loginterval"] = 500
     settings["mixed"] = ["readwrite", "rw", "randrw"]
@@ -475,7 +483,7 @@ def get_default_settings():
 
 def calculate_duration(settings, tests):
     number_of_tests = len(tests)
-    time_per_test = settings["duration"]
+    time_per_test = settings["runtime"]
     duration_in_seconds = number_of_tests * time_per_test
     duration = str(datetime.timedelta(seconds=duration_in_seconds))
     return duration
