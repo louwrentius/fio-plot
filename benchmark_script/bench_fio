@@ -182,7 +182,7 @@ def run_precondition_benchmark(settings):
 
     if settings["precondition"] and settings["type"] == "device":
 
-        settings_copy = settings.deepcopy()
+        settings_copy = copy.deepcopy(settings)
         settings_copy["template"] = settings["precondition_template"]
 
         for device in settings_copy["target"]:
