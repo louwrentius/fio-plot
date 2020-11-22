@@ -142,6 +142,13 @@ def expand_command_line(command, settings, benchmark):
             option = str(option)
             command.append("--" + option)
 
+    if settings["ss"]:
+        command.append(f"--steadystate={settings['ss']}")
+        if settings["ss_dur"]:
+            command.append(f"--ss_dur={settings['ss_dur']}")
+        if settings["ss_ramp"]:
+            command.append(f"--ss_ramp={settings['ss_ramp']}")
+
     return command
 
 
@@ -427,11 +434,9 @@ def get_argument_description():
         "benchmarks": "Number of benchmarks",
         "precondition": "Run precondition workload",
         "precondition_template": "Precondition template",
-        "steady_state": "Detect steady state",
-        "steady_state_iops": "Steady state iops",
-        "steady_state_iops_slope": "Steady state iops slope",
-        "steady_state_bw": "Steady state bw",
-        "steady_state_bw_slope": "Steady state bw slope",
+        "ss": "Detect steady state",
+        "ss_dur": "Steady state rolling window",
+        "ss_ramp": "Steady state rampup",
         "entire_device": "Benchmark entire device",
     }
     return descriptions
@@ -452,11 +457,9 @@ def get_default_settings():
     settings["precondition"] = False
     settings["precondition_template"] = "precondition.fio"
     settings["entire_device"] = False
-    settings["steady_state"] = False
-    settings["steady_state_iops"] = None
-    settings["steady_state_iops_slope"] = None
-    settings["steady_state_bw"] = None
-    settings["steady_state_bw_slope"] = None
+    settings["ss"] = False
+    settings["ss_dur"] = None
+    settings["ss_ramp"] = None
     settings["rwmixread"] = None
     settings["runtime"] = 60
     settings["extra_opts"] = []
