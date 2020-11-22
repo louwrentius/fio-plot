@@ -130,7 +130,7 @@ def check_target_type(target, filetype):
         sys.exit(10)
 
 
-def run_fio(settings, benchmark):
+def run_fio(settings, benchmark, preconditioning=False):
     output_directory = generate_output_directory(settings, benchmark)
     make_directory(output_directory)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
@@ -161,9 +161,15 @@ def run_fio(settings, benchmark):
     run_command(settings, benchmark, command)
 
 
+def run_precondition_benchmark(settings, benchmark):
+    run_fio(settings, benchmark, preconditioning=True)
+
+
 def run_benchmarks(settings, benchmarks):
     if not settings["quiet"]:
         for benchmark in ProgressBar(benchmarks):
+            if settings["precondition"]:
+                run_precondition_benchmark(settings, benchmark)
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
@@ -312,13 +318,35 @@ def get_arguments(settings):
         "-r",
         "--runs",
         help=(
-            "Each benchmark will be run this number of times. This option is meant for benchmarking SSDs so they"
-            f"can be preconditioned (default: {settings['runs']}). You may have to run benchmarks 5+ times to reach"
-            "steady state."
+            "Each benchmark will be run this number of times. By running benchmarks multiple times you can be"
+            f"assured that results are consistent. (default: {settings['runs']})."
         ),
         default=settings["runs"],
         type=int,
     )
+
+    ag.add_argument(
+        "-p",
+        "--precondition",
+        help=(
+            "With this option you can specify an SSD precondition workload prior to performing actual"
+            "benchmarks. If you don't precondition SSDs before running a benchmark, results may not"
+            f"reflect actual real-life performance under sustained load. (default: {settings['runs']})."
+        ),
+        default=None,
+        type=int,
+    )
+
+    ag.add_argument(
+        "--precondition-template",
+        help=(
+            "The Fio job template containing the precondition workload"
+            f"(default={settings['precondition_template']}"
+        ),
+        default="precondition.fio",
+        type=str,
+    )
+
     ag.add_argument(
         "-m",
         "--mode",
@@ -410,6 +438,8 @@ def get_argument_description():
         "type": "Target type",
         "output": "Output folder",
         "benchmarks": "Number of benchmarks",
+        "precondition": "Run precondition workload",
+        "precondition_template": "Precondition template",
     }
     return descriptions
 
@@ -427,6 +457,8 @@ def get_default_settings():
     settings["direct"] = 1
     settings["size"] = None
     settings["runs"] = 1
+    settings["precondition"] = False
+    settings["precondition-template"] = "precondition.fio"
     settings["rwmixread"] = None
     settings["duration"] = 60
     settings["extra_opts"] = []
