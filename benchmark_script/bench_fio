@@ -20,6 +20,7 @@ import time
 import shutil
 from numpy import linspace
 from pathlib import Path
+import copy
 
 import pprint
 
@@ -180,7 +181,11 @@ def run_fio(settings, benchmark):
 def run_precondition_benchmark(settings):
 
     if settings["precondition"] and settings["type"] == "device":
-        for device in settings["target"]:
+
+        settings_copy = settings.deepcopy()
+        settings_copy["template"] = settings["precondition_template"]
+
+        for device in settings_copy["target"]:
             benchmark = device
             run_fio(settings, benchmark)
 
