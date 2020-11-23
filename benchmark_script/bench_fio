@@ -509,7 +509,7 @@ def get_argument_description():
         "extra_opts": "Extra custom options",
         "loginterval": "Log interval of perf data",
         "invalidate": "Invalidate buffer cache",
-        "loops": "How often benchmark is repeated",
+        "loops": "Benchmark loops",
         "type": "Target type",
         "output": "Output folder",
         "time_based": "Time based",
@@ -568,7 +568,7 @@ def get_default_settings():
 
 
 def calculate_duration(settings, tests):
-    number_of_tests = len(tests)
+    number_of_tests = len(tests) * settings["loops"]
     time_per_test = settings["runtime"]
     duration_in_seconds = number_of_tests * time_per_test
     duration = str(datetime.timedelta(seconds=duration_in_seconds))
