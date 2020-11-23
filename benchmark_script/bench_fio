@@ -408,6 +408,14 @@ def get_arguments(settings):
     )
 
     ag.add_argument(
+        "--runtime",
+        help=f"How long a single test should run.\
+            (default: {settings['runtime']})",
+        type=int,
+        default=settings["direct"],
+    )
+
+    ag.add_argument(
         "--time-based",
         action="store_true",
         help=(
