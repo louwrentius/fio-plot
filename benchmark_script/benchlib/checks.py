@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import shutil
 import sys
 import os
@@ -27,24 +28,6 @@ def check_encoding():
         print("Changing the default encoding could affect other applications, beware.")
         print()
         exit(90)
-
-
-def check_fio_version(settings):
-    """The 3.x series .json format is different from the 2.x series format.
-    This breaks fio-plot, thus this older version is not supported.
-    """
-
-    command = ["fio", "--version"]
-    result = runfio.run_raw_command(command).stdout
-    result = result.decode("UTF-8").strip()
-    if "fio-3" in result:
-        return True
-    elif "fio-2" in result:
-        print(f"Your Fio version ({result}) is not compatible. Please use Fio-3.x")
-        sys.exit(1)
-    else:
-        print("Could not detect Fio version.")
-        sys.exit(1)
 
 
 # THIS IS UNUSED CODE I don't remember why I wrote this.
