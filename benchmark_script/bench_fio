@@ -525,6 +525,7 @@ def get_argument_description():
         "benchmarks": "Number of benchmarks",
         "precondition": "Run precondition workload",
         "precondition_template": "Precondition template",
+        "precondition_repeat": "Run precondition after each test",
         "ss": "Detect steady state",
         "ss_dur": "Steady state rolling window",
         "ss_ramp": "Steady state rampup",
