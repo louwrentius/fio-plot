@@ -2,7 +2,7 @@ import datetime
 import time
 import sys
 from numpy import linspace
-import benchlib.argparsing as argparsing
+import benchlib.argparsing as ap
 
 
 def parse_settings_for_display(settings):
@@ -44,7 +44,7 @@ def display_header(settings, tests):
         print()
     estimated = "Estimated duration"
     print(f"{estimated:<{fl}}: {duration:<}")
-    descriptions = argparsing.get_argument_description()
+    descriptions = ap.get_argument_description()
     for item in settings.keys():
         if item not in settings["filter_items"]:
             description = descriptions[item]
