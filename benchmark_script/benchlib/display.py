@@ -1,8 +1,8 @@
 import datetime
-import benchlib.argparsing as argparsing
 import time
-from numpy import linspace
 import sys
+from numpy import linspace
+import benchlib.argparsing as argparsing
 
 
 def parse_settings_for_display(settings):
