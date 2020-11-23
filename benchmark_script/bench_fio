@@ -11,13 +11,12 @@ fio-plot, depending on the graph type.
 """
 
 import sys
-
-import benchlib.argparsing as argparsing
 import benchlib.checks as checks
 import benchlib.defaultsettings as defaults
 import benchlib.display as display
 import benchlib.runfio as runfio
 import benchlib.supporting as supporting
+import benchlib.argparsing as argparsing
 
 
 def main():
