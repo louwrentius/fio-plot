@@ -271,7 +271,7 @@ def generate_test_list(settings):
     benchmark_list = list(itertools.product(*dataset))
     result = [dict(zip(loop_items, item)) for item in benchmark_list]
     settings["benchmarks"] = len(result)  # Augment display with extra sanity check
-    pprint.pprint(result)
+    # pprint.pprint(result)
     return result
 
 
