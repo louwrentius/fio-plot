@@ -346,6 +346,7 @@ def get_arguments(settings):
         "--runtime",
         help=f"Override the default test runtime per benchmark"
         f"(default: {settings['runtime']})",
+        type=int,
         default=settings["runtime"],
     )
 
@@ -403,14 +404,6 @@ def get_arguments(settings):
         "--direct",
         help=f"Use DIRECT I/O \
             (default: {settings['direct']})",
-        type=int,
-        default=settings["direct"],
-    )
-
-    ag.add_argument(
-        "--runtime",
-        help=f"How long a single test should run.\
-            (default: {settings['runtime']})",
         type=int,
         default=settings["direct"],
     )
