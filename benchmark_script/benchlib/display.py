@@ -1,5 +1,5 @@
 import datetime
-import benchlib.arg_parsing as argparsing
+import benchlib.argparsing as argparsing
 import time
 from numpy import linspace
 import sys
