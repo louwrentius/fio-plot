@@ -132,7 +132,7 @@ def expand_command_line(command, settings, benchmark):
     if settings["size"]:
         command.append(f"--size={settings['size']}")
 
-    if settings["runtime"]:
+    if settings["runtime"] and not settings["entire_device"]:
         command.append(f"--runtime={settings['runtime']}")
 
     if settings["time_based"]:
