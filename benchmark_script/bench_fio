@@ -22,7 +22,6 @@ from numpy import linspace
 from pathlib import Path
 import copy
 import configparser
-
 import pprint
 
 
@@ -207,7 +206,7 @@ def run_precondition_benchmark(settings):
 
 
 def run_benchmarks(settings, benchmarks):
-    pprint.pprint(benchmarks)
+    # pprint.pprint(benchmarks)
     if not settings["quiet"]:
         for benchmark in ProgressBar(benchmarks):
             run_fio(settings, benchmark)
