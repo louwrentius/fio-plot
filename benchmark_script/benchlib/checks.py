@@ -1,7 +1,6 @@
 import shutil
 import sys
 import os
-import benchlib.runfio as runfio
 from pathlib import Path
 
 

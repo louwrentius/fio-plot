@@ -1,6 +1,7 @@
 import argparse
 import sys
 import benchlib.checks as checks
+import benchlib.runfio as runfio
 
 
 def check_args(settings):
@@ -17,7 +18,7 @@ def check_args(settings):
         parser.print_help()
         sys.exit(2)
 
-    if not checks.check_fio_version(settings):
+    if not runfio.check_fio_version(settings):
         parser.print_help()
         sys.exit(3)
 
