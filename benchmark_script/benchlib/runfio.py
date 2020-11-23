@@ -6,7 +6,7 @@ import pprint
 import copy
 
 import benchlib.supporting as supporting
-import benchlib.display as display
+import benchlib.display as show
 import benchlib.checks as checks
 
 
@@ -100,7 +100,7 @@ def run_precondition_benchmark(settings, device):
 def run_benchmarks(settings, benchmarks):
     # pprint.pprint(benchmarks)
     if not settings["quiet"]:
-        for benchmark in display.ProgressBar(benchmarks):
+        for benchmark in show.ProgressBar(benchmarks):
             if settings["precondition_repeat"]:
                 run_precondition_benchmark(settings, benchmark["target"])
             run_fio(settings, benchmark)
