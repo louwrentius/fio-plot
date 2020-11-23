@@ -363,7 +363,6 @@ def get_arguments(settings):
     )
 
     ag.add_argument(
-        "-p",
         "--precondition-repeat",
         action="store_true",
         help=(
