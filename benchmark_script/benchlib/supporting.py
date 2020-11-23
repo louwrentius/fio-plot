@@ -48,6 +48,9 @@ def generate_output_directory(settings, benchmark):
     else:
         directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['block_size']}"
 
+    if "run" in benchmark.keys():
+        directory = directory + f"/run-{benchmark['run']}"
+
     return directory
 
 

@@ -79,7 +79,7 @@ def run_fio(settings, benchmark):
     #    pprint.pprint(command)
 
 
-def run_precondition_benchmark(settings, device):
+def run_precondition_benchmark(settings, device, run):
 
     if settings["precondition"] and settings["type"] == "device":
 
@@ -94,6 +94,7 @@ def run_precondition_benchmark(settings, device):
             "iodepth": template["precondition"]["iodepth"],
             "block_size": template["precondition"]["bs"],
             "numjobs": template["precondition"]["numjobs"],
+            "run": run,
         }
         run_fio(settings, benchmark)
 
@@ -101,9 +102,11 @@ def run_precondition_benchmark(settings, device):
 def run_benchmarks(settings, benchmarks):
     # pprint.pprint(benchmarks)
     if not settings["quiet"]:
+        run = 0
         for benchmark in ProgressBar(benchmarks):
             if settings["precondition_repeat"]:
-                run_precondition_benchmark(settings, benchmark["target"])
+                run_precondition_benchmark(settings, benchmark["target"], run)
+                run += 1
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
