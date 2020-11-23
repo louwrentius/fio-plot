@@ -185,7 +185,7 @@ def import_fio_template(template):
     return config
 
 
-def run_precondition_benchmark(settings):
+def run_precondition_benchmark(settings, device):
 
     if settings["precondition"] and settings["type"] == "device":
 
@@ -194,21 +194,22 @@ def run_precondition_benchmark(settings):
 
         template = import_fio_template(settings["precondition_template"])
 
-        for device in settings_copy["target"]:
-            benchmark = {
-                "target": device,
-                "mode": template["precondition"]["rw"],
-                "iodepth": template["precondition"]["iodepth"],
-                "block_size": template["precondition"]["bs"],
-                "numjobs": template["precondition"]["numjobs"],
-            }
-            run_fio(settings, benchmark)
+        benchmark = {
+            "target": device,
+            "mode": template["precondition"]["rw"],
+            "iodepth": template["precondition"]["iodepth"],
+            "block_size": template["precondition"]["bs"],
+            "numjobs": template["precondition"]["numjobs"],
+        }
+        run_fio(settings, benchmark)
 
 
 def run_benchmarks(settings, benchmarks):
     # pprint.pprint(benchmarks)
     if not settings["quiet"]:
         for benchmark in ProgressBar(benchmarks):
+            if settings["precondition_repeat"]:
+                run_precondition_benchmark(settings, benchmark["target"])
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
@@ -362,6 +363,15 @@ def get_arguments(settings):
     )
 
     ag.add_argument(
+        "-p",
+        "--precondition-repeat",
+        action="store_true",
+        help=(
+            "After every individual benchmark, the preconditioning run is executed (again). (Default: False)."
+        ),
+    )
+
+    ag.add_argument(
         "--precondition-template",
         help=(
             "The Fio job template containing the precondition workload"
@@ -507,7 +517,7 @@ def get_argument_description():
         "rwmixread": "Read/write mix in %% read",
         "runtime": "Time duration per test (s)",
         "extra_opts": "Extra custom options",
-        "loginterval": "Log interval of perf data",
+        "loginterval": "Log interval of perf data (ms)",
         "invalidate": "Invalidate buffer cache",
         "loops": "Benchmark loops",
         "type": "Target type",
@@ -717,7 +727,6 @@ def main():
     check_settings(settings)
     tests = generate_test_list(settings)
     display_header(settings, tests)
-    run_precondition_benchmark(settings)
     run_benchmarks(settings, tests)
 
 
