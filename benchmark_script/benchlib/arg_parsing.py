@@ -1,6 +1,5 @@
 import argparse
 import sys
-import benchlib.checks as checks
 import benchlib.runfio as runfio
 
 
