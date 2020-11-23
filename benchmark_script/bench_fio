@@ -547,6 +547,7 @@ def get_default_settings():
     settings["size"] = None
     settings["precondition"] = False
     settings["precondition_template"] = "precondition.fio"
+    settings["precondition_repeat"] = False
     settings["entire_device"] = False
     settings["ss"] = False
     settings["ss_dur"] = None
