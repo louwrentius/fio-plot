@@ -409,6 +409,13 @@ def get_arguments(settings):
     )
 
     ag.add_argument(
+        "--loops",
+        help=f"Each individual benchmark is repeated x times (default: {settings['loops']})",
+        type=int,
+        default=settings["loops"],
+    )
+
+    ag.add_argument(
         "--time-based",
         action="store_true",
         help=(
@@ -502,6 +509,7 @@ def get_argument_description():
         "extra_opts": "Extra custom options",
         "loginterval": "Log interval of perf data",
         "invalidate": "Invalidate buffer cache",
+        "loops": "How often benchmark is repeated",
         "type": "Target type",
         "output": "Output folder",
         "time_based": "Time based",
@@ -536,6 +544,7 @@ def get_default_settings():
     settings["ss_ramp"] = None
     settings["rwmixread"] = None
     settings["runtime"] = 60
+    settings["loops"] = 1
     settings["time_based"] = False
     settings["extra_opts"] = []
     settings["loginterval"] = 500
