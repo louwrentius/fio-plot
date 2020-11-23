@@ -172,6 +172,7 @@ def run_fio(settings, benchmark):
 
     target_parameter = check_target_type(benchmark["target"], settings["type"])
     command.append(f"{target_parameter}={benchmark['target']}")
+
     if not settings["dry_run"]:
         make_directory(output_directory)
         run_command(settings, benchmark, command)
