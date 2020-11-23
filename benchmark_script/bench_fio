@@ -418,6 +418,15 @@ def get_arguments(settings):
     )
 
     ag.add_argument(
+        "--entire-device",
+        action="store_true",
+        help=(
+            "The benchmark will keep running until all sectors are read or written to."
+            f"(default: {str(settings['entire_device'])})."
+        ),
+    )
+
+    ag.add_argument(
         "--ss",
         help=f"Detect and exit on achieving steady state (spefial Fio feature, 'man fio' for more detials) \
             (default: {settings['ss']})",
