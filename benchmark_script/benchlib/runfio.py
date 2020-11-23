@@ -75,8 +75,8 @@ def run_fio(settings, benchmark):
     if not settings["dry_run"]:
         supporting.make_directory(output_directory)
         run_command(settings, benchmark, command)
-    else:
-        pprint.pprint(command)
+    # else:
+    #    pprint.pprint(command)
 
 
 def run_precondition_benchmark(settings, device):
