@@ -102,7 +102,7 @@ def run_precondition_benchmark(settings, device, run):
 def run_benchmarks(settings, benchmarks):
     # pprint.pprint(benchmarks)
     if not settings["quiet"]:
-        run = 0
+        run = 1
         for benchmark in ProgressBar(benchmarks):
             if settings["precondition_repeat"]:
                 run_precondition_benchmark(settings, benchmark["target"], run)
