@@ -71,7 +71,7 @@ def get_largest_scale_factor(scale_factors):
     return scalefactor[0]
 
 
-def scale_yaxis_latency(dataset, scale):
+def scale_yaxis(dataset, scale):
     """The dataset supplied is scaled with the supplied scale. The scaled
     dataset is returned."""
     result = {}
@@ -278,6 +278,8 @@ def process_dataset(settings, dataset):
 
                 if "lat" in item["type"]:
                     scale_factors.append(get_scale_factor_lat(item[rw]["yvalues"]))
+                if "bw" in item["type"]:
+                    scale_factors.append(get_scale_factor_bw(item[rw]["yvalues"]))
         item.pop("data")
         new_list.append(item)
 
@@ -290,8 +292,8 @@ def process_dataset(settings, dataset):
     for item in new_list:
         for rw in settings["filter"]:
             if rw in item.keys():
-                if "lat" in item["type"]:
-                    scaled_data = scale_yaxis_latency(item[rw]["yvalues"], scale_factor)
+                if "lat" in item["type"] or "bw" in item["type"]:
+                    scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor)
                     item[rw]["ylabel"] = scaled_data["format"]
                     item[rw]["yvalues"] = scaled_data["data"]
                 else:
