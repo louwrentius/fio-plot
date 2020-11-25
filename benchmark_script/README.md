@@ -1,20 +1,16 @@
 ### Introduction
  This benchmark script is provided alongside fio-plot. It automates the process of running multiple benchmarks with different parameters. For example, it allows you to gather data for different queue depths and/or number of simultaneous jobs. The benchmark script shows progress in real-time.
 
-### Examples
- 
-We benchmark two devices with a randread/randrwite workload. 
+#### Steady State
+ It supports the [Fio "steady state"][fioss] feature, that stops a benchmark when the desired steady state is reached for a configure time duration.
 
-    ./bench_fio --target /dev/md0 /dev/md1 --type device --mode randread randwrite --output RAID_ARRAY 
+ [fioss]: https://github.com/axboe/fio/blob/master/examples/steadystate.fio
 
-We benchmark one device with a custom set of iodepths and numjobs:
+#### SSD Preconditioning
 
-    ./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --iodepth 1 8 16 --numjobs 8
+This benchmark script supports running configure SSD preconditioning jobs that are run before the actual benchmarks are executed. You may even specify for them to run after each benchmark if desired.
 
-We benchmark one device and pass extra custom parameters. 
-
-	./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1
-
+### Example output
 
 An example with output:
 
@@ -39,6 +35,25 @@ An example with output:
 
 Tip: Because benchmarks can run a long time, it may be advised to run them
 in a 'screen' session.
+
+### Example usage
+
+We benchmark two devices with a randread/randrwite workload. 
+
+    ./bench_fio --target /dev/md0 /dev/md1 --type device --mode randread randwrite --output RAID_ARRAY 
+
+We benchmark one device with a custom set of iodepths and numjobs:
+
+    ./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --iodepth 1 8 16 --numjobs 8
+
+We benchmark one device and pass extra custom parameters. 
+
+	./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1
+
+We benchmark using the steady state feature:
+
+    ./bench_fio --target /dev/sda --type device -o test -m randwrite --loops 1 --iodepth 1 8 16 32 --numjobs 1 --ss iops:0.1% --ss-ramp 10 --ss-dur 20 --runtime 60
+
 
 ### Output
 
