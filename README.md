@@ -66,7 +66,7 @@ A 3D bar chart that plots both queue depth an numjobs against either latency or 
 
 This is the command-line used to generate this graph:
 
-    ~/projects/fio-plot/fio_plot/fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t iops -r randread
+    fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t iops -r randread
 
 It is also possible to chart the latency:
 
@@ -76,7 +76,7 @@ It is also possible to chart the latency:
 
 This is the command-line used to generate this graph:
 
-    ~/projects/fio-plot/fio_plot/fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t lat -r randread
+    fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t lat -r randread
 
 ## Line chart based on FIO log data
 
@@ -87,7 +87,7 @@ This data can be parsed and graphed over time. In this example, we plot the data
 
 ![linechart][linegraph01]
 
-[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0007.png
+[linegraph01]: https://louwrentius.com/static/images/fio-plot/fioplot0012.png
 
 This is the command-line used to generate this graph:
 
@@ -97,7 +97,7 @@ It is also possible to chart the latency instead of IOPs.
 
 ![linechart][linegraph02]
 
-[linegraph02]: https://louwrentius.com/static/images/fio-plot/fioplot0008.png
+[linegraph02]: https://louwrentius.com/static/images/fio-plot/fioplot0013.png
 
 This is the command-line used to generate this graph:
 
