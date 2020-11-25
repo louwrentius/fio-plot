@@ -271,7 +271,7 @@ Please note that the folder names are used in the graph to distinguish the datas
 
 [![multipledataset][multipledataset]][multipledataset]
 
-[multipledataset]: https://louwrentius.com/static/images/comparingraid10raid5new.png
+[multipledataset]: https://louwrentius.com/static/images/fio-plot/fioplot0017.png
    
 Command used: 
 
