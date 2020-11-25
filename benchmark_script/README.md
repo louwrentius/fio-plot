@@ -1,16 +1,5 @@
-### Requirements
-
-Bench_fio requires Python3. The 'numpy' python module is required.
-
-   pip3 install -r requirements.txt 
-
-You can also use apt/yum to satisfy this requirement.
-
-
-### Notes on IO queue depth and number of jobs
-
-As discussed in issue #41 each job has its own I/O queue. If qd=1 and nj=5, you will have 5 IOs in flight.
-If you have qd=4 and nj=4 you will have 4 x 4 = 16 IOs in flight. 
+### Introduction
+ This benchmark script is provided alongside fio-plot. It automates the process of running multiple benchmarks with different parameters. For example, it allows you to gather data for different queue depths and/or number of simultaneous jobs. The benchmark script shows progress in real-time.
 
 ### Examples
  
@@ -90,15 +79,19 @@ Pure read/write/trim workloads will appear in the *device* folder.
 
 ### Usage
 	usage: bench_fio [-h] -d TARGET [TARGET ...] -t {device,file,directory}
-					[-s SIZE] -o OUTPUT [-j TEMPLATE]
-					[-b BLOCK_SIZE [BLOCK_SIZE ...]]
-					[--iodepth IODEPTH [IODEPTH ...]]
-					[--numjobs NUMJOBS [NUMJOBS ...]] [--duration DURATION]
-					[-m MODE [MODE ...]] [--rwmixread RWMIXREAD [RWMIXREAD ...]]
-					[-e ENGINE] [--direct DIRECT]
-					[--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]]
-					[--invalidate INVALIDATE] [--quiet]
-					[--loginterval LOGINTERVAL] [--dry-run]
+                 [-s SIZE] -o OUTPUT [-j TEMPLATE]
+                 [-b BLOCK_SIZE [BLOCK_SIZE ...]]
+                 [--iodepth IODEPTH [IODEPTH ...]]
+                 [--numjobs NUMJOBS [NUMJOBS ...]] [--runtime RUNTIME] [-p]
+                 [--precondition-repeat]
+                 [--precondition-template PRECONDITION_TEMPLATE]
+                 [-m MODE [MODE ...]] [--rwmixread RWMIXREAD [RWMIXREAD ...]]
+                 [-e ENGINE] [--direct DIRECT] [--loops LOOPS] [--time-based]
+                 [--entire-device] [--ss SS] [--ss-dur SS_DUR]
+                 [--ss-ramp SS_RAMP]
+                 [--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]]
+                 [--invalidate INVALIDATE] [--quiet]
+                 [--loginterval LOGINTERVAL] [--dry-run]
 
 	Automates FIO benchmarking. It can run benchmarks with different iodepths,
 	jobs or other properties.
@@ -119,8 +112,9 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							read/write mix is specified, separate directories for
 							each mix will be created.
 	-j TEMPLATE, --template TEMPLATE
-							Fio job file in INI format. (Default: ./fio-job-
-							template.fio)
+							Fio job file in INI format. A file is already included
+							and this parameter is only required if you create your
+							own custom Fio job. (Default: ./fio-job-template.fio)
 	-b BLOCK_SIZE [BLOCK_SIZE ...], --block-size BLOCK_SIZE [BLOCK_SIZE ...]
 							Specify block size(s). (Default: ['4k']
 	--iodepth IODEPTH [IODEPTH ...]
@@ -129,8 +123,19 @@ Pure read/write/trim workloads will appear in the *device* folder.
 	--numjobs NUMJOBS [NUMJOBS ...]
 							Override default number of jobs test series ([1, 2, 4,
 							8, 16, 32, 64]). Usage example: --numjobs 1 8 16
-	--duration DURATION   Override the default test duration per benchmark
-							(default: 60)
+	--runtime RUNTIME     Override the default test runtime per
+							benchmark(default: 60)
+	-p, --precondition    With this option you can specify an SSD precondition
+							workload prior to performing actualbenchmarks. If you
+							don't precondition SSDs before running a benchmark,
+							results may notreflect actual real-life performance
+							under sustained load. (default: False).
+	--precondition-repeat
+							After every individual benchmark, the preconditioning
+							run is executed (again). (Default: False).
+	--precondition-template PRECONDITION_TEMPLATE
+							The Fio job template containing the precondition
+							workload(default=precondition.fio
 	-m MODE [MODE ...], --mode MODE [MODE ...]
 							List of I/O load tests to run (default: ['randread',
 							'randwrite'])
@@ -148,6 +153,17 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							Select the ioengine to use, see fio --enghelp for an
 							overview of supported engines. (Default: libaio).
 	--direct DIRECT       Use DIRECT I/O (default: 1)
+	--loops LOOPS         Each individual benchmark is repeated x times
+							(default: 1)
+	--time-based          All benchmarks are time based, even if a test size is
+							specifiedLookt at the Fio time based option for more
+							information.(default: False).
+	--entire-device       The benchmark will keep running until all sectors are
+							read or written to.(default: False).
+	--ss SS               Detect and exit on achieving steady state (spefial Fio
+							feature, 'man fio' for more detials) (default: False)
+	--ss-dur SS_DUR       Steady state window (default: None)
+	--ss-ramp SS_RAMP     Steady state ramp time (default: None)
 	--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]
 							Allows you to add extra options, for example, options
 							that are specific to the selected ioengine. It can be
@@ -166,12 +182,26 @@ Pure read/write/trim workloads will appear in the *device* folder.
 
 ### SSD Preconditioning
 
-If you don't precondition an SSD, you may observe inconsistent write performance. 
+In order to obtain performance numbers that will actually represent production, it is very important to precondition SSDs.
+SSDs perform all kinds of strategies to improve write performance. Under a sustained write load, performance may dramatically deteriorate. To find out how much performance decreases, it's important to test with the SSD completely written over, multiple times. 
 
-I found [this presentation][intelpresentation] from Intel that provides guidance for benchmarking SSDs. 
-It points out that you need to precondition the SSD before benchmarking. 
+The included preconditioning step in this benchmark script overwrites the device twice, to make sure all flash storage is written to.
 
-[intelpresentation]: https://s3.us-east-2.amazonaws.com/intel-builders/day_2_spdk_best_practices_performance_benchmarking_tuning.pdf
+More background information about SSD preconditioning [can be found here][snia].
 
+[snia]: https://www.snia.org/sites/default/education/tutorials/2011/fall/SolidState/EstherSpanjer_The_Why_How_SSD_Performance_Benchmarking.pdf
+
+### Notes on IO queue depth and number of jobs
+
+As discussed in issue #41 each job has its own I/O queue. If qd=1 and nj=5, you will have 5 IOs in flight.
+If you have qd=4 and nj=4 you will have 4 x 4 = 16 IOs in flight. 
+
+### Requirements
+
+Bench_fio requires Python3. The 'numpy' python module is required.
+
+   pip3 install -r requirements.txt 
+
+You can also use apt/yum to satisfy this requirement.
 
    
