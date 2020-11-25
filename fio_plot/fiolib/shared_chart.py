@@ -26,7 +26,7 @@ def get_dataset_types(dataset):
             tmp = type_list[len(type_list) - 1]
             if tmp != temp_dict:
                 print(
-                    f"Warning: benchmark data may not contain the same kind of data, comparisons may be impossible."
+                    "Warning: benchmark data may not contain the same kind of data, comparisons may be impossible."
                 )
         type_list.append(temp_dict)
     # pprint.pprint(type_list)
@@ -61,7 +61,8 @@ def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
     if settings["rw"] == "randrw":
         if len(settings["filter"]) > 1 or not settings["filter"]:
             print(
-                "Since we are processing randrw data, you must specify a filter for either read or write data, not both."
+                "Since we are processing randrw data, you must specify a "
+                "filter for either read or write data, not both."
             )
             exit(1)
 
@@ -88,7 +89,8 @@ def get_record_set_improved(settings, dataset, dataset_types):
     if settings["rw"] == "randrw":
         if len(settings["filter"]) > 1 or not settings["filter"]:
             print(
-                "Since we are processing randrw data, you must specify a filter for either read or write data, not both."
+                "Since we are processing randrw data, you must specify a"
+                " filter for either read or write data, not both."
             )
             exit(1)
 
@@ -141,13 +143,16 @@ def get_record_set(settings, dataset, dataset_types):
     """
     dataset = dataset[0]
 
+    # pprint.pprint(dataset)
+
     rw = settings["rw"]
     numjobs = settings["numjobs"]
 
     if settings["rw"] == "randrw":
         if len(settings["filter"]) > 1 or not settings["filter"]:
             print(
-                "Since we are processing randrw data, you must specify a filter for either read or write data, not both."
+                "Since we are processing randrw data, you must specify a filter for either"
+                "read or write data, not both."
             )
             exit(1)
 
@@ -163,7 +168,12 @@ def get_record_set(settings, dataset, dataset_types):
         "y1_axis": None,
         "y2_axis": None,
         "numjobs": numjobs,
+        "ss_settings": [],
+        "ss_attained": [],
+        "ss_data_bw_mean": [],
+        "ss_data_iops_mean": [],
     }
+
     newlist = sorted(dataset["data"], key=itemgetter(settings["query"]))
     # pprint.pprint(newlist)
 
@@ -183,6 +193,18 @@ def get_record_set(settings, dataset, dataset_types):
                     datadict["cpu"]["cpu_sys"].append(int(round(record["cpu_sys"], 0)))
                     datadict["cpu"]["cpu_usr"].append(int(round(record["cpu_usr"], 0)))
 
+                    # pprint.pprint(record.keys())
+
+                    if "ss_attained" in record.keys():
+                        datadict["ss_settings"].append(str(record["ss_settings"])),
+                        datadict["ss_attained"].append(int(record["ss_attained"])),
+                        datadict["ss_data_bw_mean"].append(
+                            int(round(record["ss_data_bw_mean"], 0))
+                        ),
+                        datadict["ss_data_iops_mean"].append(
+                            int(round(record["ss_data_iops_mean"], 0))
+                        ),
+
     return scale_data(datadict)
 
 
@@ -194,6 +216,8 @@ def scale_data(datadict):
     lat_stddev_series_raw = datadict["lat_stddev_series_raw"]
     cpu_usr = datadict["cpu"]["cpu_usr"]
     cpu_sys = datadict["cpu"]["cpu_sys"]
+    ss_data_bw_mean = datadict["ss_data_bw_mean"]
+    ss_data_iops_mean = datadict["ss_data_iops_mean"]
 
     #
     # Latency data must be scaled, IOPs will not be scaled.
@@ -238,14 +262,36 @@ def scale_data(datadict):
     iops_stdev_rounded_percent = [int(x) for x in iops_stdev_rounded_percent]
     #
     #
+
+    # Steady state bandwidth data must be scaled.
+    if ss_data_bw_mean:
+        ss_bw_scalefactor = supporting.get_scale_factor_bw_ss(ss_data_bw_mean)
+        ss_data_bw_mean = supporting.scale_yaxis(ss_data_bw_mean, ss_bw_scalefactor)
+        ss_data_bw_mean["data"] = supporting.round_metric_series(
+            ss_data_bw_mean["data"]
+        )
+
+        ss_iops_scalefactor = supporting.get_scale_factor_iops(ss_data_iops_mean)
+        ss_data_iops_mean = supporting.scale_yaxis(
+            ss_data_iops_mean, ss_iops_scalefactor
+        )
+        ss_data_iops_mean["data"] = supporting.round_metric_series(
+            ss_data_iops_mean["data"]
+        )
+
     datadict["y1_axis"] = {
         "data": iops_series_rounded,
         "format": "IOPS",
         "stddev": iops_stdev_rounded_percent,
     }
+
     datadict["y2_axis"] = scaled_latency_data
     if cpu_sys and cpu_usr:
         datadict["cpu"] = {"cpu_sys": cpu_sys, "cpu_usr": cpu_usr}
+
+    if ss_data_bw_mean:
+        datadict["ss_data_bw_mean"] = ss_data_bw_mean
+        datadict["ss_data_iops_mean"] = ss_data_iops_mean
 
     return datadict
 
@@ -362,4 +408,32 @@ def create_stddev_table(settings, data, ax2):
 
     rowlabels = [table_name, "IOP/s \u03C3 %", f"Latency \u03C3 %"]
     location = "lower right"
+    create_generic_table(settings, table_vals, ax2, rowlabels, location)
+
+
+def convert_number_to_yes_no(data):
+    newlist = []
+    lookup = {1: "yes", 0: "no"}
+    for item in data:
+        newlist.append(lookup[item])
+    return newlist
+
+
+def create_steadystate_table(settings, data, ax2):
+    data["ss_attained"] = convert_number_to_yes_no(data["ss_attained"])
+
+    table_vals = [
+        data["x_axis"],
+        data["ss_data_bw_mean"]["data"],
+        data["ss_data_iops_mean"]["data"],
+        data["ss_attained"],
+    ]
+
+    rowlabels = [
+        "Steady state",
+        f"BW mean {data['ss_data_bw_mean']['format']}",
+        f"{data['ss_data_iops_mean']['format']}  mean",
+        f"{data['ss_settings'][0]} attained",
+    ]
+    location = "lower center"
     create_generic_table(settings, table_vals, ax2, rowlabels, location)

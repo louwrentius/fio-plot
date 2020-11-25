@@ -80,12 +80,39 @@ def scale_yaxis(dataset, scale):
     return result
 
 
+def get_scale_factor_iops(dataset):
+    mean = statistics.mean(dataset)
+    scale_factors = [
+        {"scale": 1000000, "label": "M IOPs"},
+        {"scale": 1000, "label": "K IOPs"},
+        {"scale": 1, "label": "IOPs"},
+    ]
+
+    for item in scale_factors:
+        if mean > item["scale"] * 5:
+            return item
+
+
 def get_scale_factor_bw(dataset):
     mean = statistics.mean(dataset)
     scale_factors = [
         {"scale": 1048576, "label": "GB/s"},
         {"scale": 1024, "label": "MB/s"},
         {"scale": 1, "label": "KB/s"},
+    ]
+
+    for item in scale_factors:
+        if mean > item["scale"] * 5:
+            return item
+
+
+def get_scale_factor_bw_ss(dataset):
+    mean = statistics.mean(dataset)
+    scale_factors = [
+        {"scale": 1073741824, "label": "GB/s"},
+        {"scale": 1048576, "label": "MB/s"},
+        {"scale": 1024, "label": "KB/s"},
+        {"scale": 1, "label": "B/s"},
     ]
 
     for item in scale_factors:
@@ -373,6 +400,7 @@ def create_title_and_sub(settings, plt, skip_keys=[], sub_x_offset=0, sub_y_offs
         "type": str(settings["type"]).strip("[]").replace("'", ""),
         "filter": str(settings["filter"]).strip("[]").replace("'", ""),
     }
+
     if settings["subtitle"]:
         subtitle = settings["subtitle"]
     else:
