@@ -216,8 +216,10 @@ def scale_data(datadict):
     lat_stddev_series_raw = datadict["lat_stddev_series_raw"]
     cpu_usr = datadict["cpu"]["cpu_usr"]
     cpu_sys = datadict["cpu"]["cpu_sys"]
-    ss_data_bw_mean = datadict["ss_data_bw_mean"]
-    ss_data_iops_mean = datadict["ss_data_iops_mean"]
+
+    if "ss_settings" in datadict.keys():
+        ss_data_bw_mean = datadict["ss_data_bw_mean"]
+        ss_data_iops_mean = datadict["ss_data_iops_mean"]
 
     #
     # Latency data must be scaled, IOPs will not be scaled.
@@ -264,7 +266,7 @@ def scale_data(datadict):
     #
 
     # Steady state bandwidth data must be scaled.
-    if ss_data_bw_mean:
+    if "ss_settings" in datadict.keys():
         ss_bw_scalefactor = supporting.get_scale_factor_bw_ss(ss_data_bw_mean)
         ss_data_bw_mean = supporting.scale_yaxis(ss_data_bw_mean, ss_bw_scalefactor)
         ss_data_bw_mean["data"] = supporting.round_metric_series(
@@ -289,7 +291,7 @@ def scale_data(datadict):
     if cpu_sys and cpu_usr:
         datadict["cpu"] = {"cpu_sys": cpu_sys, "cpu_usr": cpu_usr}
 
-    if ss_data_bw_mean:
+    if "ss_settings" in datadict.keys():
         datadict["ss_data_bw_mean"] = ss_data_bw_mean
         datadict["ss_data_iops_mean"] = ss_data_iops_mean
 

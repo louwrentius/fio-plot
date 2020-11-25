@@ -177,5 +177,5 @@ def get_flat_json_mapping(settings, dataset):
                 "ss_settings": get_nested_value(record, m["ss_settings"]),
             }
             item["data"].append(row)
-        item["rawdata"] = None  # --> enable to throw away the data after parsing.
+        # item["rawdata"] = None  # --> enable to throw away the data after parsing.
     return dataset
