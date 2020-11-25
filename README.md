@@ -290,7 +290,7 @@ This would look like:
 
 [![labellength][labellength]][labellength]
 
-[labellength]: https://louwrentius.com/static/images/labellength.png
+[labellength]: https://louwrentius.com/static/images/fio-plot/fioplot0018.png
 
 Some additional examples to explain how you can trim the labels to contain exactly the directories you want:
 
@@ -317,7 +317,7 @@ Example:
 
 ![shortlabel][shortlabel]
 
-[shortlabel]: https://louwrentius.com/static/images/shortlabel.png
+[shortlabel]: https://louwrentius.com/static/images/fio-plot/fioplot0019.png
 
 ## JSON / LOG file name requirements
 
