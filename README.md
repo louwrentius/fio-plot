@@ -251,6 +251,12 @@ There is also an option (--show-cpu) that includes a table with CPU usage:
 
 [comparecpu]: https://louwrentius.com/static/images/comparecpu.png
 
+It is now also possible to show steady state statistics (--show-ss) if you ran a Fio benchmark with steady state options.
+
+![steadystatechart][steadystatechart]
+
+[steadystatechart]: https://louwrentius.com/static/images/fio-plot/fioplot0016.png
+
 ### Comparing two or more benchmarks in a single line chart
 
 Create a line chart based on data from two different folders (but the same benchmark parameters)     
