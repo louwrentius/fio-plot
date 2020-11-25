@@ -384,6 +384,16 @@ def run_preflight_checks(settings):
             print("\nIf -l is specified, only one input directory can be used.\n")
             sys.exit(1)
 
+    if settings["show_ss"] and settings["show_cpu"]:
+        print(
+            "\nYou have to choose between either --show-ss or --show-cpu, you can't display both.\n"
+        )
+        sys.exit(1)
+
+    if not settings["latency_iops_2d_qd"] and settings["show_ss"]:
+        print("\nThe --show-ss option only works with the 2D bar chart -l graph.\n")
+        sys.exit(1)
+
 
 def configure_default_settings(settings, routing_dict, key):
     if not settings["iodepth"]:
