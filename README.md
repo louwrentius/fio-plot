@@ -107,7 +107,7 @@ You can also include all information in one graph:
 
 ![linechart][linegraph03]
 
-[linegraph03]: https://louwrentius.com/static/images/fio-plot/fioplot0009.png
+[linegraph03]: https://louwrentius.com/static/images/fio-plot/fioplot0014.png
 
 This is the command-line used to generate this graph:
 
@@ -117,7 +117,7 @@ And this is an example with a single benchmark run, comparing the performance of
 
 ![linechart][linegraph04]
 
-[linegraph04]: https://louwrentius.com/static/images/fio-plot/fioplot0010.png
+[linegraph04]: https://louwrentius.com/static/images/fio-plot/fioplot0015.png
 
 This is the command-line used to generate this graph:
 
