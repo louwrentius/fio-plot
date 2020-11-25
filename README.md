@@ -178,74 +178,107 @@ Fio-plot also writes metadata to the PNG files using Pillow
 
 ## Usage
 
-    usage: fio_plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] -T TITLE [-s SOURCE] (-L | -l | -N | -H | -g | -C) [--disable-grid] [--enable-markers] [--subtitle SUBTITLE]
-                [-d IODEPTH [IODEPTH ...]] [-n NUMJOBS [NUMJOBS ...]] [-M [MAXDEPTH]] [-J [MAXJOBS]] [-D [DPI]] [-p [PERCENTILE]] -r
-                {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite} [-m MAX] [-e MOVING_AVERAGE] [-x MIN_Y]
-                [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]] [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH] [--xlabel-parent XLABEL_PARENT]
-                [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH] [--group-bars] [--show-cpu] [--table-lines]
+    usage: bench_fio [-h] -d TARGET [TARGET ...] -t {device,file,directory}
+                 [-s SIZE] -o OUTPUT [-j TEMPLATE]
+                 [-b BLOCK_SIZE [BLOCK_SIZE ...]]
+                 [--iodepth IODEPTH [IODEPTH ...]]
+                 [--numjobs NUMJOBS [NUMJOBS ...]] [--runtime RUNTIME] [-p]
+                 [--precondition-repeat]
+                 [--precondition-template PRECONDITION_TEMPLATE]
+                 [-m MODE [MODE ...]] [--rwmixread RWMIXREAD [RWMIXREAD ...]]
+                 [-e ENGINE] [--direct DIRECT] [--loops LOOPS] [--time-based]
+                 [--entire-device] [--ss SS] [--ss-dur SS_DUR]
+                 [--ss-ramp SS_RAMP]
+                 [--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]]
+                 [--invalidate INVALIDATE] [--quiet]
+                 [--loginterval LOGINTERVAL] [--dry-run]
 
-    Generates charts/graphs from FIO JSON output or logdata.
+    Automates FIO benchmarking. It can run benchmarks with different iodepths,
+    jobs or other properties.
 
     optional arguments:
     -h, --help            show this help message and exit
 
     Generic Settings:
-    -i INPUT_DIRECTORY [INPUT_DIRECTORY ...], --input-directory INPUT_DIRECTORY [INPUT_DIRECTORY ...]
-                            input directory where JSON files or log data (CSV) can be found.
-    -T TITLE, --title TITLE
-                            specifies title to use in charts
-    -s SOURCE, --source SOURCE
-                            Author
-    -L, --iodepth-numjobs-3d
-                            Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.
-    -l, --latency-iops-2d-qd
-                            Generates a 2D barchart of IOPs and latency for all queue depths given a particular numjobs value.
-    -N, --latency-iops-2d-nj
-                            This graph type is like the latency-iops-2d-qd barchart but instead of plotting queue depths for a particular numjobs value, it plots numjobs values
-                            for a particular queue depth.
-    -H, --histogram       Generates a latency histogram for a particular queue depth and numjobs value.
-    -g, --loggraph        This option generates a 2D graph of the log data recorded by FIO.
-    -C, --compare-graph   This option generates a bar chart to compare results from different benchmark runs.
-    --disable-grid        Disables the dotted grid in the output graph.
-    --enable-markers      Enable markers for the plot lines when graphing log data.
-    --subtitle SUBTITLE   Specify your own subtitle or leave it blank with double quotes.
-    -d IODEPTH [IODEPTH ...], --iodepth IODEPTH [IODEPTH ...]
-                            The I/O queue depth to graph. You can specify multiple values separated by spaces.
-    -n NUMJOBS [NUMJOBS ...], --numjobs NUMJOBS [NUMJOBS ...]
-                            Specifies for which numjob parameter you want the 2d graphs to be generated. You can specify multiple values separated by spaces.
-    -M [MAXDEPTH], --maxdepth [MAXDEPTH]
-                            Maximum queue depth to graph in 3D graph.
-    -J [MAXJOBS], --maxjobs [MAXJOBS]
-                            Maximum number of jobs to graph in 3D graph.
-    -D [DPI], --dpi [DPI]
-                            The chart will be saved with this DPI setting. Higher means larger image.
-    -p [PERCENTILE], --percentile [PERCENTILE]
-                            Calculate the percentile, default 99.99th.
-    -r {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite}, --rw {read,write,randread,randwrite,randrw,trim,rw,randtrim,trimwrite}
-                            Specifies the kind of data you want to graph.
-    -m MAX, --max MAX     Optional maximum value for Z-axis in 3D graph.
-    -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
-                            The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be carefull as this setting
-                            may smooth out issues you may want to be aware of.
-    -x MIN_Y, --min-y MIN_Y
-                            Optional minimal value for y-axis. Use 'None' to disable.
-    -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
-                            This setting specifies which kind of metric you want to graph.
-    -f {read,write} [{read,write} ...], --filter {read,write} [{read,write} ...]
-                            filter should be read/write.
-    --xlabel-depth XLABEL_DEPTH
-                            Can be used to truncate the most significant folder name from the label. Often used to strip off folders generated with benchfio (e.g. 4k)
-    --xlabel-parent XLABEL_PARENT
-                            use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a value of 0 to
-                            remove parent folder name.
-    --xlabel-segment-size XLABEL_SEGMENT_SIZE
-                            Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used
-                            with -g.
-    -w LINE_WIDTH, --line-width LINE_WIDTH
-                            Line width for line graphs. Can be a floating-point value. Used with -g.
-    --group-bars          When using -l or -C, bars are grouped together by iops/lat type.
-    --show-cpu            When using the -C option, a table is added with cpu_usr and cpu_sys data.
-    --table-lines         Draw the lines within a table (cpu/stdev)
+    -d TARGET [TARGET ...], --target TARGET [TARGET ...]
+                            Storage device / directory / file to be tested
+    -t {device,file,directory}, --type {device,file,directory}
+                            Target type, device, file or directory
+    -s SIZE, --size SIZE  File size if target is a file. If target is a
+                            directory, a file of the specified size is created per
+                            job
+    -o OUTPUT, --output OUTPUT
+                            Output directory for .json and .log output. If a
+                            read/write mix is specified, separate directories for
+                            each mix will be created.
+    -j TEMPLATE, --template TEMPLATE
+                            Fio job file in INI format. A file is already included
+                            and this parameter is only required if you create your
+                            own custom Fio job. (Default: ./fio-job-template.fio)
+    -b BLOCK_SIZE [BLOCK_SIZE ...], --block-size BLOCK_SIZE [BLOCK_SIZE ...]
+                            Specify block size(s). (Default: ['4k']
+    --iodepth IODEPTH [IODEPTH ...]
+                            Override default iodepth test series ([1, 2, 4, 8, 16,
+                            32, 64]). Usage example: --iodepth 1 8 16
+    --numjobs NUMJOBS [NUMJOBS ...]
+                            Override default number of jobs test series ([1, 2, 4,
+                            8, 16, 32, 64]). Usage example: --numjobs 1 8 16
+    --runtime RUNTIME     Override the default test runtime per
+                            benchmark(default: 60)
+    -p, --precondition    With this option you can specify an SSD precondition
+                            workload prior to performing actualbenchmarks. If you
+                            don't precondition SSDs before running a benchmark,
+                            results may notreflect actual real-life performance
+                            under sustained load. (default: False).
+    --precondition-repeat
+                            After every individual benchmark, the preconditioning
+                            run is executed (again). (Default: False).
+    --precondition-template PRECONDITION_TEMPLATE
+                            The Fio job template containing the precondition
+                            workload(default=precondition.fio
+    -m MODE [MODE ...], --mode MODE [MODE ...]
+                            List of I/O load tests to run (default: ['randread',
+                            'randwrite'])
+    --rwmixread RWMIXREAD [RWMIXREAD ...]
+                            If a mix of read/writes is specified with --testmode,
+                            the ratio of reads vs. writes can be specified with
+                            this option. the parameter is an integer and
+                            represents the percentage of reads. A read/write mix
+                            of 75%/25% is specified as '75' (default: None).
+                            Multiple values can be specified and separate output
+                            directories will be created. This argument is only
+                            used if the benchmark is of type randrw. Otherwise
+                            this option is ignored.
+    -e ENGINE, --engine ENGINE
+                            Select the ioengine to use, see fio --enghelp for an
+                            overview of supported engines. (Default: libaio).
+    --direct DIRECT       Use DIRECT I/O (default: 1)
+    --loops LOOPS         Each individual benchmark is repeated x times
+                            (default: 1)
+    --time-based          All benchmarks are time based, even if a test size is
+                            specifiedLookt at the Fio time based option for more
+                            information.(default: False).
+    --entire-device       The benchmark will keep running until all sectors are
+                            read or written to.(default: False).
+    --ss SS               Detect and exit on achieving steady state (spefial Fio
+                            feature, 'man fio' for more detials) (default: False)
+    --ss-dur SS_DUR       Steady state window (default: None)
+    --ss-ramp SS_RAMP     Steady state ramp time (default: None)
+    --extra-opts EXTRA_OPTS [EXTRA_OPTS ...]
+                            Allows you to add extra options, for example, options
+                            that are specific to the selected ioengine. It can be
+                            any other Fio option. Example: --extra-opts
+                            norandommap=1 invalidate=0 You may also choose to add
+                            those options to the fio_template.fio file.
+    --invalidate INVALIDATE
+                            From the Fio manual: Invalidate buffer-cache for the
+                            file prior to starting I/O.(Default: 1)
+    --quiet               The progresbar will be supressed.
+    --loginterval LOGINTERVAL
+                            Interval that specifies how often stats are logged to
+                            the .log files. (Default: 500
+    --dry-run             Simulates a benchmark, does everything except running
+                            Fio.
 
 ## Example Usage
 
