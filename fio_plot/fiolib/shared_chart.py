@@ -193,17 +193,16 @@ def get_record_set(settings, dataset, dataset_types):
                     datadict["cpu"]["cpu_sys"].append(int(round(record["cpu_sys"], 0)))
                     datadict["cpu"]["cpu_usr"].append(int(round(record["cpu_usr"], 0)))
 
-                    # pprint.pprint(record.keys())
-
                     if "ss_attained" in record.keys():
-                        datadict["ss_settings"].append(str(record["ss_settings"])),
-                        datadict["ss_attained"].append(int(record["ss_attained"])),
-                        datadict["ss_data_bw_mean"].append(
-                            int(round(record["ss_data_bw_mean"], 0))
-                        ),
-                        datadict["ss_data_iops_mean"].append(
-                            int(round(record["ss_data_iops_mean"], 0))
-                        ),
+                        if record["ss_attained"]:
+                            datadict["ss_settings"].append(str(record["ss_settings"])),
+                            datadict["ss_attained"].append(int(record["ss_attained"])),
+                            datadict["ss_data_bw_mean"].append(
+                                int(round(record["ss_data_bw_mean"], 0))
+                            ),
+                            datadict["ss_data_iops_mean"].append(
+                                int(round(record["ss_data_iops_mean"], 0))
+                            ),
 
     return scale_data(datadict)
 
@@ -267,19 +266,20 @@ def scale_data(datadict):
 
     # Steady state bandwidth data must be scaled.
     if "ss_settings" in datadict.keys():
-        ss_bw_scalefactor = supporting.get_scale_factor_bw_ss(ss_data_bw_mean)
-        ss_data_bw_mean = supporting.scale_yaxis(ss_data_bw_mean, ss_bw_scalefactor)
-        ss_data_bw_mean["data"] = supporting.round_metric_series(
-            ss_data_bw_mean["data"]
-        )
+        if datadict["ss_attained"]:
+            ss_bw_scalefactor = supporting.get_scale_factor_bw_ss(ss_data_bw_mean)
+            ss_data_bw_mean = supporting.scale_yaxis(ss_data_bw_mean, ss_bw_scalefactor)
+            ss_data_bw_mean["data"] = supporting.round_metric_series(
+                ss_data_bw_mean["data"]
+            )
 
-        ss_iops_scalefactor = supporting.get_scale_factor_iops(ss_data_iops_mean)
-        ss_data_iops_mean = supporting.scale_yaxis(
-            ss_data_iops_mean, ss_iops_scalefactor
-        )
-        ss_data_iops_mean["data"] = supporting.round_metric_series(
-            ss_data_iops_mean["data"]
-        )
+            ss_iops_scalefactor = supporting.get_scale_factor_iops(ss_data_iops_mean)
+            ss_data_iops_mean = supporting.scale_yaxis(
+                ss_data_iops_mean, ss_iops_scalefactor
+            )
+            ss_data_iops_mean["data"] = supporting.round_metric_series(
+                ss_data_iops_mean["data"]
+            )
 
     datadict["y1_axis"] = {
         "data": iops_series_rounded,
@@ -292,8 +292,9 @@ def scale_data(datadict):
         datadict["cpu"] = {"cpu_sys": cpu_sys, "cpu_usr": cpu_usr}
 
     if "ss_settings" in datadict.keys():
-        datadict["ss_data_bw_mean"] = ss_data_bw_mean
-        datadict["ss_data_iops_mean"] = ss_data_iops_mean
+        if datadict["ss_attained"]:
+            datadict["ss_data_bw_mean"] = ss_data_bw_mean
+            datadict["ss_data_iops_mean"] = ss_data_iops_mean
 
     return datadict
 
