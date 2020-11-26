@@ -390,7 +390,10 @@ def run_preflight_checks(settings):
         )
         sys.exit(1)
 
-    if not settings["latency_iops_2d_qd"] and settings["show_ss"]:
+    if (
+        not (settings["latency_iops_2d_qd"] or settings["latency_iops_2d_nj"])
+        and settings["show_ss"]
+    ):
         print("\nThe --show-ss option only works with the 2D bar chart -l graph.\n")
         sys.exit(1)
 

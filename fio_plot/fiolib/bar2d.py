@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import fiolib.supporting as supporting
 import fiolib.shared_chart as shared
 
-import pprint
+# import pprint
 
 
 def calculate_font_size(settings, x_axis):

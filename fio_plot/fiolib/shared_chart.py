@@ -194,7 +194,7 @@ def get_record_set(settings, dataset, dataset_types):
                     datadict["cpu"]["cpu_usr"].append(int(round(record["cpu_usr"], 0)))
 
                     if "ss_attained" in record.keys():
-                        if record["ss_attained"]:
+                        if record["ss_settings"]:
                             datadict["ss_settings"].append(str(record["ss_settings"])),
                             datadict["ss_attained"].append(int(record["ss_attained"])),
                             datadict["ss_data_bw_mean"].append(
@@ -266,7 +266,7 @@ def scale_data(datadict):
 
     # Steady state bandwidth data must be scaled.
     if "ss_settings" in datadict.keys():
-        if datadict["ss_attained"]:
+        if datadict["ss_settings"]:
             ss_bw_scalefactor = supporting.get_scale_factor_bw_ss(ss_data_bw_mean)
             ss_data_bw_mean = supporting.scale_yaxis(ss_data_bw_mean, ss_bw_scalefactor)
             ss_data_bw_mean["data"] = supporting.round_metric_series(
@@ -292,7 +292,7 @@ def scale_data(datadict):
         datadict["cpu"] = {"cpu_sys": cpu_sys, "cpu_usr": cpu_usr}
 
     if "ss_settings" in datadict.keys():
-        if datadict["ss_attained"]:
+        if datadict["ss_settings"]:
             datadict["ss_data_bw_mean"] = ss_data_bw_mean
             datadict["ss_data_iops_mean"] = ss_data_iops_mean
 
@@ -423,20 +423,25 @@ def convert_number_to_yes_no(data):
 
 
 def create_steadystate_table(settings, data, ax2):
-    data["ss_attained"] = convert_number_to_yes_no(data["ss_attained"])
+    # pprint.pprint(data)
+    if data["ss_attained"]:
+        data["ss_attained"] = convert_number_to_yes_no(data["ss_attained"])
+        table_vals = [
+            data["x_axis"],
+            data["ss_data_bw_mean"]["data"],
+            data["ss_data_iops_mean"]["data"],
+            data["ss_attained"],
+        ]
 
-    table_vals = [
-        data["x_axis"],
-        data["ss_data_bw_mean"]["data"],
-        data["ss_data_iops_mean"]["data"],
-        data["ss_attained"],
-    ]
-
-    rowlabels = [
-        "Steady state",
-        f"BW mean {data['ss_data_bw_mean']['format']}",
-        f"{data['ss_data_iops_mean']['format']}  mean",
-        f"{data['ss_settings'][0]} attained",
-    ]
-    location = "lower center"
-    create_generic_table(settings, table_vals, ax2, rowlabels, location)
+        rowlabels = [
+            "Steady state",
+            f"BW mean {data['ss_data_bw_mean']['format']}",
+            f"{data['ss_data_iops_mean']['format']}  mean",
+            f"{data['ss_settings'][0]} attained",
+        ]
+        location = "lower center"
+        create_generic_table(settings, table_vals, ax2, rowlabels, location)
+    else:
+        print(
+            "\n No steadystate data was found, so the steadystate table cannot be displayed.\n"
+        )

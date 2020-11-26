@@ -8,8 +8,6 @@ import fiolib.supporting as supporting
 import fiolib.dataimport as logdata
 import matplotlib.patches as mpatches
 
-import pprint
-
 
 def make_patch_spines_invisible(ax):
     ax.set_frame_on(True)
