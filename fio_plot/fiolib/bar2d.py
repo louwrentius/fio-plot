@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 # import pprint
 import fiolib.supporting as supporting
 import fiolib.shared_chart as shared
+import fiolib.tables as tables
 
 # import pprint
 
 
 def calculate_font_size(settings, x_axis):
-    max_label_width = max(shared.get_max_width([x_axis], len(x_axis)))
+    max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))
     fontsize = 0
     #
     # This hard-coded font sizing is ugly but if somebody knows a better algorithm...
@@ -133,16 +134,16 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     shared.autolabel(rects2, ax3)
     #
     # Draw the standard deviation table
-    shared.create_stddev_table(settings, data, ax2)
+    tables.create_stddev_table(settings, data, ax2)
     #
     # Draw the cpu usage table if requested
     # pprint.pprint(data)
 
     if settings["show_cpu"] and not settings["show_ss"]:
-        shared.create_cpu_table(settings, data, ax2)
+        tables.create_cpu_table(settings, data, ax2)
 
     if settings["show_ss"] and not settings["show_cpu"]:
-        shared.create_steadystate_table(settings, data, ax2)
+        tables.create_steadystate_table(settings, data, ax2)
 
     #
     # Create legend
@@ -204,13 +205,13 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     shared.autolabel(rects1, ax1)
     shared.autolabel(rects2, ax3)
 
-    shared.create_stddev_table(settings, data, ax2)
+    tables.create_stddev_table(settings, data, ax2)
 
     if settings["show_cpu"] and not settings["show_ss"]:
-        shared.create_cpu_table(settings, data, ax2)
+        tables.create_cpu_table(settings, data, ax2)
 
     if settings["show_ss"] and not settings["show_cpu"]:
-        shared.create_steadystate_table(settings, data, ax2)
+        tables.create_steadystate_table(settings, data, ax2)
 
     # Create legend
     ax2.legend(
