@@ -157,7 +157,7 @@ you to gather data for different queue depths and/or number of simultaneous jobs
 
 This particular example benchmark was run with these parameters:
 
-    ./bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
+    bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
 
 In this example, we run a mixed random read/write benchmark. We have two runs, one with a 75% / 25% read/write mix and one with a 90% / 10% mix. 
 
@@ -183,7 +183,7 @@ Fio-plot also writes metadata to the PNG files using Pillow
 
 Creating a 2D Bar Chart based on randread data and numjobs = 1 (default).
 
-    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread
+    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread
 
 ![regularbars][regular]
 
@@ -191,11 +191,11 @@ Creating a 2D Bar Chart based on randread data and numjobs = 1 (default).
 
 Creating a 2D Bar Chart based on randread data and numjobs = 8.
 
-    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -n 8 -r randread
+    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -n 8 -r randread
 
 Creating a 2D Bar Chart grouping iops and latency data together: 
 
-    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread --group-bars
+    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread --group-bars
 
 ![groupedbars][grouped]
 
@@ -205,35 +205,41 @@ Creating a 2D Bar Chart grouping iops and latency data together:
 
 Creating a 3D graph showing IOPS. 
 
-    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
+    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
     
 Creating a 3D graph with a subselection of data
 
-    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops -J 16 -M 16
+    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops -J 16 -M 16
 
 ### 2D Bar Histogram
 
 Creating a latency histogram with a queue depth of 1 and numjobs is 1.
 
-    ./fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -H -r randread -d 1 -n 1
+    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -H -r randread -d 1 -n 1
 
 Creating a line chart from different benchmark runs in a single folder
 
-    ./fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1
+    fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1
   
 The same result but if you want markers to help distinguish between lines:
 
-    ./fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1 --enable--markers
+    fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1 --enable--markers
 
 ![markers][markers]
 
 [markers]: https://louwrentius.com/static/images/enablemarkers.png
 
+It is also possible to change the line colors with the --colors parameter.
+
+    fio_plot -i <folder1> <folder2> <folder3> <folder4> -T "Test" -g -t iops -r randread --xlabel-parent 0 --colors xkcd:red xkcd:blue xkcd:green tab:purple
+
+Please note that you need to specify a color for each line drawn. In this example, four lines are drawn.
+
 ### Comparing two or more benchmarks based on JSON data (2D Bar Chart):
 
 A simple example where we compare the iops and latency of a particular iodepth and numjobs value:
 
-    ./fio_plots -i <folder_a> <folder_b> <folder_c> -T "Test" -C -r randwrite -d 8 
+    fio_plots -i <folder_a> <folder_b> <folder_c> -T "Test" -C -r randwrite -d 8 
 
 ![compare01][compare01]
 
@@ -261,7 +267,7 @@ It is now also possible to show steady state statistics (--show-ss) if you ran a
 
 Create a line chart based on data from two different folders (but the same benchmark parameters)     
 
-    ./fio_plot -i <benchmark_data_folder A> <benchmark_data_folder B>  -T "Test" -g -r randread -t iops lat -d 8 -n 1
+    fio_plot -i <benchmark_data_folder A> <benchmark_data_folder B>  -T "Test" -g -r randread -t iops lat -d 8 -n 1
 
 I'm assuming that the benchmark was created with the (included) bench_fio tool.
 
