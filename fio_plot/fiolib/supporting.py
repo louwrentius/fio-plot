@@ -354,6 +354,7 @@ def save_png(settings, plt, fig):
     title = title.replace("/", "-")
     plt.tight_layout(rect=[0, 0, 1, 1])
     savename = f"{title}_{now}.png"
+    print(f"\n Saving to file {savename}\n")
     fig.savefig(savename, dpi=settings["dpi"])
     write_png_metadata(savename, settings)
 
@@ -369,7 +370,7 @@ def write_png_metadata(filename, settings):
             v = value
         if type(v) == bool:
             v = str(v)
-        if v == None:
+        if v is None:
             continue
         else:
             metadata.add_text(k, str(v))

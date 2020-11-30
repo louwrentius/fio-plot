@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 import unittest
-import bench_fio as b
 import benchlib.argparsing as argparsing
-import benchlib.checks as checks
 import benchlib.defaultsettings as defaultsettings
 import benchlib.display as display
-import benchlib.runfio as runfio
 import benchlib.supporting as supporting
-import pprint
 
 
 class TestFunctions(unittest.TestCase):
