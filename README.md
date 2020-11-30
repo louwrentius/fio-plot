@@ -233,7 +233,7 @@ The same result but if you want markers to help distinguish between lines:
 
 It is also possible to change the line colors with the --colors parameter.
 
-    fio_plot -i <folder1> <folder2> <folder3> <folder4> -T "Test" -g -t iops -r randread --xlabel-parent 0 --colors xkcd:red xkcd:blue xkcd:green tab:purple
+    fio_plot -i <benchmark_data_folder> -T "Test" -g -r randread -t iops -d 1 2 4 8 --colors xkcd:red xkcd:blue xkcd:green tab:purple
 
 Please note that you need to specify a color for each line drawn. In this example, four lines are drawn.
 
