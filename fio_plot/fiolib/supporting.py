@@ -120,85 +120,6 @@ def get_scale_factor_bw_ss(dataset):
             return item
 
 
-def get_colors():
-    """This is a fixed list of colors that are used to color the different
-    lines in a graph."""
-    return [
-        "tab:blue",
-        "tab:orange",
-        "tab:green",
-        "tab:red",
-        "tab:purple",
-        "tab:brown",
-        "tab:pink",
-        "tab:olive",
-        "tab:cyan",
-        "xkcd:cloudy blue",
-        "xkcd:dark pastel green",
-        "xkcd:cement",
-        "xkcd:dark grass green",
-        "xkcd:dusty teal",
-        "xkcd:grey teal",
-        "xkcd:macaroni and cheese",
-        "xkcd:pinkish tan",
-        "xkcd:spruce",
-        "xkcd:strong blue",
-        "xkcd:toxic green",
-        "xkcd:windows blue",
-        "xkcd:blue blue",
-        "xkcd:blue with a hint of purple",
-        "xkcd:booger",
-        "xkcd:bright sea green",
-        "xkcd:dark green blue",
-        "xkcd:deep turquoise",
-        "xkcd:green teal",
-        "xkcd:strong pink",
-        "xkcd:bland",
-        "xkcd:deep aqua",
-        "xkcd:lavender pink",
-        "xkcd:light moss green",
-        "xkcd:light seafoam green",
-        "xkcd:olive yellow",
-        "xkcd:pig pink",
-        "xkcd:deep lilac",
-        "xkcd:desert",
-        "xkcd:dusty lavender",
-        "xkcd:purpley grey",
-        "xkcd:purply",
-        "xkcd:candy pink",
-        "xkcd:light pastel green",
-        "xkcd:boring green",
-        "xkcd:kiwi green",
-        "xkcd:light grey green",
-        "xkcd:orange pink",
-        "xkcd:tea green",
-        "xkcd:very light brown",
-        "xkcd:egg shell",
-        "xkcd:eggplant purple",
-        "xkcd:powder pink",
-        "xkcd:reddish grey",
-        "xkcd:baby shit brown",
-        "xkcd:liliac",
-        "xkcd:stormy blue",
-        "xkcd:ugly brown",
-        "xkcd:custard",
-        "xkcd:darkish pink",
-        "xkcd:deep brown",
-        "xkcd:greenish beige",
-        "xkcd:manilla",
-        "xkcd:off blue",
-        "xkcd:battleship grey",
-        "xkcd:browny green",
-        "xkcd:bruise",
-        "xkcd:kelley green",
-        "xkcd:sickly yellow",
-        "xkcd:sunny yellow",
-        "xkcd:azul",
-        "xkcd:darkgreen",
-        "xkcd:green/yellow",
-    ]
-
-
 def lookupTable(metric):
 
     lookup = {
@@ -433,6 +354,7 @@ def save_png(settings, plt, fig):
     title = title.replace("/", "-")
     plt.tight_layout(rect=[0, 0, 1, 1])
     savename = f"{title}_{now}.png"
+    print(f"\n Saving to file {savename}\n")
     fig.savefig(savename, dpi=settings["dpi"])
     write_png_metadata(savename, settings)
 
@@ -448,7 +370,7 @@ def write_png_metadata(filename, settings):
             v = value
         if type(v) == bool:
             v = str(v)
-        if v == None:
+        if v is None:
             continue
         else:
             metadata.add_text(k, str(v))
