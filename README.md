@@ -235,6 +235,12 @@ It is also possible to change the line colors with the --colors parameter.
 
 Please note that you need to specify a color for each line drawn. In this example, four lines are drawn.
 
+You can find a list of color names [here][cl1]. There is also a list of xkcd colors [here][cl2] (xkcd:'color name'). 
+
+[cl1]: https://matplotlib.org/gallery/color/named_colors.html
+[cl2]: https://xkcd.com/color/rgb/
+
+
 ### Comparing two or more benchmarks based on JSON data (2D Bar Chart):
 
 A simple example where we compare the iops and latency of a particular iodepth and numjobs value:
