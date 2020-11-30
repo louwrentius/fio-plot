@@ -217,6 +217,8 @@ Creating a latency histogram with a queue depth of 1 and numjobs is 1.
 
     fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -H -r randread -d 1 -n 1
 
+### 2D line charts
+
 Creating a line chart from different benchmark runs in a single folder
 
     fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1
@@ -239,7 +241,6 @@ You can find a list of color names [here][cl1]. There is also a list of xkcd col
 
 [cl1]: https://matplotlib.org/gallery/color/named_colors.html
 [cl2]: https://xkcd.com/color/rgb/
-
 
 ### Comparing two or more benchmarks based on JSON data (2D Bar Chart):
 
