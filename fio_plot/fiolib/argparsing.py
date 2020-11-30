@@ -263,7 +263,7 @@ def set_arguments():
         "--max-bw", help="Maximum bandwidth on y-axis", type=int, default=None
     )
     ag.add_argument(
-        "--colormap",
+        "--colors",
         help="Space separated list of colors (only used with -g). Color names can be found "
         "at this page: https://matplotlib.org/3.3.3/gallery/color/named_colors.html"
         "(example list: tab:red teal violet yellow). You need as many colors as lines.",
