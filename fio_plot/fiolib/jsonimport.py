@@ -106,6 +106,7 @@ def get_json_mapping(mode, dataset):
     dictionary = {
         "iodepth": (jobOptions + ["iodepth"]),
         "numjobs": (jobOptions + ["numjobs"]),
+        "bs": (jobOptions + ["bs"]),
         "rw": (jobOptions + ["rw"]),
         "bw": (data + ["bw"]),
         "iops": (data + ["iops"]),
@@ -159,6 +160,7 @@ def get_flat_json_mapping(settings, dataset):
             row = {
                 "iodepth": int(get_nested_value(record, m["iodepth"])),
                 "numjobs": int(get_nested_value(record, m["numjobs"])),
+                "bs": get_nested_value(record, m["bs"]),
                 "rw": get_nested_value(record, m["rw"]),
                 "iops": get_nested_value(record, m["iops"]),
                 "iops_stddev": get_nested_value(record, m["iops_stddev"]),

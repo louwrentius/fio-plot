@@ -162,6 +162,7 @@ def get_record_set(settings, dataset, dataset_types):
         "lat_series_raw": [],
         "lat_stddev_series_raw": [],
         "cpu": {"cpu_sys": [], "cpu_usr": []},
+        "bs": [],
         "x_axis": labels,
         "y1_axis": None,
         "y2_axis": None,
@@ -188,6 +189,7 @@ def get_record_set(settings, dataset, dataset_types):
                     datadict["lat_series_raw"].append(record["lat"])
                     datadict["iops_stddev_series_raw"].append(record["iops_stddev"])
                     datadict["lat_stddev_series_raw"].append(record["lat_stddev"])
+                    datadict["bs"].append(record["bs"])
                     datadict["cpu"]["cpu_sys"].append(int(round(record["cpu_sys"], 0)))
                     datadict["cpu"]["cpu_usr"].append(int(round(record["cpu_usr"], 0)))
 

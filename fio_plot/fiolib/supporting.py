@@ -293,7 +293,9 @@ def get_highest_maximum(settings, data):
     return highest_max
 
 
-def create_title_and_sub(settings, plt, skip_keys=[], sub_x_offset=0, sub_y_offset=0):
+def create_title_and_sub(
+    settings, plt, bs=None, skip_keys=[], sub_x_offset=0, sub_y_offset=0
+):
     #
     # Offset title/subtitle if there is a 3rd y-axis
     #
@@ -322,13 +324,18 @@ def create_title_and_sub(settings, plt, skip_keys=[], sub_x_offset=0, sub_y_offs
         "filter": str(settings["filter"]).strip("[]").replace("'", ""),
     }
 
+    if bs:
+        sub_title_items.update({"bs": bs})
+
+    pprint.pprint(sub_title_items)
+
     if settings["subtitle"]:
         subtitle = settings["subtitle"]
     else:
         temporary_string = "|"
         for key in sub_title_items.keys():
             if key not in skip_keys:
-                if len(settings[key]) > 0:
+                if len(sub_title_items[key]) > 0:
                     temporary_string += f" {key} {sub_title_items[key]} |"
         subtitle = temporary_string
 
