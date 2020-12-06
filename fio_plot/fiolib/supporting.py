@@ -327,8 +327,6 @@ def create_title_and_sub(
     if bs:
         sub_title_items.update({"bs": bs})
 
-    pprint.pprint(sub_title_items)
-
     if settings["subtitle"]:
         subtitle = settings["subtitle"]
     else:
