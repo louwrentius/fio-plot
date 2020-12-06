@@ -32,6 +32,7 @@ def check_fio_version(settings):
 def drop_caches(settings):
     command = ["echo", "3", ">", "/proc/sys/vm/drop_caches"]
     run_raw_command(command)
+    print("Dropping caches...")
 
 
 def run_raw_command(command, env=None):
