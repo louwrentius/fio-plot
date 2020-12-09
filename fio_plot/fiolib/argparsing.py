@@ -271,6 +271,11 @@ def set_arguments():
         nargs="+",
         default=None,
     )
+    ag.add_argument(
+        "--override-errors",
+        help="Override error messages at your own peril.",
+        action="store_true",
+    )
 
     return parser
 

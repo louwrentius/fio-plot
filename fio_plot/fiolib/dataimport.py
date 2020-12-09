@@ -202,7 +202,7 @@ def mergeDataSet(settings, dataset):
     return mergedSets
 
 
-def parse_raw_cvs_data(dataset):
+def parse_raw_cvs_data(settings, dataset):
     """This function exists mostly because I tried to test the performance
     of a 1.44MB floppy drive. The device is so slow that it can't keep up.
     This results in records that span multiple seconds, skewing the graphs.
@@ -219,14 +219,21 @@ def parse_raw_cvs_data(dataset):
     mean = statistics.mean(distance_list)
     if mean > 1000:
         print(
-            f"\n{supporting.bcolors.WARNING} WARNING: the storage could not "
-            f"keep up with the configured I/O request size. Data is interpolated.{supporting.bcolors.ENDC}"
+            f"\n{supporting.bcolors.FAIL}ERROR: invalid log data found\n"
+            f"The storage could not keep up with the load. Data is interpolated.{supporting.bcolors.ENDC}"
+            "\nIt seems that under extreme load conditions, Fio log data may become invalid"
+            "The resulting graph data will likely show invalid results."
+            "It you override this error, it is wise to compare the .json output with the .log output."
         )
-        print(
-            "\nIO is logged every 0.5 seconds by default. "
-            "\nThis message will apear if no IO has been issued within such an interval. "
-            "\nThis can happen with very slow storage devices like floppy drives or bad SD cards.\n"
-        )
+        if not settings["override_errors"]:
+            print(
+                f"\n{supporting.bcolors.FAIL}Aborting.{supporting.bcolors.ENDC} You can still generate this graph  with --override-errors\n"
+            )
+            sys.exit(1)
+        else:
+            print(
+                f"\n{supporting.bcolors.WARNING}Override errors parameter set, so chart will be generated.{supporting.bcolors.ENDC}\n"
+            )
 
         for index, item in enumerate(dataset):
             if index == 0:
@@ -247,7 +254,7 @@ def parse_raw_cvs_data(dataset):
         return dataset
 
 
-def readLogData(inputfile):
+def readLogData(settings, inputfile):
     """FIO log data is imported as CSV data. The scope is the import of a
     single file.
     """
@@ -263,7 +270,7 @@ def readLogData(inputfile):
             )
             for item in csv_reader:
                 dataset.append(item)
-    dataset = parse_raw_cvs_data(dataset)
+    dataset = parse_raw_cvs_data(settings, dataset)
     return dataset
 
 
@@ -271,7 +278,7 @@ def readLogDataFromFiles(settings, inputfiles):
     """Returns a list of imported datasets based on the input files."""
     data = []
     for inputfile in inputfiles:
-        logdata = readLogData(inputfile["filename"])
+        logdata = readLogData(settings, inputfile["filename"])
         logdict = {"data": logdata}
         logdict.update(inputfile)
         data.append(logdict)
