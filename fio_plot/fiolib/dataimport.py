@@ -216,25 +216,21 @@ def parse_raw_cvs_data(settings, dataset):
         else:
             distance = int(item["timestamp"]) - int(dataset[index - 1]["timestamp"])
             distance_list.append(distance)
-    mean = statistics.mean(distance_list)
+    mean = int(statistics.mean(distance_list))
+
     if mean > 1000:
         print(
-            f"\n{supporting.bcolors.FAIL}ERROR: invalid log data found\n"
-            f"The storage could not keep up with the load. Data is interpolated.{supporting.bcolors.ENDC}"
-            "\nIt seems that under extreme load conditions, Fio log data may become invalid"
-            "The resulting graph data will likely show invalid results."
-            "It you override this error, it is wise to compare the .json output with the .log output."
+            f"\n{supporting.bcolors.WARNING}Warning: > 1000msec log interval found\n"
+            f"{supporting.bcolors.ENDC}"
+            "\nIf the log_avg_msec parameter used to generate the log data is < 1000 msec\n"
+            "it is stronly advised to cross-verify the output of the graph with the\n"
+            "appropriate values found in the .json output if available.\n\n"
+            "It may be advised to rerun your benchmarks with log_avg_msec = 1000 or higher\n"
+            "to achieve correct results.\n\n"
         )
-        if not settings["override_errors"]:
-            print(
-                f"\n{supporting.bcolors.FAIL}Aborting.{supporting.bcolors.ENDC} You can still generate this graph  with --override-errors\n"
-            )
-            sys.exit(1)
-        else:
-            print(
-                f"\n{supporting.bcolors.WARNING}Override errors parameter set, so chart will be generated.{supporting.bcolors.ENDC}\n"
-            )
 
+        # log data with a log_avg_msec higher than 1000 msec should be converted back
+        # to values per 1000 msec
         for index, item in enumerate(dataset):
             if index == 0:
                 average_value = int(item["value"]) / int(item["timestamp"]) * 1000
@@ -243,7 +239,7 @@ def parse_raw_cvs_data(settings, dataset):
                 previous_timestamp = int(dataset[index - 1]["timestamp"])
                 distance = int(item["timestamp"]) - previous_timestamp
                 number_of_seconds = int(distance / 1000)
-                average_value = int(item["value"]) / distance * 1000
+                average_value = int(item["value"]) / distance * mean
                 for x in range(number_of_seconds):
                     temp_dict = dict(item)
                     temp_dict["value"] = average_value
