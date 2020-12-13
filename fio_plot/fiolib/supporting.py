@@ -365,7 +365,7 @@ def plot_fio_version(settings, value, plt, ax1, vertical=-0.08):
     if not settings["disable_fio_version"]:
         horizontal = 0
         align = "left"
-        plot_text_line(value, plt, ax1, horizontal, align, vertical)
+        plot_text_line(f"Fio version: {value}", plt, ax1, horizontal, align, vertical)
 
 
 def plot_text_line(value, plt, ax1, horizontal, align, vertical):
