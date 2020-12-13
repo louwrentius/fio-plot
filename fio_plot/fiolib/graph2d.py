@@ -113,10 +113,12 @@ def chart_2d_log_data(settings, dataset):
     # A ton of work to get the Fio-version from .json output if it exists.
     #
     jsondata = support2d.get_json_data(settings)
+    ax = get_axis_for_label(axes)
     if jsondata[0]["data"] and not settings["disable_fio_version"]:
         fio_version = jsondata[0]["data"][0]["fio_version"]
-        ax = get_axis_for_label(axes)
         supporting.plot_fio_version(settings, fio_version, plt, ax, -0.12)
+    else:
+        supporting.plot_fio_version(settings, None, plt, ax, -0.12)
 
     #
     # Print source
