@@ -293,7 +293,9 @@ def get_highest_maximum(settings, data):
     return highest_max
 
 
-def create_title_and_sub(settings, plt, skip_keys=[], sub_x_offset=0, sub_y_offset=0):
+def create_title_and_sub(
+    settings, plt, bs=None, skip_keys=[], sub_x_offset=0, sub_y_offset=0
+):
     #
     # Offset title/subtitle if there is a 3rd y-axis
     #
@@ -322,13 +324,16 @@ def create_title_and_sub(settings, plt, skip_keys=[], sub_x_offset=0, sub_y_offs
         "filter": str(settings["filter"]).strip("[]").replace("'", ""),
     }
 
+    if bs:
+        sub_title_items.update({"bs": bs})
+
     if settings["subtitle"]:
         subtitle = settings["subtitle"]
     else:
         temporary_string = "|"
         for key in sub_title_items.keys():
             if key not in skip_keys:
-                if len(settings[key]) > 0:
+                if len(sub_title_items[key]) > 0:
                     temporary_string += f" {key} {sub_title_items[key]} |"
         subtitle = temporary_string
 
@@ -346,6 +351,33 @@ class bcolors:
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
+
+
+def plot_source(settings, plt, ax1):
+    if settings["source"]:
+        calculation = len(settings["source"]) / 130
+        horizontal = 1 - calculation
+        align = "left"
+        plot_text_line(settings["source"], plt, ax1, horizontal, align)
+
+
+def plot_fio_version(settings, value, plt, ax1):
+    if not settings["disable_fio_version"]:
+        horizontal = 0
+        align = "left"
+        plot_text_line(value, plt, ax1, horizontal, align)
+
+
+def plot_text_line(value, plt, ax1, horizontal, align):
+    plt.text(
+        horizontal,
+        -0.08,
+        str(value),
+        ha=align,
+        va="top",
+        transform=ax1.transAxes,
+        fontsize=8,
+    )
 
 
 def save_png(settings, plt, fig):

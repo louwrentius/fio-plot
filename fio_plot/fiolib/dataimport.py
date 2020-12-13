@@ -202,7 +202,7 @@ def mergeDataSet(settings, dataset):
     return mergedSets
 
 
-def parse_raw_cvs_data(dataset):
+def parse_raw_cvs_data(settings, dataset):
     """This function exists mostly because I tried to test the performance
     of a 1.44MB floppy drive. The device is so slow that it can't keep up.
     This results in records that span multiple seconds, skewing the graphs.
@@ -216,18 +216,21 @@ def parse_raw_cvs_data(dataset):
         else:
             distance = int(item["timestamp"]) - int(dataset[index - 1]["timestamp"])
             distance_list.append(distance)
-    mean = statistics.mean(distance_list)
+    mean = int(statistics.mean(distance_list))
+
     if mean > 1000:
         print(
-            f"\n{supporting.bcolors.WARNING} WARNING: the storage could not "
-            f"keep up with the configured I/O request size. Data is interpolated.{supporting.bcolors.ENDC}"
-        )
-        print(
-            "\nIO is logged every 0.5 seconds by default. "
-            "\nThis message will apear if no IO has been issued within such an interval. "
-            "\nThis can happen with very slow storage devices like floppy drives or bad SD cards.\n"
+            f"\n{supporting.bcolors.WARNING}Warning: > 1000msec log interval found\n"
+            f"{supporting.bcolors.ENDC}"
+            "\nIf the log_avg_msec parameter used to generate the log data is < 1000 msec\n"
+            "it is stronly advised to cross-verify the output of the graph with the\n"
+            "appropriate values found in the .json output if available.\n\n"
+            "It may be advised to rerun your benchmarks with log_avg_msec = 1000 or higher\n"
+            "to achieve correct results.\n\n"
         )
 
+        # log data with a log_avg_msec higher than 1000 msec should be converted back
+        # to values per 1000 msec
         for index, item in enumerate(dataset):
             if index == 0:
                 average_value = int(item["value"]) / int(item["timestamp"]) * 1000
@@ -236,7 +239,7 @@ def parse_raw_cvs_data(dataset):
                 previous_timestamp = int(dataset[index - 1]["timestamp"])
                 distance = int(item["timestamp"]) - previous_timestamp
                 number_of_seconds = int(distance / 1000)
-                average_value = int(item["value"]) / distance * 1000
+                average_value = int(item["value"]) / distance * mean
                 for x in range(number_of_seconds):
                     temp_dict = dict(item)
                     temp_dict["value"] = average_value
@@ -247,7 +250,7 @@ def parse_raw_cvs_data(dataset):
         return dataset
 
 
-def readLogData(inputfile):
+def readLogData(settings, inputfile):
     """FIO log data is imported as CSV data. The scope is the import of a
     single file.
     """
@@ -263,7 +266,7 @@ def readLogData(inputfile):
             )
             for item in csv_reader:
                 dataset.append(item)
-    dataset = parse_raw_cvs_data(dataset)
+    dataset = parse_raw_cvs_data(settings, dataset)
     return dataset
 
 
@@ -271,7 +274,7 @@ def readLogDataFromFiles(settings, inputfiles):
     """Returns a list of imported datasets based on the input files."""
     data = []
     for inputfile in inputfiles:
-        logdata = readLogData(inputfile["filename"])
+        logdata = readLogData(settings, inputfile["filename"])
         logdict = {"data": logdata}
         logdict.update(inputfile)
         data.append(logdict)

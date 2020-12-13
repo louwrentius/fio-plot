@@ -2,6 +2,7 @@
 import fiolib.supporting as supporting
 import fiolib.dataimport as dataimport
 from operator import itemgetter
+import pprint
 
 
 def get_dataset_types(dataset):
@@ -37,7 +38,16 @@ def get_record_set_histogram(settings, dataset):
     iodepth = int(settings["iodepth"][0])
     numjobs = int(settings["numjobs"][0])
 
-    record_set = {"iodepth": iodepth, "numjobs": numjobs, "data": None}
+    # pprint.pprint(dataset[0])
+
+    # fio_version = dataset["data"]["fio version"]
+
+    record_set = {
+        "iodepth": iodepth,
+        "numjobs": numjobs,
+        "data": None,
+        "fio_version": None,
+    }
 
     for record in dataset[0]["data"]:
         if (
@@ -46,6 +56,7 @@ def get_record_set_histogram(settings, dataset):
             and record["rw"] == rw
         ):
             record_set["data"] = record
+            record_set["fio_version"] = record["fio_version"]
             return record_set
 
 
@@ -54,6 +65,7 @@ def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
         "iodepth": dataset_types["iodepth"],
         "numjobs": dataset_types["numjobs"],
         "values": [],
+        "fio_version": [],
     }
     # pprint.pprint(dataset)
     if settings["rw"] == "randrw":
@@ -77,6 +89,7 @@ def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
                 ):
                     row.append(record[metric])
         record_set["values"].append(supporting.round_metric_series(row))
+    record_set["fio_version"].append(dataset[0]["data"][0]["fio_version"])
     return record_set
 
 
@@ -99,6 +112,7 @@ def get_record_set_improved(settings, dataset, dataset_types):
         labels.append(record["label"])
 
     datadict = {
+        "fio_version": [],
         "iops_series_raw": [],
         "iops_stddev_series_raw": [],
         "lat_series_raw": [],
@@ -125,6 +139,7 @@ def get_record_set_improved(settings, dataset, dataset_types):
                     and record["rw"] == rw
                     and record["type"] in settings["filter"]
                 ):
+                    datadict["fio_version"].append(record["fio_version"])
                     datadict["iops_series_raw"].append(record["iops"])
                     datadict["lat_series_raw"].append(record["lat"])
                     datadict["iops_stddev_series_raw"].append(record["iops_stddev"])
@@ -157,11 +172,13 @@ def get_record_set(settings, dataset, dataset_types):
     labels = dataset_types[settings["query"]]
 
     datadict = {
+        "fio_version": [],
         "iops_series_raw": [],
         "iops_stddev_series_raw": [],
         "lat_series_raw": [],
         "lat_stddev_series_raw": [],
         "cpu": {"cpu_sys": [], "cpu_usr": []},
+        "bs": [],
         "x_axis": labels,
         "y1_axis": None,
         "y2_axis": None,
@@ -184,10 +201,12 @@ def get_record_set(settings, dataset, dataset_types):
                     and record["rw"] == rw
                     and record["type"] in settings["filter"]
                 ):
+                    datadict["fio_version"].append(record["fio_version"])
                     datadict["iops_series_raw"].append(record["iops"])
                     datadict["lat_series_raw"].append(record["lat"])
                     datadict["iops_stddev_series_raw"].append(record["iops_stddev"])
                     datadict["lat_stddev_series_raw"].append(record["lat_stddev"])
+                    datadict["bs"].append(record["bs"])
                     datadict["cpu"]["cpu_sys"].append(int(round(record["cpu_sys"], 0)))
                     datadict["cpu"]["cpu_usr"].append(int(round(record["cpu_usr"], 0)))
 

@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
-
-# import pprint
 import fiolib.supporting as supporting
 import fiolib.shared_chart as shared
 import fiolib.tables as tables
 
-# import pprint
+import pprint
 
 
 def calculate_font_size(settings, x_axis):
@@ -85,23 +83,15 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     particular iodepth."""
     dataset_types = shared.get_dataset_types(dataset)
     data = shared.get_record_set(settings, dataset, dataset_types)
-
+    # pprint.pprint(data)
     fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={"height_ratios": [7, 1]})
     ax3 = ax1.twinx()
     fig.set_size_inches(10, 6)
 
     #
     # Puts in the credit source (often a name or url)
-    if settings["source"]:
-        plt.text(
-            1,
-            -0.08,
-            str(settings["source"]),
-            ha="right",
-            va="top",
-            transform=ax1.transAxes,
-            fontsize=9,
-        )
+    supporting.plot_source(settings, plt, ax1)
+    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax1)
 
     ax2.axis("off")
 
@@ -120,12 +110,14 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
         supporting.create_title_and_sub(
             settings,
             plt,
+            bs=data["bs"][0],
             skip_keys=[settings["query"]],
         )
     else:
         supporting.create_title_and_sub(
             settings,
             plt,
+            bs=data["bs"][0],
             skip_keys=[settings["query"], "filter"],
         )
     #
@@ -173,16 +165,8 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
 
     #
     # Puts in the credit source (often a name or url)
-    if settings["source"]:
-        plt.text(
-            1,
-            -0.08,
-            str(settings["source"]),
-            ha="right",
-            va="top",
-            transform=ax1.transAxes,
-            fontsize=9,
-        )
+    supporting.plot_source(settings, plt, ax1)
+    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax1)
 
     ax2.axis("off")
 

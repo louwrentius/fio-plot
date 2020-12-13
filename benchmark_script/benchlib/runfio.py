@@ -29,6 +29,11 @@ def check_fio_version(settings):
         sys.exit(1)
 
 
+def drop_caches(settings):
+    command = ["echo", "3", ">", "/proc/sys/vm/drop_caches"]
+    run_raw_command(command)
+
+
 def run_raw_command(command, env=None):
     result = subprocess.run(
         command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
@@ -107,9 +112,11 @@ def run_benchmarks(settings, benchmarks):
             if settings["precondition_repeat"]:
                 run_precondition_benchmark(settings, benchmark["target"], run)
                 run += 1
+            drop_caches(settings)
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
+            drop_caches(settings)
             run_fio(settings, benchmark)
 
 
