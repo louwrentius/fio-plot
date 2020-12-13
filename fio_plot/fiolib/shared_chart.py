@@ -37,7 +37,14 @@ def get_record_set_histogram(settings, dataset):
     iodepth = int(settings["iodepth"][0])
     numjobs = int(settings["numjobs"][0])
 
-    record_set = {"iodepth": iodepth, "numjobs": numjobs, "data": None}
+    fio_version = dataset[0]["data"]["fio version"]
+
+    record_set = {
+        "iodepth": iodepth,
+        "numjobs": numjobs,
+        "data": None,
+        "fio_version": fio_version,
+    }
 
     for record in dataset[0]["data"]:
         if (
@@ -99,6 +106,7 @@ def get_record_set_improved(settings, dataset, dataset_types):
         labels.append(record["label"])
 
     datadict = {
+        "fio_version": [],
         "iops_series_raw": [],
         "iops_stddev_series_raw": [],
         "lat_series_raw": [],
@@ -125,6 +133,7 @@ def get_record_set_improved(settings, dataset, dataset_types):
                     and record["rw"] == rw
                     and record["type"] in settings["filter"]
                 ):
+                    datadict["fio_version"].append(record["fio_version"])
                     datadict["iops_series_raw"].append(record["iops"])
                     datadict["lat_series_raw"].append(record["lat"])
                     datadict["iops_stddev_series_raw"].append(record["iops_stddev"])
@@ -157,6 +166,7 @@ def get_record_set(settings, dataset, dataset_types):
     labels = dataset_types[settings["query"]]
 
     datadict = {
+        "fio_version": [],
         "iops_series_raw": [],
         "iops_stddev_series_raw": [],
         "lat_series_raw": [],
@@ -185,6 +195,7 @@ def get_record_set(settings, dataset, dataset_types):
                     and record["rw"] == rw
                     and record["type"] in settings["filter"]
                 ):
+                    datadict["fio_version"].append(record["fio_version"])
                     datadict["iops_series_raw"].append(record["iops"])
                     datadict["lat_series_raw"].append(record["lat"])
                     datadict["iops_stddev_series_raw"].append(record["iops_stddev"])

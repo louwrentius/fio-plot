@@ -353,6 +353,32 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
+def plot_source(settings, plt, ax1):
+    if settings["source"]:
+        calculation = len(settings["source"]) / 130
+        horizontal = 1 - calculation
+        align = "left"
+        plot_text_line(settings["source"], plt, ax1, horizontal, align)
+
+
+def plot_fio_version(value, plt, ax1):
+    horizontal = 0
+    align = "left"
+    plot_text_line(value, plt, ax1, horizontal, align)
+
+
+def plot_text_line(value, plt, ax1, horizontal, align):
+    plt.text(
+        horizontal,
+        -0.08,
+        str(value),
+        ha=align,
+        va="top",
+        transform=ax1.transAxes,
+        fontsize=9,
+    )
+
+
 def save_png(settings, plt, fig):
     now = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     title = settings["title"].replace(" ", "-")

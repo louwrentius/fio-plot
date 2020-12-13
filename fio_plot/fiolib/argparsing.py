@@ -272,11 +272,10 @@ def set_arguments():
         default=None,
     )
     ag.add_argument(
-        "--override-errors",
-        help="Override error messages at your own peril.",
+        "--disable-fio-version",
+        help="Don't display the fio version in the graph.",
         action="store_true",
     )
-
     return parser
 
 

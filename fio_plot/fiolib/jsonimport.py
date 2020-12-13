@@ -104,6 +104,7 @@ def get_json_mapping(mode, dataset):
     jobOptions = root + ["job options"]
     data = root + [mode]
     dictionary = {
+        "fio_version": ["fio version"],
         "iodepth": (jobOptions + ["iodepth"]),
         "numjobs": (jobOptions + ["numjobs"]),
         "bs": (jobOptions + ["bs"]),
@@ -177,6 +178,7 @@ def get_flat_json_mapping(settings, dataset):
                 "ss_data_bw_mean": get_nested_value(record, m["ss_data_bw_mean"]),
                 "ss_data_iops_mean": get_nested_value(record, m["ss_data_iops_mean"]),
                 "ss_settings": get_nested_value(record, m["ss_settings"]),
+                "fio_version": get_nested_value(record, m["fio_version"]),
             }
             item["data"].append(row)
         # item["rawdata"] = None  # --> enable to throw away the data after parsing.
