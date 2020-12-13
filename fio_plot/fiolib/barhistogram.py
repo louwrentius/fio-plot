@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
+
 # import pprint
 import fiolib.shared_chart as shared
 import fiolib.supporting as supporting
@@ -14,13 +15,13 @@ def sort_latency_keys(latency):
     placeholder = ""
     tmp = []
     for item in latency:
-        if item == '>=2000':
+        if item == ">=2000":
             placeholder = ">=2000"
         else:
             tmp.append(item)
 
     tmp.sort(key=int)
-    if(placeholder):
+    if placeholder:
         tmp.append(placeholder)
     return tmp
 
@@ -29,11 +30,11 @@ def sort_latency_data(latency_dict):
     """The sorted keys from the sort_latency_keys function are used to create
     a sorted list of values, matching the order of the keys."""
     keys = latency_dict.keys()
-    values = {'keys': None, 'values': []}
+    values = {"keys": None, "values": []}
     sorted_keys = sort_latency_keys(keys)
-    values['keys'] = sorted_keys
+    values["keys"] = sorted_keys
     for key in sorted_keys:
-        values['values'].append(latency_dict[key])
+        values["values"].append(latency_dict[key])
     return values
 
 
@@ -44,12 +45,21 @@ def autolabel(rects, axis):
     for rect in rects:
         height = rect.get_height()
         if height >= 1:
-            axis.text(rect.get_x() + rect.get_width() / 2., 1 +
-                      height, '{}%'.format(int(height)),
-                              ha='center', fontsize=fontsize)
+            axis.text(
+                rect.get_x() + rect.get_width() / 2.0,
+                1 + height,
+                "{}%".format(int(height)),
+                ha="center",
+                fontsize=fontsize,
+            )
         elif height > 0.4:
-            axis.text(rect.get_x() + rect.get_width() /
-                      2., 1 + height, "{:3.2f}%".format(height), ha='center', fontsize=fontsize)
+            axis.text(
+                rect.get_x() + rect.get_width() / 2.0,
+                1 + height,
+                "{:3.2f}%".format(height),
+                ha="center",
+                fontsize=fontsize,
+            )
 
 
 def chart_latency_histogram(settings, dataset):
@@ -59,15 +69,15 @@ def chart_latency_histogram(settings, dataset):
     record_set = shared.get_record_set_histogram(settings, dataset)
 
     # We have to sort the data / axis from low to high
-    sorted_result_ms = sort_latency_data(record_set['data']['latency_ms'])
-    sorted_result_us = sort_latency_data(record_set['data']['latency_us'])
-    sorted_result_ns = sort_latency_data(record_set['data']['latency_ns'])
+    sorted_result_ms = sort_latency_data(record_set["data"]["latency_ms"])
+    sorted_result_us = sort_latency_data(record_set["data"]["latency_us"])
+    sorted_result_ns = sort_latency_data(record_set["data"]["latency_ns"])
 
     # This is just to use easier to understand variable names
-    x_series = sorted_result_ms['keys']
-    y_series1 = sorted_result_ms['values']
-    y_series2 = sorted_result_us['values']
-    y_series3 = sorted_result_ns['values']
+    x_series = sorted_result_ms["keys"]
+    y_series1 = sorted_result_ms["values"]
+    y_series2 = sorted_result_us["values"]
+    y_series3 = sorted_result_ns["values"]
 
     # us/ns histogram data is missing 2000/>=2000 fields that ms data has
     # so we have to add dummy data to match x-axis size
@@ -88,12 +98,12 @@ def chart_latency_histogram(settings, dataset):
     coverage_ns = round(sum(y_series3), 2)
 
     # Draw the bars
-    rects1 = ax1.bar(x_pos, y_series1, width, color='r')
-    rects2 = ax1.bar(x_pos + width, y_series2, width, color='b')
-    rects3 = ax1.bar(x_pos + width + width, y_series3, width, color='g')
+    rects1 = ax1.bar(x_pos, y_series1, width, color="r")
+    rects2 = ax1.bar(x_pos + width, y_series2, width, color="b")
+    rects3 = ax1.bar(x_pos + width + width, y_series3, width, color="g")
 
     # Configure the axis and labels
-    ax1.set_ylabel('Percentage of I/O')
+    ax1.set_ylabel("Percentage of I/O")
     ax1.set_xlabel("Latency")
     ax1.set_xticks(x_pos + width / 2)
     ax1.set_xticklabels(x_series)
@@ -106,21 +116,28 @@ def chart_latency_histogram(settings, dataset):
     label_ns = "Latency in ns  ({0:05.2f}%)".format(coverage_ns)
 
     # Configure the title
-    settings['type'] = ""
-    supporting.create_title_and_sub(settings, plt, ['type', 'filter'])
+    settings["type"] = ""
+    supporting.create_title_and_sub(settings, plt, ["type", "filter"])
     # Configure legend
-    ax1.legend((rects1[0], rects2[0], rects3[0]), (label_ms, label_us, label_ns), frameon=False,
-               loc='best')
+    ax1.legend(
+        (rects1[0], rects2[0], rects3[0]),
+        (label_ms, label_us, label_ns),
+        frameon=False,
+        loc="best",
+    )
 
     # puts a percentage above each bar (ns/us/ms)
     autolabel(rects1, ax1)
     autolabel(rects2, ax1)
     autolabel(rects3, ax1)
 
-    if settings['source']:
-        sourcelength = len(settings['source'])
-        offset = 1.0 - sourcelength / 120
-        fig.text(offset, 0.03, settings['source'])
+    supporting.plot_source(settings, plt, ax1)
+    supporting.plot_fio_version(record_set["fio_version"], plt, ax1)
+
+    # if settings['source']:
+    #    sourcelength = len(settings['source'])
+    #    offset = 1.0 - sourcelength / 120
+    #    fig.text(offset, 0.03, settings['source'])
     #
     # Save graph to PNG file
     #

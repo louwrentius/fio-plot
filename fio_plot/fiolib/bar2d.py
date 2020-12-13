@@ -165,16 +165,8 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
 
     #
     # Puts in the credit source (often a name or url)
-    if settings["source"]:
-        plt.text(
-            1,
-            -0.08,
-            str(settings["source"]),
-            ha="right",
-            va="top",
-            transform=ax1.transAxes,
-            fontsize=9,
-        )
+    supporting.plot_source(settings, plt, ax1)
+    supporting.plot_fio_version(data["fio_version"][0], plt, ax1)
 
     ax2.axis("off")
 

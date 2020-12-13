@@ -2,6 +2,7 @@
 import fiolib.supporting as supporting
 import fiolib.dataimport as dataimport
 from operator import itemgetter
+import pprint
 
 
 def get_dataset_types(dataset):
@@ -37,13 +38,15 @@ def get_record_set_histogram(settings, dataset):
     iodepth = int(settings["iodepth"][0])
     numjobs = int(settings["numjobs"][0])
 
-    fio_version = dataset[0]["data"]["fio version"]
+    # pprint.pprint(dataset[0])
+
+    # fio_version = dataset["data"]["fio version"]
 
     record_set = {
         "iodepth": iodepth,
         "numjobs": numjobs,
         "data": None,
-        "fio_version": fio_version,
+        "fio_version": None,
     }
 
     for record in dataset[0]["data"]:
@@ -53,6 +56,7 @@ def get_record_set_histogram(settings, dataset):
             and record["rw"] == rw
         ):
             record_set["data"] = record
+            record_set["fio_version"] = record["fio_version"]
             return record_set
 
 
