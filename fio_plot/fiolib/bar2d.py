@@ -91,7 +91,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     #
     # Puts in the credit source (often a name or url)
     supporting.plot_source(settings, plt, ax1)
-    supporting.plot_fio_version(data["fio_version"][0], plt, ax1)
+    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax1)
 
     ax2.axis("off")
 
@@ -166,7 +166,7 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     #
     # Puts in the credit source (often a name or url)
     supporting.plot_source(settings, plt, ax1)
-    supporting.plot_fio_version(data["fio_version"][0], plt, ax1)
+    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax1)
 
     ax2.axis("off")
 

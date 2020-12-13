@@ -361,10 +361,11 @@ def plot_source(settings, plt, ax1):
         plot_text_line(settings["source"], plt, ax1, horizontal, align)
 
 
-def plot_fio_version(value, plt, ax1):
-    horizontal = 0
-    align = "left"
-    plot_text_line(value, plt, ax1, horizontal, align)
+def plot_fio_version(settings, value, plt, ax1):
+    if not settings["disable_fio_version"]:
+        horizontal = 0
+        align = "left"
+        plot_text_line(value, plt, ax1, horizontal, align)
 
 
 def plot_text_line(value, plt, ax1, horizontal, align):
@@ -375,7 +376,7 @@ def plot_text_line(value, plt, ax1, horizontal, align):
         ha=align,
         va="top",
         transform=ax1.transAxes,
-        fontsize=9,
+        fontsize=8,
     )
 
 

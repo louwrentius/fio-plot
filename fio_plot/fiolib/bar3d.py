@@ -7,6 +7,7 @@ import fiolib.shared_chart as shared
 from matplotlib import cm
 import matplotlib as mpl
 import fiolib.supporting as supporting
+import pprint
 
 
 def plot_3d(settings, dataset):
@@ -168,7 +169,11 @@ def plot_3d(settings, dataset):
     )
 
     # Source
-    fig.text(0.65, 0.075, settings["source"])
+    if settings["source"]:
+        fig.text(0.65, 0.075, settings["source"])
+    if not settings["disable_fio_version"]:
+        fio_version = data["fio_version"][0]
+        fig.text(0.05, 0.075, f"Fio version: {fio_version}")
 
     #
     # Save graph to PNG file

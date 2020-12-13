@@ -65,6 +65,7 @@ def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
         "iodepth": dataset_types["iodepth"],
         "numjobs": dataset_types["numjobs"],
         "values": [],
+        "fio_version": [],
     }
     # pprint.pprint(dataset)
     if settings["rw"] == "randrw":
@@ -88,6 +89,7 @@ def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
                 ):
                     row.append(record[metric])
         record_set["values"].append(supporting.round_metric_series(row))
+    record_set["fio_version"].append(dataset[0]["data"][0]["fio_version"])
     return record_set
 
 

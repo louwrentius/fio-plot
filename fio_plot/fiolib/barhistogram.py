@@ -132,7 +132,7 @@ def chart_latency_histogram(settings, dataset):
     autolabel(rects3, ax1)
 
     supporting.plot_source(settings, plt, ax1)
-    supporting.plot_fio_version(record_set["fio_version"], plt, ax1)
+    supporting.plot_fio_version(settings, record_set["fio_version"], plt, ax1)
 
     # if settings['source']:
     #    sourcelength = len(settings['source'])
