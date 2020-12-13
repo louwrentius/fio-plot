@@ -116,23 +116,14 @@ def chart_2d_log_data(settings, dataset):
     if jsondata[0]["data"] and not settings["disable_fio_version"]:
         fio_version = jsondata[0]["data"][0]["fio_version"]
         ax = get_axis_for_label(axes)
-        supporting.plot_fio_version(settings, fio_version, plt, ax)
+        supporting.plot_fio_version(settings, fio_version, plt, ax, -0.12)
 
     #
-    # Save graph to file (png)
+    # Print source
     #
-    if settings["source"]:
-        ax = get_axis_for_label(axes)
-        plt.text(
-            1,
-            -0.10,
-            str(settings["source"]),
-            ha="right",
-            va="top",
-            transform=ax.transAxes,
-            fontsize=8,
-            fontfamily="monospace",
-        )
+    ax = get_axis_for_label(axes)
+    supporting.plot_source(settings, plt, ax, -0.12)
+
     #
     # Save graph to PNG file
     #
