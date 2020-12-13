@@ -353,25 +353,25 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-def plot_source(settings, plt, ax1):
+def plot_source(settings, plt, ax1, vertical=-0.08):
     if settings["source"]:
         calculation = len(settings["source"]) / 130
         horizontal = 1 - calculation
         align = "left"
-        plot_text_line(settings["source"], plt, ax1, horizontal, align)
+        plot_text_line(settings["source"], plt, ax1, horizontal, align, vertical)
 
 
-def plot_fio_version(settings, value, plt, ax1):
+def plot_fio_version(settings, value, plt, ax1, vertical=-0.08):
     if not settings["disable_fio_version"]:
         horizontal = 0
         align = "left"
-        plot_text_line(value, plt, ax1, horizontal, align)
+        plot_text_line(value, plt, ax1, horizontal, align, vertical)
 
 
-def plot_text_line(value, plt, ax1, horizontal, align):
+def plot_text_line(value, plt, ax1, horizontal, align, vertical):
     plt.text(
         horizontal,
-        -0.08,
+        vertical,
         str(value),
         ha=align,
         va="top",
