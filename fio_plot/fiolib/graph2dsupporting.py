@@ -1,12 +1,22 @@
 import fiolib.supporting as supporting
 import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
+import fiolib.jsonimport as jsonimport
 import sys
 import pprint
+
 
 #
 # These functions below is just one big mess to get the legend labels to align.
 #
+def get_json_data(settings):
+    list_of_json_files = jsonimport.list_json_files(settings, fail=False)
+    if list_of_json_files:
+        dataset = jsonimport.import_json_dataset(settings, list_of_json_files)
+        parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
+        return parsed_data
+    else:
+        return None
 
 
 def create_label(settings, item, directories):

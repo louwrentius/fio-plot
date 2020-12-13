@@ -18,7 +18,7 @@ def filter_json_files(settings, filename):
         return filename
 
 
-def list_json_files(settings):
+def list_json_files(settings, fail=True):
     """List all JSON files that maches the command line settings."""
     json_files = []
     for directory in settings["input_directory"]:
@@ -39,11 +39,11 @@ def list_json_files(settings):
                 file_list.append(result)
 
         item["files"] = sorted(file_list)
-        if not item["files"]:
+        if not item["files"] and fail:
             print(
                 f"\nCould not find any (matching) JSON files in the specified directory {str(absolute_dir)}\n"
             )
-            print(f"Are the correct directories specified?\n")
+            print("Are the correct directories specified?\n")
             print(
                 f"If so, please check the -d ({settings['iodepth']}) -n ({settings['numjobs']}) and -r ({settings['rw']}) parameters.\n"
             )
