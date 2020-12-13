@@ -22,6 +22,7 @@ def chart_2d_log_data(settings, dataset):
     data = supporting.process_dataset(settings, dataset)
     datatypes = data["datatypes"]
     directories = logdata.get_unique_directories(dataset)
+
     # pprint.pprint(data)
     #
     # Create matplotlib figure and first axis. The 'host' axis is used for
@@ -39,6 +40,7 @@ def chart_2d_log_data(settings, dataset):
     # Create title and subtitle
     #
     supporting.create_title_and_sub(settings, plt)
+
     #
     # The extra offsets are requred depending on the size of the legend, which
     # in turn depends on the number of legend items.
@@ -101,12 +103,26 @@ def chart_2d_log_data(settings, dataset):
         ncol=ncol,
         frameon=False,
     )
+
+    def get_axis_for_label(axes):
+        axis = list(axes.keys())[0]
+        ax = axes[axis]
+        return ax
+
+    #
+    # A ton of work to get the Fio-version from .json output if it exists.
+    #
+    jsondata = support2d.get_json_data(settings)
+    if jsondata[0]["data"] and not settings["disable_fio_version"]:
+        fio_version = jsondata[0]["data"][0]["fio_version"]
+        ax = get_axis_for_label(axes)
+        supporting.plot_fio_version(settings, fio_version, plt, ax)
+
     #
     # Save graph to file (png)
     #
     if settings["source"]:
-        axis = list(axes.keys())[0]
-        ax = axes[axis]
+        ax = get_axis_for_label(axes)
         plt.text(
             1,
             -0.10,
