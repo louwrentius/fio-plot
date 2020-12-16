@@ -4,6 +4,8 @@ import statistics
 import numpy as np
 from datetime import datetime
 from PIL.PngImagePlugin import PngImageFile, PngInfo
+import random
+import string
 
 
 def running_mean(l, N):
@@ -386,12 +388,17 @@ def plot_text_line(value, plt, ax1, horizontal, align, vertical, fontsize=7):
     )
 
 
+def random_char(y):
+    return "".join(random.choice(string.ascii_letters) for x in range(y))
+
+
 def save_png(settings, plt, fig):
     now = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     title = settings["title"].replace(" ", "-")
     title = title.replace("/", "-")
     plt.tight_layout(rect=[0, 0, 1, 1])
-    savename = f"{title}_{now}.png"
+    random = random_char(2)
+    savename = f"{title}_{now}_{random}.png"
     print(f"\n Saving to file {savename}\n")
     fig.savefig(savename, dpi=settings["dpi"])
     write_png_metadata(savename, settings)
