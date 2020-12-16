@@ -273,7 +273,7 @@ def set_arguments():
     )
     ag.add_argument(
         "--disable-fio-version",
-        help="Don't display the fio version in the graph.",
+        help="Don't display the fio version in the graph. It will also disable the fio-plot credit.",
         action="store_true",
     )
     return parser
