@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 import matplotlib.pyplot as plt
 import matplotlib.markers as markers
 from matplotlib.font_manager import FontProperties
@@ -62,9 +63,12 @@ def chart_2d_log_data(settings, dataset):
         # this third y-axis.
         #
         fig.subplots_adjust(left=0.21)
+
+    try:
         fig.subplots_adjust(bottom=bottom_offset)
-    else:
-        fig.subplots_adjust(bottom=bottom_offset)
+    except ValueError as v:
+        print(f"\nError: {v} - probably too many lines in the graph.\n")
+        sys.exit(1)
 
     supportdata = {
         "lines": [],
