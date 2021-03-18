@@ -75,6 +75,14 @@ def check_settings(settings):
             )
             sys.exit(6)
 
+    if settings["type"] == "rbd" and settings["ceph_pool"]:
+        if settings["template"] == "./fio-job-template.fio":
+            print(
+                "Please specify the appropriate Fio template (--template).\n\
+                    The example fio-job-template-ceph.fio can be used."
+            )
+            sys.exit(7)
+
     for mode in settings["mode"]:
         if mode in settings["mixed"]:
             if settings["rwmixread"]:
@@ -83,6 +91,6 @@ def check_settings(settings):
                 print(
                     "\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n"
                 )
-                sys.exit(7)
+                sys.exit(8)
         else:
             settings["filter_items"].append("rwmixread")

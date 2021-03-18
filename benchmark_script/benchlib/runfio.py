@@ -2,7 +2,6 @@
 import subprocess
 import sys
 import os
-import pprint
 import copy
 from numpy import linspace
 import time
