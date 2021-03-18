@@ -56,7 +56,7 @@ def check_settings(settings):
         print()
         sys.exit(6)
 
-    if settings["type"] != "device" and not settings["size"]:
+    if settings["type"] not in ["device", "rbd"] and not settings["size"]:
         print()
         print("When the target is a file or directory, --size must be specified.")
         print()
