@@ -34,7 +34,7 @@ def get_arguments(settings):
     ag.add_argument(
         "-d",
         "--target",
-        help="Storage device / directory / file to be tested",
+        help="Storage device / directory / file / rbd image (Ceph) to be tested.",
         required=True,
         nargs="+",
         type=str,
@@ -42,9 +42,15 @@ def get_arguments(settings):
     ag.add_argument(
         "-t",
         "--type",
-        help="Target type, device, file or directory",
-        choices=["device", "file", "directory"],
+        help="Target type, device, file, directory or rbd (Ceph)",
+        choices=["device", "file", "directory", "rbd"],
         required=True,
+    )
+    ag.add_argument(
+        "-P",
+        "--ceph-pool",
+        help="Specify the Ceph pool in wich the target rbd image resides.",
+        type=str,
     )
     ag.add_argument(
         "-s",
@@ -279,5 +285,6 @@ def get_argument_description():
         "ss_dur": "Steady state rolling window",
         "ss_ramp": "Steady state rampup",
         "entire_device": "Benchmark entire device",
+        "ceph_pool": "Ceph RBD pool",
     }
     return descriptions

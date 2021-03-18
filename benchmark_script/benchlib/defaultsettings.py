@@ -30,6 +30,7 @@ def get_default_settings():
     settings["loginterval"] = 500
     settings["mixed"] = ["readwrite", "rw", "randrw"]
     settings["invalidate"] = 1
+    settings["ceph_pool"] = None
     settings["loop_items"] = [
         "target",
         "mode",
@@ -67,6 +68,13 @@ def check_settings(settings):
                 print(f"\nThe target directory ({item}) doesn't seem to exist.\n")
                 sys.exit(5)
 
+    if settings["type"] == "rbd":
+        if not settings["ceph_pool"]:
+            print(
+                "\nCeph pool (--ceph-pool) must be specified when target type is rbd.\n"
+            )
+            sys.exit(6)
+
     for mode in settings["mode"]:
         if mode in settings["mixed"]:
             if settings["rwmixread"]:
@@ -75,6 +83,6 @@ def check_settings(settings):
                 print(
                     "\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n"
                 )
-                sys.exit(6)
+                sys.exit(7)
         else:
             settings["filter_items"].append("rwmixread")

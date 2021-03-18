@@ -1,0 +1,16 @@
+[iotest]
+ioengine=rbd
+pool=${CEPH_POOL}
+rbdname=${TARGET}
+rw=${MODE}
+blocksize=${BLOCK_SIZE}
+iodepth=${IODEPTH}
+numjobs=${NUMJOBS}
+direct=${DIRECT}
+group_reporting=1
+invalidate=${INVALIDATE}
+loops=${LOOPS}
+write_bw_log=${OUTPUT}/${MODE}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+write_lat_log=${OUTPUT}/${MODE}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+write_iops_log=${OUTPUT}/${MODE}-iodepth-${IODEPTH}-numjobs-${NUMJOBS}
+log_avg_msec=${LOGINTERVAL}

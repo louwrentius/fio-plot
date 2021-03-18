@@ -46,26 +46,30 @@ def check_target_type(target, filetype):
     file type.
     """
 
-    keys = ["file", "device", "directory"]
+    keys = ["file", "device", "directory", "rbd"]
 
     test = {keys[0]: Path.is_file, keys[1]: Path.is_block_device, keys[2]: Path.is_dir}
 
     parameter = {keys[0]: "--filename", keys[1]: "--filename", keys[2]: "--directory"}
 
-    if not os.path.exists(target):
-        print(f"Benchmark target {filetype} {target} does not exist.")
-        sys.exit(10)
+    if not filetype == "rbd":
 
-    if filetype not in keys:
-        print(f"Error, filetype {filetype} is an unknown option.")
-        exit(123)
+        if not os.path.exists(target):
+            print(f"Benchmark target {filetype} {target} does not exist.")
+            sys.exit(10)
 
-    check = test[filetype]
+        if filetype not in keys:
+            print(f"Error, filetype {filetype} is an unknown option.")
+            exit(123)
 
-    path_target = Path(target)  # path library needs to operate on path object
+        check = test[filetype]
 
-    if check(path_target):
-        return parameter[filetype]
+        path_target = Path(target)  # path library needs to operate on path object
+
+        if check(path_target):
+            return parameter[filetype]
+        else:
+            print(f"Target {filetype} {target} is not {filetype}.")
+            sys.exit(10)
     else:
-        print(f"Target {filetype} {target} is not {filetype}.")
-        sys.exit(10)
+        return None
