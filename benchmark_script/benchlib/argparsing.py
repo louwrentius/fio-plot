@@ -55,8 +55,9 @@ def get_arguments(settings):
     ag.add_argument(
         "-s",
         "--size",
-        help="File size if target is a file. If target \
-            is a directory, a file of the specified size is created per job",
+        help="File size if target is a file. The value is passed straight to the fio --size parameter.\
+        See the Fio man page for supported syntax. If target is a directory, a file of the specified size \
+        is created per job",
         type=str,
     )
     ag.add_argument(
