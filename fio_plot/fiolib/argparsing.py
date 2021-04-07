@@ -17,6 +17,12 @@ def set_arguments():
         required=True,
     )
     ag.add_argument(
+        "-o",
+        "--output-filename",
+        help="Specify output graph filename instead of the generated default. Note that the file type is always png.",
+        default=None
+    )
+    ag.add_argument(
         "-T", "--title", help="specifies title to use in charts", required=True
     )
     ag.add_argument("-s", "--source", help="Author")
