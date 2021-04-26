@@ -5,8 +5,6 @@ import fiolib.supporting as supporting
 import fiolib.shared_chart as shared
 import fiolib.tables as tables
 
-import pprint
-
 
 def calculate_font_size(settings, x_axis):
     max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))
