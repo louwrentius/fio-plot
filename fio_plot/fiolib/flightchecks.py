@@ -38,11 +38,6 @@ def run_preflight_checks(settings):
         )
         sys.exit(1)
 
-    if settings["type"]:
-        if not settings["loggraph"] and not settings["iodepth_numjobs_3d"]:
-            print("\n The -t parameter only works with -g or -L style graphs\n")
-            sys.exit(1)
-
     if settings["iodepth_numjobs_3d"]:
         if not settings["type"]:
             print("\nIf -L is specified (3D Chart) you must specify -t (iops or lat)\n")
