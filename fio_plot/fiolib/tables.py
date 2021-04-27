@@ -83,12 +83,20 @@ def create_cpu_table(settings, data, ax2):
 
 
 def create_stddev_table(settings, data, ax2):
-    table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
-
+    table_vals = [data["x_axis"]]
     table_name = settings["label"]
+    rowlabels = [table_name]
 
-    rowlabels = [table_name, "IOP/s \u03C3 %", "Latency \u03C3 %"]
+    if data["y1_axis"]["stddev"] is not None:
+        table_vals.append(data["y1_axis"]["stddev"])
+        rowlabels.append("IOP/s \u03C3 %")
+
+    if data["y2_axis"]["stddev"] is not None:
+        table_vals.append(data["y2_axis"]["stddev"])
+        rowlabels.append("Latency \u03C3 %")
+
     location = "lower right"
+
     create_generic_table(settings, table_vals, ax2, rowlabels, location)
 
 
