@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -40,6 +41,14 @@ def plot_3d(settings, dataset):
     if settings["maxdepth"]:
         iodepth = [x for x in iodepth if x <= settings["maxdepth"]]
         lx = len(iodepth)
+        if not iodepth:
+            print(
+                f"\nDefault maximum iodepth {settings['maxdepth']} is lower than specified iops {settings['iodepth']}."
+            )
+            print(
+                "\nPlease specify a higher maximum iodepth for the graph with -M <iodepth> like '-M 512'\n"
+            )
+            sys.exit(1)
     if settings["maxjobs"] or settings["maxdepth"]:
         temp_x = []
         for item in data["values"]:
