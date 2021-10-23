@@ -5,8 +5,8 @@ import csv
 # import pprint as pprint
 import re
 import statistics
-from . import supporting
 from pathlib import Path
+from . import supporting
 
 
 def list_fio_log_files(directory):

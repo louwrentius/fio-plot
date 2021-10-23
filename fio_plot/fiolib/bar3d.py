@@ -13,6 +13,7 @@ from . import (
     shared_chart as shared
 )
 
+
 def plot_3d(settings, dataset):
     """This function is responsible for plotting the entire 3D plot."""
 

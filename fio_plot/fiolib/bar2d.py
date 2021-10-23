@@ -3,10 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from . import (
-    supporting as supporting,
+    supporting,
     shared_chart as shared,
-    tables as tables
+    tables
 )
+
 
 def calculate_font_size(settings, x_axis):
     max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))
