@@ -12,11 +12,12 @@ setuptools.setup(
         long_description_content_type="text/markdown",
         url="https://github.com/louwrentius/fio-plot/", 
         packages=setuptools.find_packages(),
-        install_requires=['numpy>=1.19.0','matplotlib>=3.3.0','Pillow>=7.2.0'],
+        install_requires=['numpy>=1.19.0','matplotlib>=3.3.0','Pillow>=7.2.0', 'pyan3'],
         entry_points = {
             'console_scripts': [
                 'fio-plot = fio_plot:main',
+                'bench-fio = bench_fio:main'
             ],
         },
-        scripts=['bin/fio-plot'],
+        scripts=['bin/fio-plot', 'bin/bench-fio'],
 )

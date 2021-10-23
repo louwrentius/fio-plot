@@ -6,8 +6,10 @@ import copy
 from numpy import linspace
 import time
 
-import benchlib.supporting as supporting
-import benchlib.checks as checks
+from . import ( 
+    supporting,
+    checks
+)
 
 
 def check_fio_version(settings):

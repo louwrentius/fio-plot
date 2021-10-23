@@ -3,7 +3,7 @@ import datetime
 
 import sys
 
-import benchlib.argparsing as argp
+from . import argparsing as argp
 
 
 def parse_settings_for_display(settings):

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import sys
-import benchlib.runfio as runfio
+
+from . import runfio
 
 
 def check_args(settings):

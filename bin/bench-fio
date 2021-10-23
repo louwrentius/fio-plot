@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import bench_fio
+
+if __name__ == '__main__':
+    bench_fio.main()

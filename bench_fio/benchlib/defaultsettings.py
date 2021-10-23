@@ -4,10 +4,11 @@ import sys
 
 
 def get_default_settings():
-
+    path = os.path.abspath(__file__)
+    dir_path = os.path.dirname(path)
     settings = {}
     settings["target"] = []
-    settings["template"] = "./fio-job-template.fio"
+    settings["template"] = os.path.join(dir_path, "..", "templates", "fio-job-template.fio")
     settings["engine"] = "libaio"
     settings["mode"] = ["randread", "randwrite"]
     settings["iodepth"] = [1, 2, 4, 8, 16, 32, 64]

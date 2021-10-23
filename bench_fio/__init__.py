@@ -11,13 +11,14 @@ fio-plot, depending on the graph type.
 """
 
 import sys
-import benchlib.checks as checks
-import benchlib.defaultsettings as defaults
-import benchlib.display as display
-import benchlib.runfio as runfio
-import benchlib.supporting as supporting
-import benchlib.argparsing as argparsing
-
+from .benchlib import (
+    checks,
+    display,
+    runfio,
+    supporting,
+    argparsing,
+    defaultsettings as defaults
+)
 
 def main():
     checks.check_encoding()
@@ -30,11 +31,3 @@ def main():
     tests = supporting.generate_test_list(settings)
     display.display_header(settings, tests)
     runfio.run_benchmarks(settings, tests)
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nControl-C pressed - quitting...")
-        sys.exit(1)
