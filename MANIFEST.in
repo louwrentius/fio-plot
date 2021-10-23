@@ -1,0 +1,7 @@
+graft docs
+graft tests
+include bench_fio/templates/*.fio
+include bench_fio/scripts/*.sh
+include CHANGELOG.md
+include README.md
+include LICENSE
