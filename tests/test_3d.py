@@ -1,5 +1,5 @@
 import unittest
-from fiolib.bar3d import plot_3d
+from fio_plot.fiolib.bar3d import plot_3d
 
 
 class Test3D(unittest.TestCase):

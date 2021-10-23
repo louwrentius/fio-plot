@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import unittest
-import benchlib.argparsing as argparsing
-import benchlib.defaultsettings as defaultsettings
-import benchlib.display as display
-import benchlib.supporting as supporting
+
+from bench_fio.benchlib import (
+    argparsing,
+    defaultsettings,
+    display,
+    supporting
+)
 
 
 class TestFunctions(unittest.TestCase):
