@@ -1,0 +1,22 @@
+import setuptools
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+setuptools.setup(
+        name="fio-plot",
+        version="1.0.9",
+        author="louwrentius",
+        description="Create charts from FIO storage benchmark tool output",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
+        url="https://github.com/louwrentius/fio-plot/", 
+        packages=setuptools.find_packages(),
+        install_requires=['numpy>=1.19.0','matplotlib>=3.3.0','Pillow>=7.2.0'],
+        entry_points = {
+            'console_scripts': [
+                'fio-plot = fio_plot:main',
+            ],
+        },
+        scripts=['bin/fio-plot'],
+)

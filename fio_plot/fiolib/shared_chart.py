@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-import fiolib.supporting as supporting
-import fiolib.dataimport as dataimport
-from operator import itemgetter
 import pprint
 
+from operator import itemgetter
+from . import(
+    supporting,
+    dataimport
+)
 
 def get_dataset_types(dataset):
     """This code is probably insane.

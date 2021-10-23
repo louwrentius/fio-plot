@@ -2,12 +2,15 @@
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.markers as markers
-from matplotlib.font_manager import FontProperties
-import fiolib.supporting as supporting
-import fiolib.dataimport as logdata
-import fiolib.graph2dsupporting as support2d
 import pprint
 
+from matplotlib.font_manager import FontProperties
+
+from . import (
+    supporting,
+    dataimport as logdata,
+    graph2dsupporting as support2d,
+)
 
 def make_patch_spines_invisible(ax):
     ax.set_frame_on(True)

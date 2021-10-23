@@ -1,9 +1,11 @@
-import fiolib.dataimport as logdata
-import fiolib.graph2d as graph
-import fiolib.jsonimport as jsonimport
-import fiolib.bar2d as bar2d
-import fiolib.bar3d as bar3d
-import fiolib.barhistogram as histogram
+from . import(
+    dataimport as logdata,
+    graph2d as graph,
+    jsonimport,
+    bar2d,
+    bar3d,
+    barhistogram as histogram
+)
 
 
 def configure_default_settings(settings, routing_dict, key):

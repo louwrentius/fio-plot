@@ -1,0 +1,3 @@
+[console_scripts]
+fio-plot = fio_plot:main
+

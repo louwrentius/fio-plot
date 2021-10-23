@@ -5,7 +5,7 @@ import csv
 # import pprint as pprint
 import re
 import statistics
-import fiolib.supporting as supporting
+from . import supporting
 from pathlib import Path
 
 

@@ -4,12 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # import pprint
-import fiolib.shared_chart as shared
-from matplotlib import cm
 import matplotlib as mpl
-import fiolib.supporting as supporting
 import pprint
 
+from matplotlib import cm
+from . import (
+    supporting,
+    shared_chart as shared
+)
 
 def plot_3d(settings, dataset):
     """This function is responsible for plotting the entire 3D plot."""

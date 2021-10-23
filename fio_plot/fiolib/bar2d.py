@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
-import fiolib.supporting as supporting
-import fiolib.shared_chart as shared
-import fiolib.tables as tables
 
+from . import (
+    supporting as supporting,
+    shared_chart as shared,
+    tables as tables
+)
 
 def calculate_font_size(settings, x_axis):
     max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))

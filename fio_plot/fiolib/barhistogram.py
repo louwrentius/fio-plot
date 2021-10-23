@@ -3,9 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # import pprint
-import fiolib.shared_chart as shared
-import fiolib.supporting as supporting
-
+from . import (
+    shared_chart as shared,
+    supporting
+)
 
 def sort_latency_keys(latency):
     """The FIO latency data has latency buckets and those are sorted ascending.

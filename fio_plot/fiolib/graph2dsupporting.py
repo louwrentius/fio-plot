@@ -1,10 +1,12 @@
-import fiolib.supporting as supporting
 import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
-import fiolib.jsonimport as jsonimport
 import sys
 import pprint
 
+from . import (
+    jsonimport,
+    supporting
+)
 
 #
 # These functions below is just one big mess to get the legend labels to align.
