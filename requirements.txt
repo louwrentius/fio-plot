@@ -1,3 +1,5 @@
 numpy
+Pillow
+pyparsing
 matplotlib
 pyan3
