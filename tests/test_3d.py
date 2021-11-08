@@ -18,12 +18,16 @@ class Test3D(unittest.TestCase):
             "maxdepth": 32,
             "max": None,
             "dpi": 200,
+            "disable_fio_version": 2.0,
+            "output_filename": "/tmp/test.png"
         }
+
         dataset = [{"data": []}]
         for iodepth in settings["iodepth"]:
             for numjobs in settings["numjobs"]:
                 dataset[0]["data"].append(
                     {
+                        "fio_version": 3.1,
                         "iodepth": str(iodepth),
                         "numjobs": str(numjobs),
                         "rw": "read",
