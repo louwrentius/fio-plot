@@ -17,7 +17,7 @@ To get to these charts, you need to follow this process:
 
 ## Quick installation guide:
 
-Ubuntu: please run this command first: 
+Ubuntu 18.04 LTS: please run this command first: 
 
     apt install zlib1g-dev libjpeg-dev python3-pip
 
