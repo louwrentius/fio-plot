@@ -12,7 +12,29 @@ To get to these charts, you need to follow this process:
 2. Determine which information you would like to show
 3. Run fio-plot to generate the images with the appropriate command line options
 
-[bms]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
+[bms]: https://github.com/louwrentius/fio-plot/tree/master/bin
+
+
+## Quick installation guide:
+
+Ubuntu: please run this command first: 
+
+    apt install zlib1g-dev libjpeg-dev python3-pip
+
+All operating systems:
+
+    pip3 install fio-plot 
+
+If you want to use the benchmark script bench-fio, make sure to install Fio too.
+
+If you don't want to install fio-plot system-wide, you can make a virtual environment like this:
+
+    cd /desired/path
+    python3 -m venv fio-plot
+    source fio-plot/bin/activate
+    pip3 install fio-plot
+
+When you source the virtual environment, fio-plot and bench-fio will be in your executable path. 
 
 ## 2D chart (iodepth)
 This kind of chart shows both IOPs and Latency for different queue depths.
