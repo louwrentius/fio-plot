@@ -83,6 +83,12 @@ def get_nested_value(dictionary, key):
     if not key:
         return None
 
+    if key not in dictionary.keys():
+        if key == "job options":
+            key = "global options"
+        else:
+            return None
+
     for item in key:
         dictionary = dictionary[item]
     return dictionary
@@ -94,6 +100,7 @@ def check_for_steadystate(dataset, mode):
         return True
     else:
         return False
+
 
 
 def get_json_mapping(mode, dataset):
