@@ -75,6 +75,15 @@ def import_json_dataset(settings, dataset):
             item["rawdata"].append(import_json_data(f))
     return dataset
 
+def validate_key(dictionary, key):
+    newkey = []
+    for item in key:
+        if item not in dictionary.keys():
+            if item == "job options":
+                newkey.append("global options")
+        else:
+            newkey.append(item)
+    return newkey
 
 def get_nested_value(dictionary, key):
     """This function reads the data from the FIO JSON file based on the supplied
@@ -83,13 +92,12 @@ def get_nested_value(dictionary, key):
     if not key:
         return None
 
-    if key not in dictionary.keys():
-        if key == "job options":
-            key = "global options"
-        else:
-            return None
+    key = validate_key(dictionary, key)
 
     for item in key:
+        print(item)
+        print(type(dictionary))
+        print(dictionary)
         dictionary = dictionary[item]
     return dictionary
 
@@ -100,7 +108,6 @@ def check_for_steadystate(dataset, mode):
         return True
     else:
         return False
-
 
 
 def get_json_mapping(mode, dataset):

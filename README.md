@@ -8,12 +8,11 @@ Fio-plot generates charts from FIO storage benchmark data. It can process FIO ou
 
 To get to these charts, you need to follow this process:
 
-1. Run your tests, maybe use the [included benchmark script][bms]
+1. Run your tests, maybe use the included benchmark script [bench-fio][bms]
 2. Determine which information you would like to show
 3. Run fio-plot to generate the images with the appropriate command line options
 
 [bms]: https://github.com/louwrentius/fio-plot/tree/master/bin
-
 
 ## Quick installation guide:
 
@@ -44,7 +43,7 @@ This kind of chart shows both IOPs and Latency for different queue depths.
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -l -r randread
+    fio-plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -l -r randread
 
 ## 2D chart (numjobs)
 This kind of chart shows both IOPs and Latency for diffent simultaneous number of jobs.
@@ -54,7 +53,7 @@ This kind of chart shows both IOPs and Latency for diffent simultaneous number o
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -N -r randread
+    fio-plot -i INTEL_D3-S4610 --source "https://louwrentius.com" -T "INTEL D3-S4610 SSD on IBM M1015" -N -r randread
 
 ## 2D chart to compare benchmark results
 
@@ -66,7 +65,7 @@ The compare chart shows the results from multiple different benchmarks in one gr
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0
+    fio-plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0
 
 It is also possible to group the bars for IOPs and Latency like this:
 
@@ -76,7 +75,7 @@ It is also possible to group the bars for IOPs and Latency like this:
 
 This is the command-line used to generate this graph:
    
-    fio_plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0 --group-bars
+    fio-plot -i INTEL_D3-S4610 SAMSUNG_860_PRO KINGSTON_DC500M SAMSUNG_PM883 --source "https://louwrentius.com" -T "Comparing the performance of various Solid State Drives" -C -r randread --xlabel-parent 0 --group-bars
 
 
 ## 3D chart
@@ -88,7 +87,7 @@ A 3D bar chart that plots both queue depth an numjobs against either latency or 
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t iops -r randread
+    fio-plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t iops -r randread
 
 It is also possible to chart the latency:
 
@@ -98,7 +97,7 @@ It is also possible to chart the latency:
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t lat -r randread
+    fio-plot -i RAID10 --source "https://louwrentius.com"  -T "RAID10 performance of 8 x WD Velociraptor 10K RPM" -L -t lat -r randread
 
 ## Line chart based on FIO log data
 
@@ -113,7 +112,7 @@ This data can be parsed and graphed over time. In this example, we plot the data
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing IOPs performance of multiple SSDs" -g -t iops -r randread --xlabel-parent 0
+    fio-plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing IOPs performance of multiple SSDs" -g -t iops -r randread --xlabel-parent 0
 
 It is also possible to chart the latency instead of IOPs.
 
@@ -123,7 +122,7 @@ It is also possible to chart the latency instead of IOPs.
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing latency performance of multiple SSDs" -g -t lat -r randread --xlabel-parent 0
+    fio-plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ SAMSUNG_PM883/ SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Comparing latency performance of multiple SSDs" -g -t lat -r randread --xlabel-parent 0
 
 You can also include all information in one graph:
 
@@ -133,7 +132,7 @@ You can also include all information in one graph:
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ --source "https://louwrentius.com"  -T "Comparing performance of multiple SSDs" -g -t iops lat -r randread --xlabel-parent 0    
+    fio-plot -i INTEL_D3-S4610/ KINGSTON_DC500M/ --source "https://louwrentius.com"  -T "Comparing performance of multiple SSDs" -g -t iops lat -r randread --xlabel-parent 0    
 
 And this is an example with a single benchmark run, comparing the performance of multiple queue depths.
 
@@ -143,7 +142,7 @@ And this is an example with a single benchmark run, comparing the performance of
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i INTEL_D3-S4610 --source "https://louwrentius.com"  -T "Comparing multiple queue depths" -g -t iops lat -r randread -d 1 8 16  --xlabel-parent 0    
+    fio-plot -i INTEL_D3-S4610 --source "https://louwrentius.com"  -T "Comparing multiple queue depths" -g -t iops lat -r randread -d 1 8 16  --xlabel-parent 0    
 
 ## Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.
@@ -154,7 +153,7 @@ The FIO JSON output also contains latency histogram data. It's available in a ns
 
 This is the command-line used to generate this graph:
 
-    fio_plot -i SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Historgram of SSD" -H -r randread -d 16 -n 16
+    fio-plot -i SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Historgram of SSD" -H -r randread -d 16 -n 16
 
 ## Benchmark script
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
@@ -179,7 +178,7 @@ you to gather data for different queue depths and/or number of simultaneous jobs
 
 This particular example benchmark was run with these parameters:
 
-    bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
+    bench-fio --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
 
 In this example, we run a mixed random read/write benchmark. We have two runs, one with a 75% / 25% read/write mix and one with a 90% / 10% mix. 
 
@@ -205,7 +204,7 @@ Fio-plot also writes metadata to the PNG files using Pillow
 
 Creating a 2D Bar Chart based on randread data and numjobs = 1 (default).
 
-    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread
+    fio-plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread
 
 ![regularbars][regular]
 
@@ -213,11 +212,11 @@ Creating a 2D Bar Chart based on randread data and numjobs = 1 (default).
 
 Creating a 2D Bar Chart based on randread data and numjobs = 8.
 
-    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -n 8 -r randread
+    fio-plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -n 8 -r randread
 
 Creating a 2D Bar Chart grouping iops and latency data together: 
 
-    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread --group-bars
+    fio-plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -l -r randread --group-bars
 
 ![groupedbars][grouped]
 
@@ -227,27 +226,27 @@ Creating a 2D Bar Chart grouping iops and latency data together:
 
 Creating a 3D graph showing IOPS. 
 
-    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
+    fio-plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops
     
 Creating a 3D graph with a subselection of data
 
-    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops -J 16 -M 16
+    fio-plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -L -r randread -t iops -J 16 -M 16
 
 ### 2D Bar Histogram
 
 Creating a latency histogram with a queue depth of 1 and numjobs is 1.
 
-    fio_plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -H -r randread -d 1 -n 1
+    fio-plot -i <benchmark_data_folder> -T "Title" -s https://louwrentius.com -H -r randread -d 1 -n 1
 
 ### 2D line charts
 
 Creating a line chart from different benchmark runs in a single folder
 
-    fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1
+    fio-plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1
   
 The same result but if you want markers to help distinguish between lines:
 
-    fio_plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1 --enable--markers
+    fio-plot -i <benchmark_data_folder>  -T "Test" -g -r randread -t iops lat -d 1 8 16 -n 1 --enable--markers
 
 ![markers][markers]
 
@@ -255,7 +254,7 @@ The same result but if you want markers to help distinguish between lines:
 
 It is also possible to change the line colors with the --colors parameter.
 
-    fio_plot -i <benchmark_data_folder> -T "Test" -g -r randread -t iops -d 1 2 4 8 --colors xkcd:red xkcd:blue xkcd:green tab:purple
+    fio-plot -i <benchmark_data_folder> -T "Test" -g -r randread -t iops -d 1 2 4 8 --colors xkcd:red xkcd:blue xkcd:green tab:purple
 
 Please note that you need to specify a color for each line drawn. In this example, four lines are drawn.
 
@@ -268,7 +267,7 @@ You can find a list of color names [here][cl1]. There is also a list of xkcd col
 
 A simple example where we compare the iops and latency of a particular iodepth and numjobs value:
 
-    fio_plots -i <folder_a> <folder_b> <folder_c> -T "Test" -C -r randwrite -d 8 
+    fio-plots -i <folder_a> <folder_b> <folder_c> -T "Test" -C -r randwrite -d 8 
 
 ![compare01][compare01]
 
@@ -296,9 +295,9 @@ It is now also possible to show steady state statistics (--show-ss) if you ran a
 
 Create a line chart based on data from two different folders (but the same benchmark parameters)     
 
-    fio_plot -i <benchmark_data_folder A> <benchmark_data_folder B>  -T "Test" -g -r randread -t iops lat -d 8 -n 1
+    fio-plot -i <benchmark_data_folder A> <benchmark_data_folder B>  -T "Test" -g -r randread -t iops lat -d 8 -n 1
 
-I'm assuming that the benchmark was created with the (included) bench_fio tool.
+I'm assuming that the benchmark was created with the (included) bench-fio tool.
 
 For example, you can run a benchmark on a RAID10 setup and store data in folder A. Store the benchmark data for a RAID5 setup in folder B and you can compare the results of both RAID setups in a single Line graph.
 
@@ -310,16 +309,16 @@ Please note that the folder names are used in the graph to distinguish the datas
    
 Command used: 
 
-    fio_plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1
+    fio-plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1
 
-If you use the bench_fio tool to generate benchmark data, you may notice that you end up with folders like:
+If you use the bench-fio tool to generate benchmark data, you may notice that you end up with folders like:
 
     IBM1015/RAID10/4k
     IBM1015/RAID5/4k
 
 Those parent folders are used to distinguish and identify the lines from each other. The labels are based on the parent folder names as you can see in the graph. By default, we use only one level deep, so in this example only RAID10/4k or RAID5/4k are used. If we want to include the folder above that (IBM1015) we use the --xlabel-parent parameter like so:
 
-    fio_plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 -w 1 --xlabel-parent 2
+    fio-plot -i ./IBM1015/RAID10/4k/ ./IBM1015/RAID5/4k/ -T "Comparing RAID 10 vs. RAID 5 on 10,000 RPM Drives" -s https://louwrentius.com -g -r randread -t iops lat -d 8 -n 1 -w 1 --xlabel-parent 2
 
 This would look like: 
 
