@@ -75,14 +75,12 @@ def import_json_dataset(settings, dataset):
             item["rawdata"].append(import_json_data(f))
     return dataset
 
-
 def get_nested_value(dictionary, key):
     """This function reads the data from the FIO JSON file based on the supplied
     key (which is often a nested path within the JSON file).
     """
     if not key:
         return None
-
     for item in key:
         dictionary = dictionary[item]
     return dictionary
@@ -95,13 +93,27 @@ def check_for_steadystate(dataset, mode):
     else:
         return False
 
+def walk_dictionary(dictionary, path):
+    result = dictionary
+    for item in path:
+        result = result[item]
+    return result
+
+def validate_job_options(dataset, jobOptionsRaw, root):
+    result = None
+    try:
+        result = walk_dictionary(dataset[0]['rawdata'][0], jobOptionsRaw)
+        return jobOptionsRaw
+    except KeyError:
+        return ['global options']
 
 def get_json_mapping(mode, dataset):
     """This function contains a hard-coded mapping of FIO nested JSON data
     to a flat dictionary.
     """
     root = ["jobs", 0]
-    jobOptions = root + ["job options"]
+    jobOptionsRaw = root + ["job options"]
+    jobOptions = validate_job_options(dataset, jobOptionsRaw, root)
     data = root + [mode]
     dictionary = {
         "fio_version": ["fio version"],
