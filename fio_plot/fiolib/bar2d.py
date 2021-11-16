@@ -8,6 +8,8 @@ from . import (
     tables
 )
 
+import pprint
+
 
 def calculate_font_size(settings, x_axis):
     max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))
@@ -34,34 +36,47 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
 
     return_data = {"ax1": None, "ax3": None, "rects1": None, "rects2": None}
 
-    iops = data["y1_axis"]["data"]
-    latency = np.array(data["y2_axis"]["data"], dtype=float)
+    left = data["y1_axis"]["data"]
+    if data["y2_axis"] is not None:
+        right = np.array(data["y2_axis"]["data"], dtype=float)
+    else:
+        right = None
     width = 0.9
 
     color_iops = "#a8ed63"
     color_lat = "#34bafa"
+    rects2 = None
 
     if settings["group_bars"]:
-        x_pos1 = np.arange(1, len(iops) + 1, 1)
-        x_pos2 = np.arange(len(iops) + 1, len(iops) + len(latency) + 1, 1)
+        x_pos1 = np.arange(1, len(left) + 1, 1)
 
-        rects1 = ax1.bar(x_pos1, iops, width, color=color_iops)
-        rects2 = ax3.bar(x_pos2, latency, width, color=color_lat)
+        rects1 = ax1.bar(x_pos1, left, width, color=color_iops)
+        if right is not None:
+            x_pos2 = np.arange(len(left) + 1, len(left) + len(right) + 1, 1)
+            rects2 = ax3.bar(x_pos2, right, width, color=color_lat)
+            x_axis = data["x_axis"] * 2
+        else:
+            x_axis = data["x_axis"]
 
-        x_axis = data["x_axis"] * 2
         ltest = np.arange(1, len(x_axis) + 1, 1)
 
     else:
-        x_pos = np.arange(0, (len(iops) * 2), 2)
-
-        rects1 = ax1.bar(x_pos, iops, width, color=color_iops)
-        rects2 = ax3.bar(x_pos + width, latency, width, color=color_lat)
+        if right is not None:
+            x_pos = np.arange(0, (len(left) * 2), 2)
+            ltest = np.arange(0.45, (len(left) * 2), 2)
+        else:
+            # only one bar
+            x_pos = ltest = np.arange(0, (len(left) * 1), 1)
+        rects1 = ax1.bar(x_pos, left, width, color=color_iops)
+        if right is not None:
+            rects2 = ax3.bar(x_pos + width, right, width, color=color_lat)
 
         x_axis = data["x_axis"]
-        ltest = np.arange(0.45, (len(iops) * 2), 2)
+
 
     ax1.set_ylabel(data["y1_axis"]["format"])
-    ax3.set_ylabel(data["y2_axis"]["format"])
+    if right is not None:
+        ax3.set_ylabel(data["y2_axis"]["format"])
     ax1.set_xlabel(settings["label"])
     ax1.set_xticks(ltest)
 
@@ -188,9 +203,10 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     #
     # Labeling the top of the bars with their value
     shared.autolabel(rects1, ax1)
-    shared.autolabel(rects2, ax3)
+    if rects2 is not None:
+        shared.autolabel(rects2, ax3)
 
-    tables.create_stddev_table(settings, data, ax2)
+        tables.create_stddev_table(settings, data, ax2)
 
     if settings["show_cpu"] and not settings["show_ss"]:
         tables.create_cpu_table(settings, data, ax2)
@@ -199,12 +215,13 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
         tables.create_steadystate_table(settings, data, ax2)
 
     # Create legend
-    ax2.legend(
-        (rects1[0], rects2[0]),
-        (data["y1_axis"]["format"], data["y2_axis"]["format"]),
-        loc="center left",
-        frameon=False,
-    )
+    if rects2:
+        ax2.legend(
+            (rects1[0], rects2[0]),
+            (data["y1_axis"]["format"], data["y2_axis"]["format"]),
+            loc="center left",
+            frameon=False,
+        )
 
     #
     # Save graph to PNG file
