@@ -157,9 +157,6 @@ def get_record_set(settings, dataset, dataset_types):
     on the parameters as set by the command line. The filtered data is also scaled and rounded.
     """
     dataset = dataset[0]
-
-    # pprint.pprint(dataset)
-
     rw = settings["rw"]
     numjobs = settings["numjobs"]
 
@@ -192,7 +189,7 @@ def get_record_set(settings, dataset, dataset_types):
     }
 
     newlist = sorted(dataset["data"], key=itemgetter(settings["query"]))
-    # pprint.pprint(newlist)
+    #pprint.pprint(newlist)
 
     for record in newlist:
         for x in settings["iodepth"]:
@@ -222,12 +219,11 @@ def get_record_set(settings, dataset, dataset_types):
                             datadict["ss_data_iops_mean"].append(
                                 int(round(record["ss_data_iops_mean"], 0))
                             ),
-
+    #pprint.pprint(datadict)
     return scale_data(datadict)
 
 
 def scale_data(datadict):
-
     iops_series_raw = datadict["iops_series_raw"]
     iops_stddev_series_raw = datadict["iops_stddev_series_raw"]
     lat_series_raw = datadict["lat_series_raw"]

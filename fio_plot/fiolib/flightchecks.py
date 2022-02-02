@@ -126,6 +126,9 @@ def run_preflight_checks(settings):
     if settings["colors"] and not settings["loggraph"]:
         print("\nThe --colors option can only be used with the -g 2D line graph.\n")
         sys.exit(1)
+    if settings["rw"] == "rw" and len(settings["filter"]) > 1:
+        print("\n if -r rw is specified, please specify a filter -f read or -f write\n")
+        sys.exit(1)
 
 
 def post_flight_check(parser, option_found):

@@ -99,10 +99,19 @@ def walk_dictionary(dictionary, path):
         result = result[item]
     return result
 
-def validate_job_options(dataset, jobOptionsRaw, root):
-    result = None
+def validate_job_option_key(dataset):
+    mykeys = dataset['jobs'][0]['job options'].keys()
+    if "iodepth" in mykeys:
+        return True
+    else:
+        raise KeyError
+
+def validate_job_options(dataset, ):
+    ## This chain of error handling is beyond ridiculous and disgusting.
+    jobOptionsRaw = ["jobs", 0, "job options"]
     try:
-        result = walk_dictionary(dataset[0]['rawdata'][0], jobOptionsRaw)
+        walk_dictionary(dataset[0]['rawdata'][0], jobOptionsRaw)
+        validate_job_option_key(dataset[0]['rawdata'][0])
         return jobOptionsRaw
     except KeyError:
         return ['global options']
@@ -113,7 +122,7 @@ def get_json_mapping(mode, dataset):
     """
     root = ["jobs", 0]
     jobOptionsRaw = root + ["job options"]
-    jobOptions = validate_job_options(dataset, jobOptionsRaw, root)
+    jobOptions = validate_job_options(dataset)
     data = root + [mode]
     dictionary = {
         "fio_version": ["fio version"],
@@ -157,6 +166,7 @@ def get_flat_json_mapping(settings, dataset):
     for item in dataset:
         item["data"] = []
         for record in item["rawdata"]:
+            options = validate_job_options(dataset)
             if settings["rw"] == "randrw":
                 if settings["filter"][0]:
                     mode = settings["filter"][0]
@@ -167,8 +177,11 @@ def get_flat_json_mapping(settings, dataset):
                     exit(1)
             elif settings["rw"] == "read" or settings["rw"] == "write":
                 mode = settings["rw"]
+            elif settings["rw"] == "rw":
+                mode = settings['filter'][0]
             else:
-                mode = get_nested_value(record, ("jobs", 0, "job options", "rw"))[4:]
+                print(options + ['rw'])
+                mode = get_nested_value(record, options + ["rw"])[4:]
             m = get_json_mapping(mode, dataset)
             row = {
                 "iodepth": int(get_nested_value(record, m["iodepth"])),
