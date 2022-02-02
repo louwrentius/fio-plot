@@ -180,7 +180,6 @@ def get_flat_json_mapping(settings, dataset):
             elif settings["rw"] == "rw":
                 mode = settings['filter'][0]
             else:
-                print(options + ['rw'])
                 mode = get_nested_value(record, options + ["rw"])[4:]
             m = get_json_mapping(mode, dataset)
             row = {
