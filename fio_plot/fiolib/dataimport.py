@@ -216,7 +216,12 @@ def parse_raw_cvs_data(settings, dataset):
         else:
             distance = int(item["timestamp"]) - int(dataset[index - 1]["timestamp"])
             distance_list.append(distance)
-    mean = int(statistics.mean(distance_list))
+    try:
+        mean = int(statistics.mean(distance_list))
+    except statistics.StatisticsError as e:
+        print(f"ERROR: {e}")
+        print("\n Could this be because of an empty log file?\n")
+        sys.exit(1)
 
     if mean > 1000:
         print(
