@@ -1,5 +1,7 @@
 ## Release Notes
 
+### Sorry, I've not updated this in a long time.
+
 ### v1.0.1 (2020-09-30)
 
 - Added cpu usage table for 2D bar charts (-l and -C)
