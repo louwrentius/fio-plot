@@ -116,10 +116,18 @@ def validate_job_options(dataset, ):
     except KeyError:
         return ['global options']
 
+def validate_number_of_jobs(dataset):
+    length = len(dataset[0]['rawdata'][0]['jobs'])
+    if length > 1:
+        print("\n Unfortunately, fio-plot can't deal (yet) with JSON files containing multiple jobs\n")
+        print("See also: https://github.com/louwrentius/fio-plot/issues/64")
+        sys.exit(1)
+
 def get_json_mapping(mode, dataset):
     """This function contains a hard-coded mapping of FIO nested JSON data
     to a flat dictionary.
     """
+    validate_number_of_jobs(dataset)
     root = ["jobs", 0]
     jobOptionsRaw = root + ["job options"]
     jobOptions = validate_job_options(dataset)
@@ -205,5 +213,5 @@ def get_flat_json_mapping(settings, dataset):
                 "fio_version": get_nested_value(record, m["fio_version"]),
             }
             item["data"].append(row)
-        # item["rawdata"] = None  # --> enable to throw away the data after parsing.
+            #item["rawdata"] = None  # --> enable to throw away the data after parsing.
     return dataset

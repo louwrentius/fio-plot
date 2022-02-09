@@ -1,5 +1,6 @@
 #!/usr/local/bin env
 import pprint as pprint
+import sys
 import statistics
 import numpy as np
 from datetime import datetime
@@ -50,8 +51,12 @@ def get_scale_factor_lat(dataset):
     which scale factor should be used on the data. The data is not scaled, only
     the scale factor and the y-axis label is returned in a dictionary.
     """
-    mean = statistics.mean(dataset)
-
+    try:
+        mean = statistics.mean(dataset)
+    except statistics.StatisticsError as e:
+        print(f"\n Long story short, something went wrong: {e}\n")
+        sys.exit(1)
+        
     scale_factors = [
         {"scale": 1000000, "label": "Latency (ms)"},
         {"scale": 1000, "label": "Latency (\u03BCs)"},
@@ -218,9 +223,9 @@ def process_dataset(settings, dataset):
         for rw in settings["filter"]:
             if len(item["data"][rw]) > 0:
                 datatypes.append(item["type"])
-                # pprint.pprint(item['data'][rw])
+                #pprint.pprint(item['data'][rw])
                 unpacked = list(zip(*item["data"][rw]))
-                # pprint.pprint(unpacked)
+                
                 item[rw] = {}
 
                 item[rw]["xvalues"] = unpacked[0]

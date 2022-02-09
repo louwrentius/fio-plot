@@ -157,6 +157,7 @@ def set_arguments():
             "randrw",
             "trim",
             "rw",
+            "readwrite",
             "randtrim",
             "trimwrite",
         ],

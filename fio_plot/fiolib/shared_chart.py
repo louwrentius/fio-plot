@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import pprint
+import sys
 
 from operator import itemgetter
+import re
 from . import(
     supporting,
     dataimport
@@ -61,8 +63,16 @@ def get_record_set_histogram(settings, dataset):
             record_set["fio_version"] = record["fio_version"]
             return record_set
 
+def validate_get_record_set(settings, mismatch, dataset):
+    if mismatch == len(dataset):
+        print(f"\n   It seems that none of the data matched your selection criteria.\n \
+    Check the filenames of the JSON files check the following parameters \n \
+    -r {settings['rw']}  -d {settings['iodepth']} -n {settings['numjobs']}\n")
+        print("\nIf you think everything is correct, feel free to report a bug.\n")
+        sys.exit(1)
 
 def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
+    mismatch = 0
     record_set = {
         "iodepth": dataset_types["iodepth"],
         "numjobs": dataset_types["numjobs"],
@@ -90,15 +100,19 @@ def get_record_set_3d(settings, dataset, dataset_types, rw, metric):
                     and record["type"] in settings["filter"]
                 ):
                     row.append(record[metric])
+                else:
+                    mismatch+=1    
         record_set["values"].append(supporting.round_metric_series(row))
     record_set["fio_version"].append(dataset[0]["data"][0]["fio_version"])
+    validate_get_record_set(settings, mismatch, dataset)
     return record_set
-
 
 def get_record_set_improved(settings, dataset, dataset_types):
     """The supplied dataset, a list of flat dictionaries with data is filtered based
     on the parameters as set by the command line. The filtered data is also scaled and rounded.
     """
+    mismatch = 0
+
     if settings["rw"] == "randrw":
         if len(settings["filter"]) > 1 or not settings["filter"]:
             print(
@@ -135,6 +149,7 @@ def get_record_set_improved(settings, dataset, dataset_types):
             # pprint.pprint(data['directory'])
             for record in data["data"]:
                 # pprint.pprint(record.keys())
+                # pprint.pprint(record["lat"])
                 if (
                     (int(record["iodepth"]) == int(depth))
                     and int(record["numjobs"]) == int(numjobs)
@@ -148,7 +163,10 @@ def get_record_set_improved(settings, dataset, dataset_types):
                     datadict["lat_stddev_series_raw"].append(record["lat_stddev"])
                     datadict["cpu"]["cpu_sys"].append(int(round(record["cpu_sys"], 0)))
                     datadict["cpu"]["cpu_usr"].append(int(round(record["cpu_usr"], 0)))
+                else:
+                    mismatch+=1
 
+    validate_get_record_set(settings, mismatch, dataset)
     return scale_data(datadict)
 
 
@@ -159,6 +177,7 @@ def get_record_set(settings, dataset, dataset_types):
     dataset = dataset[0]
     rw = settings["rw"]
     numjobs = settings["numjobs"]
+    mismatch = 0
 
     if settings["rw"] == "randrw":
         if len(settings["filter"]) > 1 or not settings["filter"]:
@@ -189,11 +208,12 @@ def get_record_set(settings, dataset, dataset_types):
     }
 
     newlist = sorted(dataset["data"], key=itemgetter(settings["query"]))
-    #pprint.pprint(newlist)
 
     for record in newlist:
         for x in settings["iodepth"]:
             for y in settings["numjobs"]:
+                #print(f"{x} - {record['iodepth']} + {y} - {record['numjobs']} + {record['rw']} + {record['type']}")
+                #print(f"{settings['filter']}") 
                 if (
                     (int(record["iodepth"]) == int(x))
                     and int(record["numjobs"]) == int(y)
@@ -219,7 +239,10 @@ def get_record_set(settings, dataset, dataset_types):
                             datadict["ss_data_iops_mean"].append(
                                 int(round(record["ss_data_iops_mean"], 0))
                             ),
-    #pprint.pprint(datadict)
+                else:
+                    mismatch+=1
+
+    validate_get_record_set(settings, mismatch, dataset)
     return scale_data(datadict)
 
 
