@@ -187,6 +187,8 @@ def get_flat_json_mapping(settings, dataset):
                 mode = settings["rw"]
             elif settings["rw"] == "rw":
                 mode = settings['filter'][0]
+            elif settings["rw"] == "readwrite":
+                mode = settings['filter'][0]
             else:
                 mode = get_nested_value(record, options + ["rw"])[4:]
             m = get_json_mapping(mode, dataset)

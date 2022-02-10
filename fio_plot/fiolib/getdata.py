@@ -1,3 +1,5 @@
+import pprint
+
 from . import(
     dataimport as logdata,
     graph2d as graph,

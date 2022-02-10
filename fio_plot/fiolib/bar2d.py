@@ -158,7 +158,7 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     """This function is responsible for creating bar charts that compare data."""
     dataset_types = shared.get_dataset_types(dataset)
     data = shared.get_record_set_improved(settings, dataset, dataset_types)
-
+    
     # pprint.pprint(data)
 
     fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={"height_ratios": [7, 1]})

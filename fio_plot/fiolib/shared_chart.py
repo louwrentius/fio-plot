@@ -113,10 +113,10 @@ def get_record_set_improved(settings, dataset, dataset_types):
     """
     mismatch = 0
 
-    if settings["rw"] == "randrw":
+    if settings["rw"] == "randrw" or settings["rw"] == "readwrite":
         if len(settings["filter"]) > 1 or not settings["filter"]:
             print(
-                "Since we are processing randrw data, you must specify a"
+                f"Since we are processing {settings['rw']} data, you must specify a"
                 " filter for either read or write data, not both."
             )
             exit(1)
@@ -142,14 +142,15 @@ def get_record_set_improved(settings, dataset, dataset_types):
     depth = settings["iodepth"][0]
     numjobs = settings["numjobs"][0]
     rw = settings["rw"]
-
     for depth in dataset_types["iodepth"]:
         for data in dataset:
             # pprint.pprint(data.keys())
             # pprint.pprint(data['directory'])
             for record in data["data"]:
-                # pprint.pprint(record.keys())
-                # pprint.pprint(record["lat"])
+                #pprint.pprint(record.keys())
+                #pprint.pprint(f"-> {record['type']}")
+                #print(f"{depth} - {record['iodepth']} + {numjobs} - {record['numjobs']} + {record['rw']} + {record['type']}")
+                #print(f"{settings['filter']}") 
                 if (
                     (int(record["iodepth"]) == int(depth))
                     and int(record["numjobs"]) == int(numjobs)
