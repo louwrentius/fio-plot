@@ -119,7 +119,7 @@ def validate_job_options(dataset, ):
 def validate_number_of_jobs(dataset):
     length = len(dataset[0]['rawdata'][0]['jobs'])
     if length > 1:
-        print("\n Unfortunately, fio-plot can't deal (yet) with JSON files containing multiple jobs\n")
+        print(f"\n Unfortunately, fio-plot can't deal (yet) with JSON files containing multiple ({length}) jobs\n")
         print("See also: https://github.com/louwrentius/fio-plot/issues/64")
         sys.exit(1)
 
@@ -176,13 +176,7 @@ def get_flat_json_mapping(settings, dataset):
         for record in item["rawdata"]:
             options = validate_job_options(dataset)
             if settings["rw"] == "randrw":
-                if settings["filter"][0]:
-                    mode = settings["filter"][0]
-                else:
-                    print(
-                        "When processing randrw data, a -f filter (read/write) must also be specified."
-                    )
-                    exit(1)
+               mode = settings["filter"][0]
             elif settings["rw"] == "read" or settings["rw"] == "write":
                 mode = settings["rw"]
             elif settings["rw"] == "rw":

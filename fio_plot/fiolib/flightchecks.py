@@ -123,13 +123,19 @@ def run_preflight_checks(settings):
             "\nThe --show-ss option only works with the 2D bar chart -l or -N graph.\n"
         )
         sys.exit(1)
+
     if settings["colors"] and not settings["loggraph"]:
         print("\nThe --colors option can only be used with the -g 2D line graph.\n")
         sys.exit(1)
+
     if settings["rw"] == "rw" and len(settings["filter"]) > 1:
         print("\n if -r rw is specified, please specify a filter -f read or -f write\n")
         sys.exit(1)
 
+    if settings["rw"] == "randrw":
+        if not settings["filter"][0]:
+            print("When processing randrw data, a -f filter (read/write) must also be specified.")
+            exit(1)
 
 def post_flight_check(parser, option_found):
     if not option_found:
