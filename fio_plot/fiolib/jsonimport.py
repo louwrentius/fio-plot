@@ -14,8 +14,12 @@ def filter_json_files(settings, filename):
         try:
             candidate_json = json.load(candidate_file)
             if candidate_json["fio version"]:
-                if candidate_json["jobs"][0]["job options"]["rw"] == settings["rw"]:
-                    return filename
+                job_options = candidate_json["jobs"][0]["job options"]
+                if job_options["rw"] == settings["rw"]:
+                    iodepth = int(job_options["iodepth"])
+                    numjobs = int(job_options["numjobs"])
+                    if iodepth in settings["iodepth"] and numjobs in settings["numjobs"]:
+                        return filename
             else:
                 logger.debug(f"{filename} does not appear to be a valid fio json output file, skipping")
         except Exception as e:
