@@ -1,4 +1,5 @@
 import bench_fio
+import sys
 
 if __name__ == '__main__':
     try:

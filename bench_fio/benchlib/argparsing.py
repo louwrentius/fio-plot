@@ -133,7 +133,7 @@ def get_arguments(settings):
             "The Fio job template containing the precondition workload"
             f"(default={settings['precondition_template']}"
         ),
-        default="precondition.fio",
+        default=settings['precondition_template'],
         type=str,
     )
 

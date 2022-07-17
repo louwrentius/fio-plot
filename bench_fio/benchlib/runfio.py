@@ -111,7 +111,10 @@ def run_benchmarks(settings, benchmarks):
     if not settings["quiet"]:
         run = 1
         for benchmark in ProgressBar(benchmarks):
-            if settings["precondition_repeat"]:
+            if not settings["precondition_repeat"] and run < 2: # only run once at the start
+                run_precondition_benchmark(settings, benchmark["target"], run)
+                run += 1
+            if settings["precondition_repeat"]: # run preconditioning after each benchmark
                 run_precondition_benchmark(settings, benchmark["target"], run)
                 run += 1
             drop_caches(settings)

@@ -17,7 +17,7 @@ def get_default_settings():
     settings["direct"] = 1
     settings["size"] = None
     settings["precondition"] = False
-    settings["precondition_template"] = "precondition.fio"
+    settings["precondition_template"] = os.path.join(dir_path, "..", "templates", "precondition.fio") 
     settings["precondition_repeat"] = False
     settings["entire_device"] = False
     settings["ss"] = False
