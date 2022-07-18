@@ -8,7 +8,7 @@
 
 #### SSD Preconditioning
 
-This benchmark script supports running configure SSD preconditioning jobs that are run before the actual benchmarks are executed. You may even specify for them to run after each benchmark if desired.
+This benchmark script supports running configure SSD preconditioning jobs that are run before the actual benchmarks are executed. You may even specify for them to run after each benchmark if desired. More information can be found further down into this document.
 
 ### Example output
 
@@ -40,20 +40,44 @@ in a 'screen' session.
 
 We benchmark two devices with a randread/randrwite workload. 
 
-    ./bench_fio --target /dev/md0 /dev/md1 --type device --mode randread randwrite --output RAID_ARRAY 
+    ./bench_fio --target /dev/md0 /dev/md1 --type device --mode randread randwrite --output RAID_ARRAY --destructive
 
 We benchmark one device with a custom set of iodepths and numjobs:
 
-    ./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --iodepth 1 8 16 --numjobs 8
+    ./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --iodepth 1 8 16 --numjobs 8 --destructive
 
 We benchmark one device and pass extra custom parameters. 
 
-	./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1
+	./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1 --destructive
 
 We benchmark using the steady state feature:
 
-    ./bench_fio --target /dev/sda --type device -o test -m randwrite --loops 1 --iodepth 1 8 16 32 --numjobs 1 --ss iops:0.1% --ss-ramp 10 --ss-dur 20 --runtime 60
+    ./bench_fio --target /dev/sda --type device -o test -m randwrite --loops 1 --iodepth 1 8 16 32 --numjobs 1 --ss iops:0.1% --ss-ramp 10 --ss-dur 20 --runtime 60 --destructive
 
+### INI configuration file support
+
+Originally bench_fio was configured purely by concatenating the required command line parameters.
+Starting with version 1.0.20 bench_fio supports an INI file format for configuration, similar to FIO.
+This is how you can run bench_fio with a INI based configuration file:
+
+	./bench_fio /path/to/benchmark.ini
+
+An example configuration file is included in the templates folder called benchmark.ini and contains the following:
+
+	[benchfio]
+	target = /dev/example
+	output = benchmark
+	type = device
+	mode = randread,randwrite
+	size = 10G
+	iodepth = 1,2,4,8,16,32,64
+	numjobs = 1,2,4,8,16,32,64
+	direct = 1
+	engine = libaio
+	precondition = False
+	precondition_repeat = False
+	runtime = 60
+	destructive = False
 
 ### Output
 
@@ -152,8 +176,9 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							From the Fio manual: Invalidate buffer-cache for the file prior to starting I/O.(Default: 1)
 	--quiet               The progresbar will be supressed.
 	--loginterval LOGINTERVAL
-							Interval that specifies how often stats are logged to the .log files. (Default: 500
+							Interval that specifies how often stats are logged to the .log files. (Default: 1000)
 	--dry-run             Simulates a benchmark, does everything except running Fio.
+	--destructive         Enables benchmarks that write towards the device|file|directory (Default: False)
 
 ### SSD Preconditioning
 

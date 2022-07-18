@@ -20,14 +20,21 @@ from .benchlib import (
     defaultsettings as defaults
 )
 
+def gather_settings():
+    settings = defaults.get_default_settings()
+    customsettings = defaults.get_settings_from_ini(sys.argv)
+    if not customsettings:
+        args = argparsing.check_args(settings)
+        customsettings = vars(args)
+    settings = {**settings, **customsettings}
+    #print(customsettings)
+    defaults.check_settings(settings)
+    return settings
+
 def main():
     checks.check_encoding()
     checks.check_if_fio_exists()
-    settings = defaults.get_default_settings()
-    args = argparsing.check_args(settings)
-    customsettings = vars(args)
-    settings = {**settings, **customsettings}
-    defaults.check_settings(settings)
+    settings = gather_settings()    
     tests = supporting.generate_test_list(settings)
     display.display_header(settings, tests)
     runfio.run_benchmarks(settings, tests)

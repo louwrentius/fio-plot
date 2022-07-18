@@ -22,7 +22,7 @@ def parse_settings_for_display(settings):
 
 def calculate_duration(settings, tests):
     number_of_tests = len(tests) * settings["loops"]
-    time_per_test = settings["runtime"]
+    time_per_test = int(settings["runtime"])
     duration_in_seconds = number_of_tests * time_per_test
     duration = str(datetime.timedelta(seconds=duration_in_seconds))
     return duration

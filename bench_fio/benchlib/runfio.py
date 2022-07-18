@@ -36,15 +36,18 @@ def drop_caches(settings):
 
 
 def run_raw_command(command, env=None):
-    result = subprocess.run(
-        command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
-    )
-    if result.returncode > 0 or (len(str(result.stderr)) > 3):
-        stdout = result.stdout.decode("UTF-8").strip()
-        stderr = result.stderr.decode("UTF-8").strip()
-        print(f"\nAn error occurred: {stderr} - {stdout}")
+    try: 
+        result = subprocess.run(
+            command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
+        )
+        if result.returncode > 0 or (len(str(result.stderr)) > 3):
+            stdout = result.stdout.decode("UTF-8").strip()
+            stderr = result.stderr.decode("UTF-8").strip()
+            print(f"\nAn error occurred: {stderr} - {stdout}")
+            sys.exit(1)
+    except KeyboardInterrupt:
+        print(f"\n ctrl-c pressed - Aborted by user....\n")
         sys.exit(1)
-
     return result
 
 
@@ -88,39 +91,43 @@ def run_fio(settings, benchmark):
 
 def run_precondition_benchmark(settings, device, run):
 
-    if settings["precondition"] and settings["type"] == "device":
+    if settings["precondition"] and settings["destructive"]:
+        if not settings["precondition_repeat"] and run > 1:
+            pass # only run once if precondition_repeat is not set
+        else:
+            settings_copy = copy.deepcopy(settings)
+            settings_copy["template"] = settings["precondition_template"]
 
-        settings_copy = copy.deepcopy(settings)
-        settings_copy["template"] = settings["precondition_template"]
+            template = supporting.import_fio_template(settings["precondition_template"])
 
-        template = supporting.import_fio_template(settings["precondition_template"])
+            benchmark = {
+                "target": device,
+                "mode": template["precondition"]["rw"],
+                "iodepth": template["precondition"]["iodepth"],
+                "block_size": template["precondition"]["bs"],
+                "numjobs": template["precondition"]["numjobs"],
+                "run": run,
+            }
+            run_fio(settings, benchmark)
 
-        benchmark = {
-            "target": device,
-            "mode": template["precondition"]["rw"],
-            "iodepth": template["precondition"]["iodepth"],
-            "block_size": template["precondition"]["bs"],
-            "numjobs": template["precondition"]["numjobs"],
-            "run": run,
-        }
-        run_fio(settings, benchmark)
+    elif settings["precondition"] and not settings["destructive"]:
+        print(f"\n When running preconditionning, also enable the destructive flag to be 100% sure.\n")
+        sys.exit(1)
 
 
 def run_benchmarks(settings, benchmarks):
     # pprint.pprint(benchmarks)
+    run = 0
     if not settings["quiet"]:
-        run = 1
         for benchmark in ProgressBar(benchmarks):
-            if not settings["precondition_repeat"] and run < 2: # only run once at the start
-                run_precondition_benchmark(settings, benchmark["target"], run)
-                run += 1
-            if settings["precondition_repeat"]: # run preconditioning after each benchmark
-                run_precondition_benchmark(settings, benchmark["target"], run)
-                run += 1
+            run += 1
+            run_precondition_benchmark(settings, benchmark["target"], run)
             drop_caches(settings)
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
+            run += 1
+            run_precondition_benchmark(settings, benchmark["target"], run)
             drop_caches(settings)
             run_fio(settings, benchmark)
 

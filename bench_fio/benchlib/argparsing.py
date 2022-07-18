@@ -25,7 +25,6 @@ def check_args(settings):
 
     return args
 
-
 def get_arguments(settings):
     parser = argparse.ArgumentParser(
         description="Automates FIO benchmarking. It can run benchmarks \
@@ -195,7 +194,7 @@ def get_arguments(settings):
         "--entire-device",
         action="store_true",
         help=(
-            "The benchmark will keep running until all sectors are read or written to."
+            "The benchmark will keep running until all sectors are read or written to. Overrides runtime setting."
             f"(default: {str(settings['entire_device'])})."
         ),
     )
@@ -256,6 +255,12 @@ def get_arguments(settings):
         action="store_true",
         default=False,
     )
+    ag.add_argument(
+        "--destructive",
+        help="Enables benchmarks that write towards the device|file|directory",
+        action="store_true",
+        default=False,
+    )
     return parser
 
 
@@ -282,11 +287,12 @@ def get_argument_description():
         "benchmarks": "Number of benchmarks",
         "precondition": "Run precondition workload",
         "precondition_template": "Precondition template",
-        "precondition_repeat": "Run precondition after each test",
+        "precondition_repeat": "Precondition after each test",
         "ss": "Detect steady state",
         "ss_dur": "Steady state rolling window",
         "ss_ramp": "Steady state rampup",
         "entire_device": "Benchmark entire device",
         "ceph_pool": "Ceph RBD pool",
+        "destructive": "Allow destructive writes"
     }
     return descriptions

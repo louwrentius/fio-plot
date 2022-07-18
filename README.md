@@ -178,7 +178,7 @@ you to gather data for different queue depths and/or number of simultaneous jobs
 
 This particular example benchmark was run with these parameters:
 
-    bench-fio --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90
+    bench-fio --target /dev/md0 --type device --template fio-job-template.fio  --mode randrw --output RAID_ARRAY --readmix 75 90  --destructive
 
 In this example, we run a mixed random read/write benchmark. We have two runs, one with a 75% / 25% read/write mix and one with a 90% / 10% mix. 
 
@@ -187,7 +187,7 @@ Alongside the benchmark script, a Fio job template file is supplied (fio-job-tem
 
 For more examples, please consult the separate [README.md][rm]
 
-[rm]: https://github.com/louwrentius/fio-plot/tree/master/benchmark_script
+[rm]: https://github.com/louwrentius/fio-plot/tree/master/bench_fio#readme
 
 ## Dependancies
 
