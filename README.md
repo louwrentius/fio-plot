@@ -59,7 +59,8 @@ An example INI is inclued in the fio_plot/templates/fio-plot.ini file. It looks 
     type = 
     ...
 
-You can't use both the INI file and command-line options, you have to pick one.
+- The fio-plot --help command explains the usage of the parameters available in the INI.
+- You can't use both the INI file and command-line options, you have to pick one.
 
 ## 2D chart (iodepth)
 This kind of chart shows both IOPs and Latency for different queue depths.
