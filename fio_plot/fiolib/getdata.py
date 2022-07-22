@@ -56,7 +56,7 @@ def get_routing_dict():
             "query": None,
             "label": None,
         },
-        "iodepth_numjobs_3d": {
+        "bargraph3d": {
             "function": bar3d.plot_3d,
             "get_data": get_json_data,
             "iodepth_default": [1, 2, 4, 8, 16, 32, 64],
@@ -64,7 +64,7 @@ def get_routing_dict():
             "query": None,
             "label": None,
         },
-        "latency_iops_2d_qd": {
+        "bargraph2d_qd": {
             "function": bar2d.chart_2dbarchart_jsonlogdata,
             "get_data": get_json_data,
             "iodepth_default": [1, 2, 4, 8, 16, 32, 64],
@@ -72,7 +72,7 @@ def get_routing_dict():
             "query": "iodepth",
             "label": "Queue depth",
         },
-        "latency_iops_2d_nj": {
+        "bargraph2d_nj": {
             "function": bar2d.chart_2dbarchart_jsonlogdata,
             "get_data": get_json_data,
             "iodepth_default": [1],

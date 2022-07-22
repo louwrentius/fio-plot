@@ -1,8 +1,8 @@
 import argparse
 import sys
 
+def set_arguments(settings):
 
-def set_arguments():
     """Parses all commandline arguments. Based on argparse."""
     parser = argparse.ArgumentParser(
         description="Generates charts/graphs from FIO JSON output or logdata."
@@ -14,7 +14,7 @@ def set_arguments():
         nargs="+",
         help="input directory where\
             JSON files or log data (CSV) can be found.",
-        required=True,
+        required=True
     )
     ag.add_argument(
         "-o",
@@ -30,21 +30,21 @@ def set_arguments():
     exclusive_group = ag.add_mutually_exclusive_group(required=True)
     exclusive_group.add_argument(
         "-L",
-        "--iodepth-numjobs-3d",
+        "--bargraph3d",
         action="store_true",
         help="\
             Generates a 3D-chart with iodepth and numjobs on x/y axis and iops or latency on the z-axis.",
     )
     exclusive_group.add_argument(
         "-l",
-        "--latency-iops-2d-qd",
+        "--bargraph2d-qd",
         action="store_true",
         help="\
             Generates a 2D barchart of IOPs and latency for all queue depths given a particular numjobs value.",
     )
     exclusive_group.add_argument(
         "-N",
-        "--latency-iops-2d-nj",
+        "--bargraph2d_nj",
         action="store_true",
         help="This graph type is like the \
         latency-iops-2d-qd barchart but instead of plotting queue depths for a particular numjobs value, it plots \
@@ -166,7 +166,7 @@ def set_arguments():
     )
     ag.add_argument(
         "-m",
-        "--max",
+        "--max-z",
         default=None,
         type=int,
         help="Optional maximum value for Z-axis in 3D graph.",
@@ -283,11 +283,25 @@ def set_arguments():
         help="Don't display the fio version in the graph. It will also disable the fio-plot credit.",
         action="store_true",
     )
+    ag.add_argument(
+        "--title-fontsize", help="Title font size", type=int,  default=settings["title_fontsize"]
+    )
+    ag.add_argument(
+        "--subtitle-fontsize", help="Subtitle font size", type=int,  default=settings["subtitle_fontsize"]
+    )
+    ag.add_argument(
+        "--source-fontsize", help="Source credit (lower right) font size", type=int,  default=settings["source_fontsize"]
+    )
+    ag.add_argument(
+        "--credit-fontsize", help="Fio version and Fio-plot credit font size", type=int, default=settings["credit_fontsize"]
+    )
+    ag.add_argument(
+        "--table-fontsize", help="Standard deviation table / CPU table font size", type=int,  default=settings["table_fontsize"]
+    )
+
     return parser
 
-
 def get_command_line_arguments(parser):
-    parser = set_arguments()
     try:
         args = parser.parse_args()
     except OSError:

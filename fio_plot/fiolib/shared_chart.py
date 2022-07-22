@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import pprint
 import sys
 
@@ -215,6 +214,7 @@ def get_record_set(settings, dataset, dataset_types):
             for y in settings["numjobs"]:
                 #print(f"{x} - {record['iodepth']} + {y} - {record['numjobs']} + {record['rw']} + {record['type']}")
                 #print(f"{settings['filter']}") 
+                
                 if (
                     (int(record["iodepth"]) == int(x))
                     and int(record["numjobs"]) == int(y)
@@ -248,6 +248,9 @@ def get_record_set(settings, dataset, dataset_types):
 
 
 def scale_data(datadict):
+    if not datadict['fio_version']:
+        print(f"\n function scale_data did not receive any data\n")
+        sys.exit(1)
     iops_series_raw = datadict["iops_series_raw"]
     iops_stddev_series_raw = datadict["iops_stddev_series_raw"]
     lat_series_raw = datadict["lat_series_raw"]
@@ -262,6 +265,7 @@ def scale_data(datadict):
     #
     # Latency data must be scaled, IOPs will not be scaled.
     #
+    
     latency_scale_factor = supporting.get_scale_factor_lat(lat_series_raw)
     scaled_latency_data = supporting.scale_yaxis(lat_series_raw, latency_scale_factor)
     #

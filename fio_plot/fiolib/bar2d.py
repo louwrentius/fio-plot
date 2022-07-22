@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
 import pprint
@@ -66,7 +65,7 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
     ax1.set_xlabel(settings["label"])
     ax1.set_xticks(ltest)
 
-    if settings["compare_graph"]:
+    if settings["graphtype"] == "compare_graph":
         fontsize = calculate_font_size(settings, x_axis)
         ax1.set_xticklabels(labels=x_axis, fontsize=fontsize)
     else:

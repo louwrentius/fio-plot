@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -135,11 +134,4 @@ def chart_latency_histogram(settings, dataset):
     supporting.plot_source(settings, plt, ax1)
     supporting.plot_fio_version(settings, record_set["fio_version"], plt, ax1)
 
-    # if settings['source']:
-    #    sourcelength = len(settings['source'])
-    #    offset = 1.0 - sourcelength / 120
-    #    fig.text(offset, 0.03, settings['source'])
-    #
-    # Save graph to PNG file
-    #
     supporting.save_png(settings, plt, fig)

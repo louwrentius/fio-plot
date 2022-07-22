@@ -2,7 +2,6 @@ import sys
 import os
 import matplotlib
 
-
 def check_matplotlib_version(requiredversion):
 
     matplotlibversion = matplotlib.__version__
@@ -19,10 +18,10 @@ def check_matplotlib_version(requiredversion):
 def check_if_target_directory_exists(dirpath):
     for directory in dirpath:
         if not os.path.exists(directory):
-            print(f"Directory {directory} is not found.")
+            print(f"\nDirectory {directory} is not found.\n")
             sys.exit(1)
         elif not os.path.isdir(directory):
-            print(f"Direcory {directory} is not a directory.")
+            print(f"\nDirecory {directory} is not a directory.\n")
             sys.exit(1)
 
 
@@ -32,18 +31,20 @@ def run_preflight_checks(settings):
     check_matplotlib_version("3.3.0")
     check_if_target_directory_exists(settings["input_directory"])
 
-    if settings["loggraph"] and not settings["type"]:
+    if settings["graphtype"] == "loggraph" and not settings["type"]:
         print(
             "\nIf -g is specified, you must specify the type of data with -t (see help)\n"
         )
         sys.exit(1)
+    try: 
+        if settings["type"][0]:
+            if not settings["graphtype"] == "loggraph" and not settings["graphtype"] =="bargraph3d":
+                print("\n The -t parameter only works with -g or -L style graphs\n")
+                sys.exit(1)
+    except TypeError:
+        pass
 
-    if settings["type"]:
-        if not settings["loggraph"] and not settings["iodepth_numjobs_3d"]:
-            print("\n The -t parameter only works with -g or -L style graphs\n")
-            sys.exit(1)
-
-    if settings["iodepth_numjobs_3d"]:
+    if settings["graphtype"] == "bargraph3d":
         if not settings["type"]:
             print("\nIf -L is specified (3D Chart) you must specify -t (iops or lat)\n")
             sys.exit(1)
@@ -58,7 +59,7 @@ def run_preflight_checks(settings):
             print("\nIf -L is specified, only one input directory can be used.\n")
             sys.exit(1)
 
-    if settings["compare_graph"]:
+    if settings["graphtype"] == "compare_graph":
         message = "\nWhen creating a graph to compare values, iodepth or numjobs must be one value.\n"
         pm = False
 
@@ -79,7 +80,7 @@ def run_preflight_checks(settings):
             )
             sys.exit(1)
 
-    if settings["latency_iops_2d_qd"]:
+    if settings["graphtype"] == "bargraph2d_qd":
         if len(settings["input_directory"]) > 1:
             print("\nIf -l is specified, only one input directory can be used.\n")
             sys.exit(1)
@@ -91,7 +92,8 @@ def run_preflight_checks(settings):
                 Use the 3D graph type (-L) to plot both iodepth and numjobs for either iops or latency.\n"
                 )
                 sys.exit(1)
-    if settings["latency_iops_2d_nj"]:
+                
+    if settings["graphtype"] == "bargraph2d_nj":
         if len(settings["input_directory"]) > 1:
             print("\nIf -l is specified, only one input directory can be used.\n")
             sys.exit(1)
@@ -104,7 +106,7 @@ def run_preflight_checks(settings):
                 )
                 sys.exit(1)
 
-    if settings["histogram"]:
+    if settings["graphtype"] == "histogram":
         if len(settings["input_directory"]) > 1:
             print("\nIf -l is specified, only one input directory can be used.\n")
             sys.exit(1)
@@ -116,17 +118,19 @@ def run_preflight_checks(settings):
         sys.exit(1)
 
     if (
-        not (settings["latency_iops_2d_qd"] or settings["latency_iops_2d_nj"])
+        not (settings["graphtype"] == "bargraph2d_qd" or settings["graphtype"] == "bargraph2d_nj")
         and settings["show_ss"]
     ):
         print(
             "\nThe --show-ss option only works with the 2D bar chart -l or -N graph.\n"
         )
         sys.exit(1)
-
-    if settings["colors"] and not settings["loggraph"]:
-        print("\nThe --colors option can only be used with the -g 2D line graph.\n")
-        sys.exit(1)
+    try:
+        if settings["colors"][0] and not settings["graphtype"] == "loggraph":
+            print("\nThe --colors option can only be used with the -g 2D line graph.\n")
+            sys.exit(1)
+    except TypeError:
+        pass
 
     if settings["rw"] == "rw" and len(settings["filter"]) > 1:
         print("\n if -r rw is specified, please specify a filter -f read or -f write\n")
@@ -135,7 +139,11 @@ def run_preflight_checks(settings):
     if settings["rw"] == "randrw":
         if not settings["filter"][0]:
             print("When processing randrw data, a -f filter (read/write) must also be specified.")
-            exit(1)
+            sys.exit(1)
+
+    if not settings["filter"][0]:
+        print(f"\nNo filter parameter is set, by default it sould be 'read,write'.\n")
+        sys.exit(1)
 
 def post_flight_check(parser, option_found):
     if not option_found:

@@ -19,7 +19,7 @@ def get_max_width(dataset, cols):
 
     col = 0
     while col < cols:
-        column = 2
+        column = 3
         for item in matrix:
             if item[col] > column:
                 column = item[col]
@@ -28,19 +28,19 @@ def get_max_width(dataset, cols):
     return returndata
 
 
-def calculate_colwidths(cols, matrix):
+def calculate_colwidths(settings, cols, matrix):
 
     collist = []
 
     for item in matrix:
-        value = item * 0.01
+        value = item * settings["tablecolumn_spacing"]
         collist.append(value)
 
     return collist
 
 
-def get_font():
-    font = font_manager.FontProperties(size=8)
+def get_font(settings):
+    font = font_manager.FontProperties(size=settings["table_fontsize"])
     return font
 
 
@@ -48,7 +48,7 @@ def create_generic_table(settings, table_vals, ax2, rowlabels, location):
     cols = len(table_vals[0])
     matrix = get_max_width(table_vals, cols)
     # print(matrix)
-    colwidths = calculate_colwidths(cols, matrix)
+    colwidths = calculate_colwidths(settings, cols, matrix)
     # print(colwidths)
 
     table = ax2.table(
@@ -71,7 +71,7 @@ def create_generic_table(settings, table_vals, ax2, rowlabels, location):
 
     for key, cell in table.get_celld().items():
         cell.set_linewidth(linewidth)
-        cell.set_text_props(fontproperties=get_font())
+        cell.set_text_props(fontproperties=get_font(settings))
 
 
 def create_cpu_table(settings, data, ax2):

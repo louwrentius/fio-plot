@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.markers as markers
