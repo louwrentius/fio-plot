@@ -35,6 +35,32 @@ If you don't want to install fio-plot system-wide, you can make a virtual enviro
 
 When you source the virtual environment, fio-plot and bench-fio will be in your executable path. 
 
+## Configuration command-line vs. INI
+
+Fio-plot supports configuration through command-line parameters or using an INI format configuration file.
+The examples provided in the following sections use command-line parameters. 
+
+This is how you use an INI configuration file (instead):
+
+    fio-plot /path/to/fio-plot.ini 
+
+An example INI is inclued in the fio_plot/templates/fio-plot.ini file. It looks like this:
+
+    [graphtype]
+    graphtype = bargraph2d_qd
+
+    [settings]
+    input_directory = /path/to/benchmarkdata
+    output_filename = test.png
+    title = Title
+    subtitle = 
+    source = https://louwrentius.com
+    rw = randread
+    type = 
+    ...
+
+You can't use both the INI file and command-line options, you have to pick one.
+
 ## 2D chart (iodepth)
 This kind of chart shows both IOPs and Latency for different queue depths.
 ![barchart][2dchartiodepth]
@@ -395,7 +421,7 @@ This is a fragment of the output:
         histogram: False
         input_directory: /Users/MyUserName/data/WDRAID5 /Users/MyUserName/data/WDRAID10
         iodepth: 16
-        iodepth_numjobs_3d: False
+        bargraph3d: False
         latency_iops_2d: False
         line_width: 1
         loggraph: False
