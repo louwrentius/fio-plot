@@ -72,13 +72,7 @@ def get_largest_scale_factor(scale_factors):
     """Based on multiple dataset, it is determined what the highest scale factor
     is. This assures that the values on the y-axis don't become too large.
     """
-    scalefactor = scale_factors[0]
-    largestscalefactor = [x for x in scale_factors if x["scale"] > scalefactor["scale"]]
-    if not largestscalefactor:
-        largestscalefactor = scalefactor
-    if isinstance(largestscalefactor, list):
-        largestscalefactor = largestscalefactor[0]
-    return largestscalefactor
+    return max([x for x in scale_factors if x], key=lambda x: x["scale"])
 
 
 def scale_yaxis(dataset, scale):
