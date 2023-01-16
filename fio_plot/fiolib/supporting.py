@@ -67,6 +67,9 @@ def get_scale_factor_lat(dataset):
         if mean > item["scale"] * 5:
             return item
 
+    # Fallback case when latency is very small 
+    return scale_factors[-1]
+
 
 def get_largest_scale_factor(scale_factors):
     """Based on multiple dataset, it is determined what the highest scale factor
@@ -96,6 +99,9 @@ def get_scale_factor_iops(dataset):
         if mean > item["scale"] * 5:
             return item
 
+    # Fallback case when IOPS is very small 
+    return scale_factors[-1]
+
 
 def get_scale_factor_bw(dataset):
     mean = statistics.mean(dataset)
@@ -108,6 +114,9 @@ def get_scale_factor_bw(dataset):
     for item in scale_factors:
         if mean > item["scale"] * 5:
             return item
+
+    # Fallback case when BW is very small 
+    return scale_factors[-1]
 
 
 def get_scale_factor_bw_ss(dataset):
@@ -122,6 +131,9 @@ def get_scale_factor_bw_ss(dataset):
     for item in scale_factors:
         if mean > item["scale"] * 5:
             return item
+
+    # Fallback case when BW (steady-state) is very small 
+    return scale_factors[-1]
 
 
 def lookupTable(metric):
