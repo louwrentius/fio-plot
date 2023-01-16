@@ -137,7 +137,7 @@ def plot_3d(settings, dataset):
     norm = mpl.colors.Normalize(vmin=0, vmax=dz.max())
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    res = fig.colorbar(sm, fraction=0.046, pad=0.19)
+    res = fig.colorbar(sm, fraction=0.046, pad=0.19, ax=ax1)
     res.ax.set_title(z_axis_label)
 
     # Set tics for x/y axis
