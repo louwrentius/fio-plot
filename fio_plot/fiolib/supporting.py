@@ -399,7 +399,7 @@ def save_png(settings, plt, fig):
     title = title.replace("/", "-")
     plt.tight_layout(rect=[0, 0, 1, 1])
     random = random_char(2)
-    if settings["output_filename"] is None or  len(settings["output_filename"]) > 0 :
+    if settings["output_filename"] is None or len(settings["output_filename"]) == 0:
         savename = f"{title}_{now}_{random}.png"
     else:
         savename = settings["output_filename"]
