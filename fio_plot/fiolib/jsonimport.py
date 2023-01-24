@@ -6,15 +6,17 @@ import pprint
 
 logger = logging.getLogger(__name__)
 
-
 def filter_json_files(settings, filename):
     """A bit of a slow process, but guarantees that we get legal
     json files regardless of their names"""
     with open(filename, 'r') as candidate_file:
-        try:
+       try:
             candidate_json = json.load(candidate_file)
             if candidate_json["fio version"]:
-                job_options = candidate_json["jobs"][0]["job options"]
+                if "global options" in candidate_json.keys():
+                    job_options = candidate_json["jobs"][0]["job options"] | candidate_json["global options"]
+                else:
+                    job_options = candidate_json["jobs"][0]["job options"]
                 if job_options["rw"] == settings["rw"]:
                     iodepth = int(job_options["iodepth"])
                     numjobs = int(job_options["numjobs"])
@@ -22,8 +24,9 @@ def filter_json_files(settings, filename):
                         return filename
             else:
                 logger.debug(f"{filename} does not appear to be a valid fio json output file, skipping")
-        except Exception as e:
-            logger.warning(e)
+       except Exception as e:
+            print(f"Error: {repr(e)} - please report this as a bug and please include the JSON file if possible.")
+            sys.exit(1)
 
 
 def list_json_files(settings, fail=True):
@@ -55,7 +58,6 @@ def list_json_files(settings, fail=True):
                 f"If so, please check the -d ({settings['iodepth']}) -n ({settings['numjobs']}) and -r ({settings['rw']}) parameters.\n"
             )
             sys.exit(1)
-
     # pprint.pprint(json_files)
     return input_directories
 
@@ -109,20 +111,22 @@ def walk_dictionary(dictionary, path):
     return result
 
 
-def validate_job_option_key(dataset):
+def validate_job_option_key(dataset, key):
     mykeys = dataset['jobs'][0]['job options'].keys()
-    if "iodepth" in mykeys:
+    if key in mykeys:
         return True
     else:
         raise KeyError
 
 
-def validate_job_options(dataset, ):
-    ## This chain of error handling is beyond ridiculous and disgusting.
+def validate_job_options(dataset, key):
+    # Job options can either be in the job or in global options.
+    # Sometimes some options are in one and others in the other.
+    # We need to figure out which one.
     jobOptionsRaw = ["jobs", 0, "job options"]
     try:
         walk_dictionary(dataset[0]['rawdata'][0], jobOptionsRaw)
-        validate_job_option_key(dataset[0]['rawdata'][0])
+        validate_job_option_key(dataset[0]['rawdata'][0], key)
         return jobOptionsRaw
     except KeyError:
         return ['global options']
@@ -142,15 +146,14 @@ def get_json_mapping(mode, dataset):
     """
     validate_number_of_jobs(dataset)
     root = ["jobs", 0]
-    jobOptionsRaw = root + ["job options"]
-    jobOptions = validate_job_options(dataset)
+    jobOptions = validate_job_options(dataset, "numjobs")
     data = root + [mode]
     dictionary = {
         "fio_version": ["fio version"],
-        "iodepth": (jobOptions + ["iodepth"]),
-        "numjobs": (jobOptions + ["numjobs"]),
-        "bs": (jobOptions + ["bs"]),
-        "rw": (jobOptions + ["rw"]),
+        "iodepth": (validate_job_options(dataset, "iodepth") + ["iodepth"]),
+        "numjobs": (validate_job_options(dataset, "numjobs") + ["numjobs"]),
+        "bs": (validate_job_options(dataset, "bs") + ["bs"]),
+        "rw": (validate_job_options(dataset, "rw") + ["rw"]),
         "bw": (data + ["bw"]),
         "iops": (data + ["iops"]),
         "iops_stddev": (data + ["iops_stddev"]),
@@ -187,7 +190,7 @@ def get_flat_json_mapping(settings, dataset):
     for item in dataset:
         item["data"] = []
         for record in item["rawdata"]:
-            options = validate_job_options(dataset)
+            options = validate_job_options(dataset, "numjobs")
             if settings["rw"] == "randrw":
                mode = settings["filter"][0]
             elif settings["rw"] == "read" or settings["rw"] == "write":

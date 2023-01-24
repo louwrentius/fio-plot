@@ -35,7 +35,6 @@ def main():
     settings = rawsettings[1]
     parser = rawsettings[0]
     routing_dict = getdata.get_routing_dict()
-
     graphtype = settings["graphtype"]
 
     settings = getdata.configure_default_settings(settings, routing_dict, graphtype)
