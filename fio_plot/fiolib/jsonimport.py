@@ -14,7 +14,8 @@ def filter_json_files(settings, filename):
             candidate_json = json.load(candidate_file)
             if candidate_json["fio version"]:
                 if "global options" in candidate_json.keys():
-                    job_options = candidate_json["jobs"][0]["job options"] | candidate_json["global options"]
+                    job_options = candidate_json["jobs"][0]["job options"] 
+                    job_options.update(candidate_json["global options"])
                 else:
                     job_options = candidate_json["jobs"][0]["job options"]
                 if job_options["rw"] == settings["rw"]:
