@@ -6,7 +6,7 @@ from pathlib import Path
 
 def get_settings_from_ini(args):
     config = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
-    listtypes = ['target','mode','block_size', 'iodepth', 'numjobs','extra_optsa', 'rwmixread']
+    listtypes = ['target','mode','block_size', 'iodepth', 'numjobs','extra_opts', 'rwmixread']
     booltypes = ['precondition','precondition_repeat','entire_device','time_based','destructive','dry_run','quiet']
     returndict = {}
     if len(args) == 2:
