@@ -6,7 +6,7 @@ from pathlib import Path
 
 def get_settings_from_ini(args):
     config = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
-    listtypes = ['target','mode','block_size', 'iodepth', 'numjobs','extra_opts']
+    listtypes = ['target','mode','block_size', 'iodepth', 'numjobs','extra_optsa', 'rwmixread']
     booltypes = ['precondition','precondition_repeat','entire_device','time_based','destructive','dry_run','quiet']
     returndict = {}
     if len(args) == 2:
@@ -123,18 +123,19 @@ def check_settings(settings):
         print()
         sys.exit(9)
 
+    mixed_count = 0
     for mode in settings["mode"]:
         writemodes = ['write', 'randwrite', 'rw', 'readwrite', 'trimwrite']
         if mode in writemodes and not settings["destructive"]:
             print(f"\n Mode {mode} will overwrite data on {settings['target']} but destructive flag not set.\n")
             sys.exit(1)
         if mode in settings["mixed"]:
-            if settings["rwmixread"]:
-                settings["loop_items"].append("rwmixread")
-            else:
+            mixed_count+=1
+            if not settings["rwmixread"]:
                 print(
                     "\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n"
                 )
                 sys.exit(8)
-        else:
-            settings["filter_items"].append("rwmixread")
+        if mixed_count > 0:
+            settings["loop_items"].append("rwmixread")
+    
