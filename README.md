@@ -384,7 +384,7 @@ Example:
 
 Fio-plot parses the filename of the generated .log files. The format is:
 
-    [rwmode]-iodepth-[iodepth]-nujobs-[numjobs]_[fio generated type].[numbjob job id].log
+    [rwmode]-iodepth-[iodepth]-numjobs-[numjobs]_[fio generated type].[numbjob job id].log
 
 An example:
 
