@@ -45,7 +45,7 @@ def check_target_type(target, settings):
     It also returns the appropritate fio command line parameter based on the
     file type.
     """
-    filetype = settings["filetype"]
+    filetype = settings["type"]
     keys = ["file", "device", "directory", "rbd"]
 
     test = {keys[0]: Path.is_file, keys[1]: Path.is_block_device, keys[2]: Path.is_dir}

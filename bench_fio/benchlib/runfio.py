@@ -36,6 +36,8 @@ def drop_caches(settings):
 
 
 def run_raw_command(command, env=None):
+    print(command)
+    print(env)
     try: 
         result = subprocess.run(
             command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
@@ -64,16 +66,15 @@ def run_command(settings, benchmark, command):
     env.update({"OUTPUT": output_directory})
     run_raw_command(command, env)
 
-
 def run_fio(settings, benchmark):
     output_directory = supporting.generate_output_directory(settings, benchmark)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
 
     command = [
         "fio",
-        "--output-format=json",
-        "--client=10.0.1.149",
+        "--output-format=json",    
         f"--output={output_file}",
+         "--client=10.0.1.149",
         settings["template"],
     ]
 
@@ -86,9 +87,6 @@ def run_fio(settings, benchmark):
     if not settings["dry_run"]:
         supporting.make_directory(output_directory)
         run_command(settings, benchmark, command)
-    # else:
-    #    pprint.pprint(command)
-
 
 def run_precondition_benchmark(settings, device, run):
 
