@@ -29,18 +29,7 @@ def check_encoding():
         print()
         exit(90)
 
-
-# THIS IS UNUSED CODE I don't remember why I wrote this.
-def check_if_mixed_workload(settings):
-    options = settings["mixed"]
-    for mode in settings["mode"]:
-        if mode in options:
-            return True
-        else:
-            return False
-
-
-def check_target_type(target, settings):
+def check_target_type(target, filetype):
     """Validate path and file / directory type.
     It also returns the appropritate fio command line parameter based on the
     file type.
