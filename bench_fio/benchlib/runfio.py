@@ -97,6 +97,8 @@ def run_precondition_benchmark(settings, device, run):
         else:
             settings_copy = copy.deepcopy(settings)
             settings_copy["template"] = settings["precondition_template"]
+            # make precondition run the whole disk
+            settings_copy["entire_device"] = True
 
             template = supporting.import_fio_template(settings["precondition_template"])
 
@@ -108,7 +110,7 @@ def run_precondition_benchmark(settings, device, run):
                 "numjobs": template["precondition"]["numjobs"],
                 "run": run,
             }
-            run_fio(settings, benchmark)
+            run_fio(settings_copy, benchmark)
 
     elif settings["precondition"] and not settings["destructive"]:
         print(f"\n When running preconditionning, also enable the destructive flag to be 100% sure.\n")
