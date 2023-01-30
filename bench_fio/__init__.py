@@ -17,18 +17,19 @@ from .benchlib import (
     runfio,
     supporting,
     argparsing,
-    defaultsettings as defaults
+    defaultsettings as defaults,
+    parseini
 )
 
 def gather_settings():
     settings = defaults.get_default_settings()
-    customsettings = defaults.get_settings_from_ini(sys.argv)
+    customsettings = parseini.get_settings_from_ini(sys.argv)
     if not customsettings:
         args = argparsing.check_args(settings)
         customsettings = vars(args)
     settings = {**settings, **customsettings}
     #print(customsettings)
-    defaults.check_settings(settings)
+    checks.check_settings(settings)
     return settings
 
 def main():

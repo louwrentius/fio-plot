@@ -12,32 +12,12 @@ from . import (
 )
 
 
-def check_fio_version(settings):
-    """The 3.x series .json format is different from the 2.x series format.
-    This breaks fio-plot, thus this older version is not supported.
-    """
-
-    command = ["fio", "--version"]
-    result = run_raw_command(command).stdout
-    result = result.decode("UTF-8").strip()
-    if "fio-3" in result:
-        return True
-    elif "fio-2" in result:
-        print(f"Your Fio version ({result}) is not compatible. Please use Fio-3.x")
-        sys.exit(1)
-    else:
-        print("Could not detect Fio version.")
-        sys.exit(1)
-
-
-def drop_caches(settings):
+def drop_caches():
     command = ["echo", "3", ">", "/proc/sys/vm/drop_caches"]
     run_raw_command(command)
 
 
 def run_raw_command(command, env=None):
-    print(command)
-    print(env)
     try: 
         result = subprocess.run(
             command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
@@ -66,6 +46,7 @@ def run_command(settings, benchmark, command):
     env.update({"OUTPUT": output_directory})
     run_raw_command(command, env)
 
+
 def run_fio(settings, benchmark):
     output_directory = supporting.generate_output_directory(settings, benchmark)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
@@ -74,7 +55,6 @@ def run_fio(settings, benchmark):
         "fio",
         "--output-format=json",    
         f"--output={output_file}",
-         "--client=10.0.1.149",
         settings["template"],
     ]
 
@@ -84,9 +64,14 @@ def run_fio(settings, benchmark):
     if target_parameter:
         command.append(f"{target_parameter}={benchmark['target']}")
 
+    if settings["remote"]:
+        hostlist = settings["remote"]
+        command.append(f"--client={hostlist}")
+
     if not settings["dry_run"]:
         supporting.make_directory(output_directory)
         run_command(settings, benchmark, command)
+
 
 def run_precondition_benchmark(settings, device, run):
 
@@ -123,13 +108,13 @@ def run_benchmarks(settings, benchmarks):
         for benchmark in ProgressBar(benchmarks):
             run += 1
             run_precondition_benchmark(settings, benchmark["target"], run)
-            drop_caches(settings)
+            drop_caches()
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
             run += 1
             run_precondition_benchmark(settings, benchmark["target"], run)
-            drop_caches(settings)
+            drop_caches()
             run_fio(settings, benchmark)
 
 

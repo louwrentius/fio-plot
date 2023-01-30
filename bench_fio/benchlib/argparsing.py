@@ -19,10 +19,6 @@ def check_args(settings):
         parser.print_help()
         sys.exit(2)
 
-    if not runfio.check_fio_version(settings):
-        parser.print_help()
-        sys.exit(3)
-
     return args
 
 def get_arguments(settings):
@@ -263,11 +259,17 @@ def get_arguments(settings):
     )
     ag.add_argument(
         "--remote",
-        help=f"Uses Fio client/server mechanism. Argument requires file containing one host per line.\
+        help=f"Uses Fio client/server mechanism. Argument requires file with name host.list\
+         containing one host per line.\
             ({settings['remote']}). Usage example: --remote host.list"       
     )
-    return parser
 
+    ag.add_argument(
+        "--remote-port",
+        help=f"Specifies TCP port for remote client/server mechanism.\
+            ({settings['remote']})."       
+    )
+    return parser
 
 def get_argument_description():
     descriptions = {
@@ -299,7 +301,6 @@ def get_argument_description():
         "entire_device": "Benchmark entire device",
         "ceph_pool": "Ceph RBD pool",
         "destructive": "Allow destructive writes",
-        "remote":"Use remote server",
-        "remote_template": "Remote template"
+        "remote":"Use remote server"
     }
     return descriptions
