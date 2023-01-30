@@ -129,12 +129,8 @@ def check_settings(settings):
             print(f"\n Mode {mode} will overwrite data on {settings['target']} but destructive flag not set.\n")
             sys.exit(1)
         if mode in settings["mixed"]:
-            if settings["rwmixread"]:
-                settings["loop_items"].append("rwmixread")
-            else:
+            if not settings["rwmixread"]:
                 print(
                     "\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n"
                 )
-                sys.exit(8)
-        else:
-            settings["filter_items"].append("rwmixread")
+                sys.exit(8)      

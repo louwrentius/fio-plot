@@ -16,7 +16,7 @@ def generate_test_list(settings):
     for item in loop_items:
         result = settings[item]
         dataset.append(result)
-    
+        
     benchmark_list = list(itertools.product(*dataset))
     #print(benchmark_list)
     result = [dict(zip(loop_items, item)) for item in benchmark_list]
