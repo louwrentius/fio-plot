@@ -19,7 +19,6 @@ def drop_caches():
 
 
 def run_raw_command(command, env=None):
-    print(command)
     try: 
         result = subprocess.run(
             command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
@@ -65,7 +64,6 @@ def run_fio(settings, benchmark):
     ## Start segment to be removed
     if not settings["remote"]:
         command = supporting.expand_command_line(command, settings, benchmark)
-
         target_parameter = checks.check_target_type(benchmark["target"], settings)
         if target_parameter:
             command.append(f"{target_parameter}={benchmark['target']}")
@@ -89,20 +87,16 @@ def run_fio(settings, benchmark):
 def fix_json_file(outputfile):
     """ Fix FIO BUG
         See #731 on github
-        Purely for client server support
+        Purely for client server support, proposed solutions don't work
     """
     with open(f"{outputfile}", 'r') as input:
          data = input.readlines()
     
-    with open("/tmp/test.txt", 'w') as output:
+    with open(f"{outputfile}", 'w') as output:
         for line in data:
             if not line.startswith("<"):
                 output.write(line)
          
-
-
-
-
 
 def run_precondition_benchmark(settings, device, run):
 

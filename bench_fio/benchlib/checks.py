@@ -50,13 +50,15 @@ def check_target_type(target, settings):
     """Validate path and file / directory type.
     It also returns the appropritate fio command line parameter based on the
     file type.
+
+    NEEDS OVERHAUL
     """
     filetype = settings["type"]
     keys = ["file", "device", "directory", "rbd"]
 
     test = {keys[0]: Path.is_file, keys[1]: Path.is_block_device, keys[2]: Path.is_dir}
 
-    parameter = {keys[0]: "--filename", keys[1]: "--filename", keys[2]: "--directory"}
+    parameter = {keys[0]: "filename", keys[1]: "filename", keys[2]: "directory"}
 
     if not filetype == "rbd":
 
@@ -78,6 +80,8 @@ def check_target_type(target, settings):
             else:
                 print(f"Target {filetype} {target} is not {filetype}.")
                 sys.exit(10)
+        else:
+            return parameter[filetype]
     else:
         return None
 

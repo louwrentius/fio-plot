@@ -67,7 +67,8 @@ def get_default_settings():
         "remote",
         "tmpjobfile",
         "type",
-        "benchmarks"
+        "benchmarks",
+        "entire_device"
     ]
     return settings
 
