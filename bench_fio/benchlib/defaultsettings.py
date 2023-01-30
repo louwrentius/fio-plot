@@ -65,6 +65,8 @@ def get_default_settings():
     settings["invalidate"] = 1
     settings["ceph_pool"] = None
     settings["destructive"] = False
+    settings["remote"] = False
+    settings["remote_template"] = os.path.join(dir_path, "..", "templates", "remote.fio") 
     settings["loop_items"] = [
         "target",
         "mode",
@@ -96,7 +98,7 @@ def check_settings(settings):
         print()
         sys.exit(4)
 
-    if settings["type"] == "directory":
+    if settings["type"] == "directory" and not settings["remote"]:
         for item in settings["target"]:
             if not os.path.exists(item):
                 print(f"\nThe target directory ({item}) doesn't seem to exist.\n")

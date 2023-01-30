@@ -72,13 +72,14 @@ def run_fio(settings, benchmark):
     command = [
         "fio",
         "--output-format=json",
+        "--client=10.0.1.149",
         f"--output={output_file}",
         settings["template"],
     ]
 
     command = supporting.expand_command_line(command, settings, benchmark)
 
-    target_parameter = checks.check_target_type(benchmark["target"], settings["type"])
+    target_parameter = checks.check_target_type(benchmark["target"], settings)
     if target_parameter:
         command.append(f"{target_parameter}={benchmark['target']}")
 

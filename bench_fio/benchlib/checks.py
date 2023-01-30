@@ -40,12 +40,12 @@ def check_if_mixed_workload(settings):
             return False
 
 
-def check_target_type(target, filetype):
+def check_target_type(target, settings):
     """Validate path and file / directory type.
     It also returns the appropritate fio command line parameter based on the
     file type.
     """
-
+    filetype = settings["filetype"]
     keys = ["file", "device", "directory", "rbd"]
 
     test = {keys[0]: Path.is_file, keys[1]: Path.is_block_device, keys[2]: Path.is_dir}
@@ -54,7 +54,7 @@ def check_target_type(target, filetype):
 
     if not filetype == "rbd":
 
-        if not os.path.exists(target):
+        if not os.path.exists(target) and not settings["remote"]:
             print(f"Benchmark target {filetype} {target} does not exist.")
             sys.exit(10)
 
@@ -66,10 +66,11 @@ def check_target_type(target, filetype):
 
         path_target = Path(target)  # path library needs to operate on path object
 
-        if check(path_target):
-            return parameter[filetype]
-        else:
-            print(f"Target {filetype} {target} is not {filetype}.")
-            sys.exit(10)
+        if not settings["remote"]:
+            if check(path_target):
+                return parameter[filetype]
+            else:
+                print(f"Target {filetype} {target} is not {filetype}.")
+                sys.exit(10)
     else:
         return None
