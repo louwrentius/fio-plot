@@ -301,6 +301,7 @@ def get_argument_description():
         "entire_device": "Benchmark entire device",
         "ceph_pool": "Ceph RBD pool",
         "destructive": "Allow destructive writes",
-        "remote":"Use remote server"
+        "remote":"Use remote server",
+        "remote_port": "Remote 'server' TCP port"
     }
     return descriptions

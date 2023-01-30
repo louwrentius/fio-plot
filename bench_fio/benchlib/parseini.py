@@ -3,6 +3,8 @@ import os
 import sys
 import configparser
 from pathlib import Path
+from . import defaultsettings
+
 
 def get_settings_from_ini(args):
     config = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})

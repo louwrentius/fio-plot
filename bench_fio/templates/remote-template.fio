@@ -1,4 +1,4 @@
-[iotest]
+[remote]
 rw=randread
 blocksize=4k
 ioengine=libaio

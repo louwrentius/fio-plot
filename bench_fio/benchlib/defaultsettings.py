@@ -39,6 +39,7 @@ def get_default_settings():
     settings["destructive"] = False
     settings["remote"] = False
     settings["remote_port"] = 8765
+    settings["tmpjobfile"] = "/tmp/tmpjobfile.fio"
     settings["loop_items"] = [
         "target",
         "mode",
@@ -52,6 +53,34 @@ def get_default_settings():
         "dry_run",
         "mixed",
         "quiet",
+        "tmpjobfile",
+        "exclude_list"
+    ]
+    settings["exclude_list"] = [
+        "exclude_list",
+        "loop_items",
+        "filter_items",
+        "precondition_template",
+        "template",
+        "target",
+        "output",
+        "remote",
+        "tmpjobfile",
+        "type",
+        "benchmarks"
     ]
     return settings
 
+def map_settings_to_fio():
+    mapping = {
+        "mode": "rw",
+        "engine": "ioengine",
+        "block_size": "bs",
+        "ss": "steadystate",
+        "ss_dur": "steadystate_duration",
+        "ss_ramp": "steadystate_ramp_time",
+        "loginterval": "log_avg_msec",
+        "ceph_pool": "pool"
+    }
+    return mapping
+    

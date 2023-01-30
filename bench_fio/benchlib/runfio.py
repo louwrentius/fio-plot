@@ -8,7 +8,8 @@ import time
 
 from . import ( 
     supporting,
-    checks
+    checks,
+    generatefio
 )
 
 
@@ -18,6 +19,7 @@ def drop_caches():
 
 
 def run_raw_command(command, env=None):
+    print(command)
     try: 
         result = subprocess.run(
             command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
@@ -50,27 +52,56 @@ def run_command(settings, benchmark, command):
 def run_fio(settings, benchmark):
     output_directory = supporting.generate_output_directory(settings, benchmark)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
+    template = settings["template"]
+    
+    if settings["remote"]:
+        generatefio.generate_fio_job_file(settings, benchmark, output_directory)
+        template = settings["tmpjobfile"]
 
     command = [
-        "fio",
-        "--output-format=json",    
-        f"--output={output_file}",
-        settings["template"],
+        "fio"
     ]
 
-    command = supporting.expand_command_line(command, settings, benchmark)
+    ## Start segment to be removed
+    if not settings["remote"]:
+        command = supporting.expand_command_line(command, settings, benchmark)
 
-    target_parameter = checks.check_target_type(benchmark["target"], settings)
-    if target_parameter:
-        command.append(f"{target_parameter}={benchmark['target']}")
+        target_parameter = checks.check_target_type(benchmark["target"], settings)
+        if target_parameter:
+            command.append(f"{target_parameter}={benchmark['target']}")
+    ## end segment to be removed
+
+    command.append("--output-format=json")
+    command.append(f"--output={output_file}") # fio bug
 
     if settings["remote"]:
         hostlist = settings["remote"]
         command.append(f"--client={hostlist}")
 
+    command.append(template)
+
     if not settings["dry_run"]:
         supporting.make_directory(output_directory)
         run_command(settings, benchmark, command)
+        if settings["remote"]:
+            fix_json_file(output_file)
+
+def fix_json_file(outputfile):
+    """ Fix FIO BUG
+        See #731 on github
+        Purely for client server support
+    """
+    with open(f"{outputfile}", 'r') as input:
+         data = input.readlines()
+    
+    with open("/tmp/test.txt", 'w') as output:
+        for line in data:
+            if not line.startswith("<"):
+                output.write(line)
+         
+
+
+
 
 
 def run_precondition_benchmark(settings, device, run):
