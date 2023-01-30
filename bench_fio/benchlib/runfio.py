@@ -97,6 +97,8 @@ def run_precondition_benchmark(settings, device, run):
         else:
             settings_copy = copy.deepcopy(settings)
             settings_copy["template"] = settings["precondition_template"]
+            # make precondition run the whole disk
+            settings_copy["entire_device"] = True
 
             template = supporting.import_fio_template(settings["precondition_template"])
 
