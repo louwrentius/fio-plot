@@ -132,7 +132,7 @@ def run_preflight_checks(settings):
     except TypeError:
         pass
 
-    if settings["rw"] == "rw" and len(settings["filter"]) > 1:
+    if settings["rw"] == "rw" and len(settings["filter"]) > 1 and not settings["loggraph"]:
         print("\n if -r rw is specified, please specify a filter -f read or -f write\n")
         sys.exit(1)
 
@@ -143,6 +143,10 @@ def run_preflight_checks(settings):
 
     if not settings["filter"][0]:
         print(f"\nNo filter parameter is set, by default it sould be 'read,write'.\n")
+        sys.exit(1)
+
+    if not len(settings["filter"]) == 2 and settings["draw_total"]:
+        print(f"\n When --draw-total is specified, \"-f read write\" (default) must be specified. \n")
         sys.exit(1)
 
 def post_flight_check(parser, option_found):

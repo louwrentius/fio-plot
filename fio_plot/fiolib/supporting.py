@@ -162,7 +162,6 @@ def generate_axes(ax, datatypes):
     metrics = ["iops", "lat", "bw", "clat", "slat"]
     tkw = dict(size=4, width=1.5)
     first_not_used = True
-    positions = [0, 5, -55]
 
     for item in metrics:
         if item in datatypes:
@@ -174,12 +173,11 @@ def generate_axes(ax, datatypes):
             else:
                 value = ax.twinx()
                 value.tick_params(axis="y", **tkw)
-
             axes[item] = value
             axes[item].ticklabel_format(style="plain")
-            axes[f"{item}_pos"] = positions.pop(0)
+            axes[f"{item}_pos"] = lookupTable(item)["label_pos"]
             if len(axes) == 6:
-                axes[item].spines["right"].set_position(("axes", -0.24))
+                axes[item].spines["right"].set_position(("axes", -0.16))
                 break
     return axes
 
@@ -219,11 +217,13 @@ def process_dataset(settings, dataset):
     new_list = []
     new_structure = {"datatypes": None, "dataset": None}
     final_list = []
-    scale_factors = []
+    scale_factors_bw = []
+    scale_factors_lat = []
 
     """
     This first loop is to unpack the data in series and add scale the xaxis
     """
+   
     for item in dataset:
         for rw in settings["filter"]:
             if len(item["data"][rw]) > 0:
@@ -240,35 +240,38 @@ def process_dataset(settings, dataset):
                 item["xlabel"] = scaled_xaxis["format"]
                 item[rw]["xvalues"] = scaled_xaxis["data"]
 
-                if "lat" in item["type"]:
-                    scale_factors.append(get_scale_factor_lat(item[rw]["yvalues"]))
-                if "bw" in item["type"]:
-                    scale_factors.append(get_scale_factor_bw(item[rw]["yvalues"]))
+                itemtype = []
+                if isinstance(item["type"], str):
+                    itemtype.append(item["type"])
+                if isinstance(item["type"], list):
+                    itemtype = item["type"]
+                for x in itemtype:
+                    if x == "lat":
+                        scale_factors_lat.append(get_scale_factor_lat(item[rw]["yvalues"]))
+                    if x == "bw":
+                        scale_factors_bw.append(get_scale_factor_bw(item[rw]["yvalues"]))
         if settings["draw_total"] and len(settings["filter"]) == 2:
             readdata = item["read"]["yvalues"]
             writedata = item["write"]["yvalues"]
-            print("=====")
-            print(item['type'])
             item["total"] = {}
             item["total"]["yvalues"] = [x + y for x, y in zip(readdata, writedata)]
-            item["total"]["xvalues"] = item["read"]["xvalues"]
+            item["total"]["xvalues"] = item["read"]["xvalues"] # hack
             if "lat" in item["type"]:
-                scale_factors.append(get_scale_factor_lat(item["total"]["yvalues"]))
+                scale_factors_lat.append(get_scale_factor_lat(item["total"]["yvalues"]))
             if "bw" in item["type"]:
-                scale_factors.append(get_scale_factor_bw(item["total"]["yvalues"]))
-            #totals["xlabel"] = item["xlabel"]
-            #item["totals"] = totals
-
+                scale_factors_bw.append(get_scale_factor_bw(item["total"]["yvalues"]))
         
         item.pop("data")
-        #pprint.pprint(item)
         new_list.append(item)
 
     """
     This second loop assures that all data is scaled with the same factor
     """
-    if len(scale_factors) > 0:
-        scale_factor = get_largest_scale_factor(scale_factors)
+
+    if len(scale_factors_lat) > 0:
+        scale_factor_lat = get_largest_scale_factor(scale_factors_lat)
+    if len(scale_factors_bw) > 0:
+        scale_factor_bw = get_largest_scale_factor(scale_factors_bw)
 
     modi = settings["filter"]
     if settings["draw_total"] and len(settings["filter"]) == 2:
@@ -277,12 +280,18 @@ def process_dataset(settings, dataset):
     for item in new_list:
         for rw in modi:
             if rw in item.keys():
-                if "lat" in item["type"] or "bw" in item["type"]:
-                    scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor)
+                if item["type"] == "lat":
+                    scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor_lat)
+                    item[rw]["ylabel"] = scaled_data["format"]
+                    item[rw]["yvalues"] = scaled_data["data"]
+
+                elif item["type"] == "bw":
+                    scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor_bw)
                     item[rw]["ylabel"] = scaled_data["format"]
                     item[rw]["yvalues"] = scaled_data["data"]
                 else:
                     item[rw]["ylabel"] = lookupTable(item["type"])["ylabel"]
+
                 max = np.max(item[rw]["yvalues"])
                 mean = np.mean(item[rw]["yvalues"])
                 stdv = round((np.std(item[rw]["yvalues"]) / mean) * 100, 2)
@@ -313,6 +322,7 @@ def process_dataset(settings, dataset):
 
     new_structure["datatypes"] = list(set(datatypes))
     new_structure["dataset"] = final_list
+                    
     return new_structure
 
 

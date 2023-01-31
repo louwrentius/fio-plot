@@ -204,7 +204,7 @@ def set_arguments(settings):
         help="\
             filter should be read/write.",
         type=str,
-        default=("read", "write"),
+        default=["read", "write"],
         choices=["read", "write"],
     )
     ag.add_argument(
