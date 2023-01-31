@@ -300,12 +300,19 @@ def get_highest_maximum(settings, data):
     highest_max = {
         "read": {"iops": 0, "lat": 0, "bw": 0},
         "write": {"iops": 0, "lat": 0, "bw": 0},
+        "total": {"iops": 0, "lat": 0, "bw": 0 }
     }
     for item in data["dataset"]:
         for rw in settings["filter"]:
             if rw in item.keys():
                 if item[rw]["max"] > highest_max[rw][item["type"]]:
                     highest_max[rw][item["type"]] = item[rw]["max"]
+    
+    for rw in settings["filter"]:
+        for metric in highest_max[rw].keys():
+            if highest_max[rw][metric] > highest_max["total"][metric]:
+                highest_max["total"][metric] = highest_max[rw][metric] 
+
     return highest_max
 
 
