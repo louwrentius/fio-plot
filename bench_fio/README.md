@@ -76,8 +76,12 @@ An example configuration file is included in the templates folder called benchma
 	engine = libaio
 	precondition = False
 	precondition_repeat = False
+	extra_opts = norandommap=1,refill_buffers=1 
 	runtime = 60
 	destructive = False
+
+Please notice that on the command line, multiple arguments are separated by spaces. However, within the INI file, 
+multiple arguments are separated by a comma.
 
 ### Output
 

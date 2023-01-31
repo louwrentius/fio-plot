@@ -25,8 +25,7 @@ def chart_2d_log_data(settings, dataset):
     data = supporting.process_dataset(settings, dataset)
     datatypes = data["datatypes"]
     directories = logdata.get_unique_directories(dataset)
-
-    # pprint.pprint(data)
+    #pprint.pprint(data)
     #
     # Create matplotlib figure and first axis. The 'host' axis is used for
     # x-axis and as a basis for the second and third y-axis
@@ -71,6 +70,9 @@ def chart_2d_log_data(settings, dataset):
     except ValueError as v:
         print(f"\nError: {v} - probably too many lines in the graph.\n")
         sys.exit(1)
+
+    ## Get axix limits 
+    
 
     supportdata = {
         "lines": [],
