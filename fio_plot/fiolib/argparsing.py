@@ -270,6 +270,11 @@ def set_arguments(settings):
         "--max-bw", help="Maximum bandwidth on y-axis", type=int, default=None
     )
     ag.add_argument(
+        "--draw-total",
+        help="Draw sum of read + write data in -g chart. Requires randrw benchmark, -f read write option.",
+        action="store_true",
+    )
+    ag.add_argument(
         "--colors",
         help="Space separated list of colors (only used with -g). Color names can be found "
         "at this page: https://matplotlib.org/3.3.3/gallery/color/named_colors.html"

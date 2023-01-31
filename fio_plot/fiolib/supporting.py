@@ -244,7 +244,24 @@ def process_dataset(settings, dataset):
                     scale_factors.append(get_scale_factor_lat(item[rw]["yvalues"]))
                 if "bw" in item["type"]:
                     scale_factors.append(get_scale_factor_bw(item[rw]["yvalues"]))
+        if settings["draw_total"] and len(settings["filter"]) == 2:
+            readdata = item["read"]["yvalues"]
+            writedata = item["write"]["yvalues"]
+            print("=====")
+            print(item['type'])
+            item["total"] = {}
+            item["total"]["yvalues"] = [x + y for x, y in zip(readdata, writedata)]
+            item["total"]["xvalues"] = item["read"]["xvalues"]
+            if "lat" in item["type"]:
+                scale_factors.append(get_scale_factor_lat(item["total"]["yvalues"]))
+            if "bw" in item["type"]:
+                scale_factors.append(get_scale_factor_bw(item["total"]["yvalues"]))
+            #totals["xlabel"] = item["xlabel"]
+            #item["totals"] = totals
+
+        
         item.pop("data")
+        #pprint.pprint(item)
         new_list.append(item)
 
     """
@@ -253,8 +270,12 @@ def process_dataset(settings, dataset):
     if len(scale_factors) > 0:
         scale_factor = get_largest_scale_factor(scale_factors)
 
+    modi = settings["filter"]
+    if settings["draw_total"] and len(settings["filter"]) == 2:
+        modi.append("total")
+
     for item in new_list:
-        for rw in settings["filter"]:
+        for rw in modi:
             if rw in item.keys():
                 if "lat" in item["type"] or "bw" in item["type"]:
                     scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor)
@@ -262,7 +283,6 @@ def process_dataset(settings, dataset):
                     item[rw]["yvalues"] = scaled_data["data"]
                 else:
                     item[rw]["ylabel"] = lookupTable(item["type"])["ylabel"]
-
                 max = np.max(item[rw]["yvalues"])
                 mean = np.mean(item[rw]["yvalues"])
                 stdv = round((np.std(item[rw]["yvalues"]) / mean) * 100, 2)
