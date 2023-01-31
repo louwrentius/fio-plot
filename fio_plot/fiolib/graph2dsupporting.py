@@ -63,7 +63,7 @@ def scale_2dgraph_yaxis(settings, item, rw, maximum):
         except ValueError:
             print("Min_y value is invalid (not None or integer).")
 
-    max_y = maximum[rw][item["type"]] * factordict[item["type"]]
+    max_y = maximum["total"][item["type"]] * factordict[item["type"]]
 
     if settings[f"max_{item['type']}"]:
         max_y = settings[f"max_{item['type']}"]
@@ -119,7 +119,7 @@ def drawline(settings, item, rw, supportdata):
 
     xvalues = item[rw]["xvalues"]
     yvalues = item[rw]["yvalues"]
-
+    
     #
     # Use a moving average as configured by the commandline option
     # to smooth out the graph for better readability.
@@ -130,7 +130,6 @@ def drawline(settings, item, rw, supportdata):
     # Plotting the line
     #
     dataplot = f"{item['type']}_plot"
-
     color = get_color(settings, supportdata)
 
     axes[dataplot] = axes[item["type"]].plot(
