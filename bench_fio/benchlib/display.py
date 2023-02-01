@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 import datetime
-import sys
+import os
 from . import argparsing as argp
 
+## This code 
 
 def parse_settings_for_display(settings):
+    """
+    We are focussing here on making the length of the top/down bars match the length of the data rows.
+    """
     data = {}
     max_length = 0
     action = {list: lambda a: " ".join(map(str, a)), str: str, int: str, bool: str}
     for k, v in settings.items():
         if v:
-            data[str(k)] = action[type(v)](v)
-            length = len(data[k])
-            if length > max_length:
-                max_length = length
+            if k not in settings["filter_items"]:
+                if k in settings["basename_list"]:
+                    data[str(k)] = os.path.basename(v)
+                else:
+                    data[str(k)] = action[type(v)](v)
+                length = len(data[k])
+                if length > max_length:
+                    max_length = length
     data["length"] = max_length
     return data
 
@@ -25,9 +33,8 @@ def calculate_duration(settings, tests):
     duration = str(datetime.timedelta(seconds=duration_in_seconds))
     return duration
 
-
 def display_header(settings, tests):
-    header = "+++ Fio Benchmark Script +++"
+    header = "+++ FIO BENCHMARK SCRIPT +++"
     blockchar = "\u2588"
     data = parse_settings_for_display(settings)
     fl = 30  # Width of left column of text

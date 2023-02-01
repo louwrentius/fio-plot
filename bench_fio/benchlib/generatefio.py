@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-import os
-import sys
 import configparser
-from pathlib import Path
 from . import (defaultsettings, checks)
 
 def write_fio_job_file(settings, parser):

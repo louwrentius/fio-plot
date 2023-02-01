@@ -28,7 +28,6 @@ def gather_settings():
         args = argparsing.check_args(settings)
         customsettings = vars(args)
     settings = {**settings, **customsettings}
-    #print(customsettings)
     checks.check_settings(settings)
     return settings
 

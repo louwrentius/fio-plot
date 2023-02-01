@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 import os
-import sys
-import configparser
-from pathlib import Path
 
 def get_default_settings():
     path = os.path.abspath(__file__)
@@ -38,7 +35,6 @@ def get_default_settings():
     settings["ceph_pool"] = None
     settings["destructive"] = False
     settings["remote"] = False
-    settings["remote_port"] = 8765
     settings["tmpjobfile"] = "/tmp/tmpjobfile.fio"
     settings["loop_items"] = [
         "target",
@@ -54,8 +50,10 @@ def get_default_settings():
         "mixed",
         "quiet",
         "tmpjobfile",
-        "exclude_list"
+        "exclude_list",
+        "basename_list"
     ]
+    ### The exclude list is used when generating temporary fio templates.
     settings["exclude_list"] = [
         "exclude_list",
         "loop_items",
@@ -68,7 +66,12 @@ def get_default_settings():
         "tmpjobfile",
         "type",
         "benchmarks",
-        "entire_device"
+        "entire_device",
+        "basename_list"
+    ]
+    settings["basename_list"] = [
+        "template",
+        "precondition_template"
     ]
     return settings
 

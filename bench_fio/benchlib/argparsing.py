@@ -2,8 +2,6 @@
 import argparse
 import sys
 
-from . import runfio
-
 
 def check_args(settings):
     """Some basic error handling."""
@@ -263,12 +261,6 @@ def get_arguments(settings):
          containing one host per line.\
             ({settings['remote']}). Usage example: --remote host.list"       
     )
-
-    ag.add_argument(
-        "--remote-port",
-        help=f"Specifies TCP port for remote client/server mechanism.\
-            ({settings['remote']})."       
-    )
     return parser
 
 def get_argument_description():
@@ -301,7 +293,6 @@ def get_argument_description():
         "entire_device": "Benchmark entire device",
         "ceph_pool": "Ceph RBD pool",
         "destructive": "Allow destructive writes",
-        "remote":"Use remote server",
-        "remote_port": "Remote 'server' TCP port"
+        "remote":"Use remote server"
     }
     return descriptions
