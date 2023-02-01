@@ -259,7 +259,25 @@ def get_arguments(settings):
         "--remote",
         help=f"Uses Fio client/server mechanism. Argument requires file with name host.list\
          containing one host per line.\
-            ({settings['remote']}). Usage example: --remote host.list"       
+            ({settings['remote']}). Usage example: --remote host.list",
+        type=str,
+        default=settings["remote"],       
+    )
+    ag.add_argument(
+        "--remote-checks",
+        help=f"When Fio client/server is used, we run a preflight check if all hosts are up \
+        using a TCP port check before we run the benchmark. Otherwise some hosts start benchmarking\
+        until a down host times out, which may be undesirable. ({settings['remote_checks']}).",
+        action="store_true",
+        default=False,      
+    )
+    ag.add_argument(
+        "--remote-timeout",
+        help=f"When Fio client/server is used, we run a preflight check if all hosts are up \
+        using a TCP port check before we run the benchmark. Otherwise some hosts start benchmarking\
+        until a down host times out, which may be undesirable. ({settings['remote_checks']}).",
+        type=int,
+        default=settings["remote_timeout"],    
     )
     return parser
 
@@ -293,6 +311,8 @@ def get_argument_description():
         "entire_device": "Benchmark entire device",
         "ceph_pool": "Ceph RBD pool",
         "destructive": "Allow destructive writes",
-        "remote":"Use remote server"
+        "remote":"Use remote server",
+        "remote_checks": "Check remote for open TCP port",
+        "remote_timeout": "Check remote timeout"
     }
     return descriptions

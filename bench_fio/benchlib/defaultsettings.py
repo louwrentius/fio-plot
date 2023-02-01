@@ -35,6 +35,8 @@ def get_default_settings():
     settings["ceph_pool"] = None
     settings["destructive"] = False
     settings["remote"] = False
+    settings["remote_checks"] = False
+    settings["remote_timeout"] = 2
     settings["tmpjobfile"] = "/tmp/tmpjobfile.fio"
     settings["loop_items"] = [
         "target",
@@ -63,6 +65,8 @@ def get_default_settings():
         "target",
         "output",
         "remote",
+        "remote_checks",
+        "remote_timeout",
         "tmpjobfile",
         "type",
         "benchmarks",

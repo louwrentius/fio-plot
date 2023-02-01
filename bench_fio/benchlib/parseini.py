@@ -8,7 +8,7 @@ def process_options(config):
     This function translates 'untyped' options from the ini file into properly typed options.
     """
     listtypes = ['target','mode','block_size', 'iodepth', 'numjobs','extra_opts', 'rwmixread']
-    booltypes = ['precondition','precondition_repeat','entire_device','time_based','destructive','dry_run','quiet']
+    booltypes = ['precondition','precondition_repeat','entire_device','time_based','destructive','dry_run','quiet',"remote_checks"]
     returndict = {}
     for x in config["benchfio"]:
                 if x == "output":       

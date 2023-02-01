@@ -83,6 +83,22 @@ An example configuration file is included in the templates folder called benchma
 Please notice that on the command line, multiple arguments are separated by spaces. However, within the INI file, 
 multiple arguments are separated by a comma.
 
+### Fio Client/Server support
+
+The Fio tool supports a client-server model where one host can issue a benchmark on one to hundreds of remote hosts.
+bench-fio supports this feature with the --remote and --remote-checks options. 
+
+The --remote argument requires a file containing one host per line as required by Fio. 
+
+	host01
+	host02
+
+The --remote-checks parameter first checks all specified hosts to determine if TCP port 8765 is open. 
+If not, the bechmark will be aborted before any benchmarks have started. Fio will start benchmarking 
+hosts that are available, but then abort when some host are found to be unreachable, which may not be desirable.
+Obiously, this check will take some time with a lot of hosts. 
+
+
 ### Output
 
 The benchmark data consists of two typtes of data. 
