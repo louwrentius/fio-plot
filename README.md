@@ -171,6 +171,18 @@ This is the command-line used to generate this graph:
 
     fio-plot -i INTEL_D3-S4610 --source "https://louwrentius.com"  -T "Comparing multiple queue depths" -g -t iops lat -r randread -d 1 8 16  --xlabel-parent 0    
 
+It is also possible to chart a total of the read+write data (iops/bw/lat) with the --draw-total option. This only works for -g style graphs and it requires
+a 'randrw' benchmark that is not 100% read, it should contain write data. 
+
+![linechart][linegraph05]
+
+[linegraph05]: https://user-images.githubusercontent.com/1312044/215907553-2c075f89-f4f4-4fba-9252-11520d3c5181.png
+
+This is the command-line used to generate this graph:
+
+    fio-plot -i . -T "TEST" -r randrw -g -t iops --draw-total
+
+
 ## Latency histogram 
 The FIO JSON output also contains latency histogram data. It's available in a ns, us and ms scale.
 

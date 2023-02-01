@@ -67,6 +67,7 @@ Generic Settings:
   --max-lat MAX_LAT     Maximum latency value on y-axis
   --max-iops MAX_IOPS   Maximum IOPs value on y-axis
   --max-bw MAX_BW       Maximum bandwidth on y-axis
+  --draw-total          Draw sum of read + write data in -g chart. Requires randrw benchmark, -f read write option.
   --colors COLORS [COLORS ...]
                         Space separated list of colors (only used with -g). Color names can be found at this page: https://matplotlib.org/3.3.3/gallery/color/named_colors.html(example list: tab:red teal violet yellow). You need as many colors as
                         lines.

@@ -204,7 +204,7 @@ def set_arguments(settings):
         help="\
             filter should be read/write.",
         type=str,
-        default=("read", "write"),
+        default=["read", "write"],
         choices=["read", "write"],
     )
     ag.add_argument(
@@ -268,6 +268,11 @@ def set_arguments(settings):
     )
     ag.add_argument(
         "--max-bw", help="Maximum bandwidth on y-axis", type=int, default=None
+    )
+    ag.add_argument(
+        "--draw-total",
+        help="Draw sum of read + write data in -g chart. Requires randrw benchmark, -f read write option.",
+        action="store_true",
     )
     ag.add_argument(
         "--colors",

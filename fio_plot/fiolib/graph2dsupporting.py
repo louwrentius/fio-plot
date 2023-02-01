@@ -129,9 +129,9 @@ def drawline(settings, item, rw, supportdata):
     #
     # Plotting the line
     #
+    
     dataplot = f"{item['type']}_plot"
     color = get_color(settings, supportdata)
-
     axes[dataplot] = axes[item["type"]].plot(
         xvalues,
         yvalues,
