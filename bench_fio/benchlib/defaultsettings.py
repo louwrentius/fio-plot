@@ -72,7 +72,9 @@ def get_default_settings():
         "benchmarks",
         "entire_device",
         "basename_list",
-        "destructive"
+        "destructive",
+        "precondition",
+        "template"
     ]
     settings["basename_list"] = [
         "precondition_template"

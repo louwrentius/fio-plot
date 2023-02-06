@@ -1,13 +1,13 @@
 [precondition]
 name=1m
-ioengine=libaio
+ioengine=sync
 direct=1
 bs=1m
 rw=write
 iodepth=64
 numjobs=1
 buffered=0
-size=100%
+size=100%%
 loops=2
 randrepeat=0
 norandommap=1

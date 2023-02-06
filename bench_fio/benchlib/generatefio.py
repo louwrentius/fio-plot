@@ -21,13 +21,11 @@ def filter_options(settings, config, mapping, benchmark, output_directory):
             key = mapping[key]
         if isinstance(value, bool):
             value = boolean[str(value)]
-        if settings["entire_device"] and key == "runtime":
-            continue
         if key == "type":
             devicetype = checks.check_target_type(benchmark["target"], settings)
             config['FIOJOB'][devicetype] = benchmark["target"]
         if value and not isinstance(value, list) and key not in settings["exclude_list"]:
-            config['FIOJOB'][key] = str(value)
+            config['FIOJOB'][key] = str(value).replace('%', '%%')
         if settings["extra_opts"]:
             for item in settings["extra_opts"]:
                 key, value = item.split("=")

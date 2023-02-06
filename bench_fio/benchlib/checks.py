@@ -90,6 +90,10 @@ def check_settings(settings):
 
     check_fio_version()
 
+    if settings["entire_device"]:
+        settings["runtime"] = None
+        settings["size"] = "100%"
+
     if settings["type"] not in ["device", "rbd"] and not settings["size"]:
         print()
         print("When the target is a file or directory, --size must be specified.")
@@ -143,3 +147,6 @@ def check_settings(settings):
         if not os.path.exists(hostlist):
                 print(f"The list of remote hosts ({hostlist}) doesn't seem to exist.\n")
                 sys.exit(5)
+    
+    if not settings["precondition"]:
+        settings["filter_items"].append("precondition_template")

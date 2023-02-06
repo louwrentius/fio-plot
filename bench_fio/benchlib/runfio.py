@@ -8,8 +8,8 @@ import time
 
 from . import ( 
     supporting,
-    checks,
-    generatefio
+    generatefio,
+    defaultsettings
 )
 
 
@@ -75,18 +75,14 @@ def fix_json_file(outputfile):
          
 
 def run_precondition_benchmark(settings, device, run):
-
     if settings["precondition"] and settings["destructive"]:
         if not settings["precondition_repeat"] and run > 1:
             pass # only run once if precondition_repeat is not set
         else:
             settings_copy = copy.deepcopy(settings)
             settings_copy["template"] = settings["precondition_template"]
-            # make precondition run the whole disk
-            settings_copy["entire_device"] = True
-
+            settings_copy["runtime"] = None # want to test entire device
             template = supporting.import_fio_template(settings["precondition_template"])
-
             benchmark = {
                 "target": device,
                 "mode": template["precondition"]["rw"],
@@ -95,6 +91,14 @@ def run_precondition_benchmark(settings, device, run):
                 "numjobs": template["precondition"]["numjobs"],
                 "run": run,
             }
+            mapping = defaultsettings.map_settings_to_fio()
+            for key, value in dict(template["precondition"]).items():
+                for x, y in mapping.items():
+                    if str(key) == str(y):
+                        settings_copy[mapping[x]] = value
+                    else:
+                        settings_copy[key] = value
+            #print(settings_copy)
             run_fio(settings_copy, benchmark)
 
     elif settings["precondition"] and not settings["destructive"]:
