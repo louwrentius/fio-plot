@@ -147,6 +147,11 @@ def check_settings(settings):
         if not os.path.exists(hostlist):
                 print(f"The list of remote hosts ({hostlist}) doesn't seem to exist.\n")
                 sys.exit(5)
+            
+    if settings["precondition_template"]:
+        if not os.path.exists(settings["precondition_template"]):
+            print(f"Precondition template ({settings['precondition_template']}) doesn't seem to exist.\n")
+            sys.exit(5)    
     
     if not settings["precondition"]:
         settings["filter_items"].append("precondition_template")
