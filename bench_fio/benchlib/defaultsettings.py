@@ -71,7 +71,8 @@ def get_default_settings():
         "type",
         "benchmarks",
         "entire_device",
-        "basename_list"
+        "basename_list",
+        "destructive"
     ]
     settings["basename_list"] = [
         "precondition_template"

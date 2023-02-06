@@ -52,8 +52,8 @@ def print_options(settings, ds):
     descriptions = argp.get_argument_description()
     for item in settings.keys():
         if item not in settings["filter_items"]: # filter items are internal options that aren't relevant
-            if item not in descriptions.keys():  # These are custom fio options added to the bench fio ini 
-                customitem = item + "*"
+            if item not in descriptions.keys(): 
+                customitem = item + "*"  # These are custom fio options so we mark them as such
                 print(f"{customitem:<{fl}}: {data[item]:<}")
             else:
                 description = descriptions[item]
