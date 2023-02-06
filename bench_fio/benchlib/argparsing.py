@@ -62,14 +62,6 @@ def get_arguments(settings):
         required=True,
     )
     ag.add_argument(
-        "-j",
-        "--template",
-        help=f"Fio job file in INI format. A file is already included and this parameter is only required if you create \
-            your own custom Fio job. \
-            (Default: {settings['template']})",
-        default=settings["template"],
-    )
-    ag.add_argument(
         "-b",
         "--block-size",
         help=f"Specify block size(s). (Default: {settings['block_size']}",
@@ -222,7 +214,7 @@ def get_arguments(settings):
         help="Allows you to add extra options, \
         for example, options that are specific to the selected ioengine. It \
              can be any other Fio option. Example: --extra-opts norandommap=1 invalidate=0\
-                 You may also choose to add those options to the fio_template.fio file.",
+                 this can also be specified in the bench-fio ini file",
         nargs="+",
     )
     ag.add_argument(
@@ -283,7 +275,7 @@ def get_arguments(settings):
 
 def get_argument_description():
     descriptions = {
-        "target": "Test target",
+        "target": "Test target(s)",
         "template": "Job template",
         "engine": "I/O Engine",
         "mode": "Test mode (read/write)",
@@ -313,6 +305,6 @@ def get_argument_description():
         "destructive": "Allow destructive writes",
         "remote":"Use remote server",
         "remote_checks": "Check remote for open TCP port",
-        "remote_timeout": "Check remote timeout"
+        "remote_timeout": "Check remote timeout (s)"
     }
     return descriptions

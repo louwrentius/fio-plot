@@ -9,6 +9,7 @@ def process_options(config):
     """
     listtypes = ['target','mode','block_size', 'iodepth', 'numjobs','extra_opts', 'rwmixread']
     booltypes = ['precondition','precondition_repeat','entire_device','time_based','destructive','dry_run','quiet',"remote_checks"]
+    inttypes  = ['loops','runtime']
     returndict = {}
     for x in config["benchfio"]:
                 if x == "output":       
@@ -18,8 +19,11 @@ def process_options(config):
                     returndict[x] = config.getlist('benchfio', x)
                 elif x in booltypes:
                     returndict[x] = config.getboolean('benchfio', x)
+                elif x in inttypes:
+                    returndict[x] = config.getint('benchfio', x)     
                 else:
                     returndict[x] = config["benchfio"][x]
+    
     return returndict
 
 def read_ini_data(args, config):
@@ -28,15 +32,18 @@ def read_ini_data(args, config):
         if os.path.isfile(filename):
             try:
                 config.read(filename)
+                return True
             except configparser.DuplicateOptionError as e:
                 print(f"{e}\n")
                 sys.exit(1)
+        else:
+            print(f"Config file {filename} not found.")
+            sys.exit(1)
     else:
-        print(f"Config file {filename} not found.")
-        sys.exit(1)
+        return False
 
 def get_settings_from_ini(args):
     config = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
-    read_ini_data(args, config)
-    returndict = process_options(config)
-    return returndict
+    if read_ini_data(args, config):
+        returndict = process_options(config)
+        return returndict

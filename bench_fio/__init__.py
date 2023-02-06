@@ -25,6 +25,7 @@ from .benchlib import (
 def gather_settings():
     settings = defaults.get_default_settings()
     customsettings = parseini.get_settings_from_ini(sys.argv)
+    #print(customsettings)
     if not customsettings:
         args = argparsing.check_args(settings)
         customsettings = vars(args)

@@ -35,6 +35,10 @@ If you don't want to install fio-plot system-wide, you can make a virtual enviro
 
 When you source the virtual environment, fio-plot and bench-fio will be in your executable path. 
 
+If you want to install from source, you can clone the repository and run 
+
+    python3 setup.py install
+
 ## Configuration command-line vs. INI
 
 Fio-plot supports configuration through command-line parameters or using an INI format configuration file.

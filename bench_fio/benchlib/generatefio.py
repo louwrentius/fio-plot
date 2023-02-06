@@ -28,6 +28,11 @@ def filter_options(settings, config, mapping, benchmark, output_directory):
             config['FIOJOB'][devicetype] = benchmark["target"]
         if value and not isinstance(value, list) and key not in settings["exclude_list"]:
             config['FIOJOB'][key] = str(value)
+        if settings["extra_opts"]:
+            for item in settings["extra_opts"]:
+                key, value = item.split("=")
+                config['FIOJOB'][key] = str(v)
+
     config['FIOJOB']["write_bw_log"] = f"{output_directory}/{benchmark['mode']}-iodepth-{benchmark['iodepth']}-numjobs-{benchmark['numjobs']}"
     config['FIOJOB']["write_lat_log"] = f"{output_directory}/{benchmark['mode']}-iodepth-{benchmark['iodepth']}-numjobs-{benchmark['numjobs']}"
     config['FIOJOB']["write_iops_log"] = f"{output_directory}/{benchmark['mode']}-iodepth-{benchmark['iodepth']}-numjobs-{benchmark['numjobs']}"

@@ -18,15 +18,15 @@ def drop_caches():
     run_raw_command(command)
 
 
-def run_raw_command(command, env=None):
+def run_raw_command(command):
     try: 
         result = subprocess.run(
-            command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
+            command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         if result.returncode > 0 or (len(str(result.stderr)) > 3):
             stdout = result.stdout.decode("UTF-8").strip()
             stderr = result.stderr.decode("UTF-8").strip()
-            print(f"\nAn error occurred: {stderr} - {stdout}")
+            print(f"\nAn error occurred: stderr: {stderr} - stdout: {stdout}")
             sys.exit(1)
     except KeyboardInterrupt:
         print(f"\n ctrl-c pressed - Aborted by user....\n")
@@ -34,55 +34,31 @@ def run_raw_command(command, env=None):
     return result
 
 
-def run_command(settings, benchmark, command):
-    """This command sets up the environment that is used in conjunction
-    with the Fio .ini job file.
-    """
-    output_directory = supporting.generate_output_directory(settings, benchmark)
-    env = os.environ
-    settings = supporting.convert_dict_vals_to_str(settings)
-    benchmark = supporting.convert_dict_vals_to_str(benchmark)
-    env.update(settings)
-    env.update(benchmark)
-    env.update({"OUTPUT": output_directory})
-    run_raw_command(command, env)
-
-
 def run_fio(settings, benchmark):
     output_directory = supporting.generate_output_directory(settings, benchmark)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
-    template = settings["template"]
+    generatefio.generate_fio_job_file(settings, benchmark, output_directory)
     
-    if settings["remote"]:
-        generatefio.generate_fio_job_file(settings, benchmark, output_directory)
-        template = settings["tmpjobfile"]
-
+    ### We build up the fio command line here
     command = [
         "fio"
     ]
-
-    ## Start segment to be removed
-    if not settings["remote"]:
-        command = supporting.expand_command_line(command, settings, benchmark)
-        target_parameter = checks.check_target_type(benchmark["target"], settings)
-        if target_parameter:
-            command.append(f"{target_parameter}={benchmark['target']}")
-    ## end segment to be removed
-
+    
     command.append("--output-format=json")
     command.append(f"--output={output_file}") # fio bug
 
     if settings["remote"]:
-        hostlist = settings["remote"]
-        command.append(f"--client={hostlist}")
+        command.append(f"--client={settings['remote']}")
 
-    command.append(template)
-
+    command.append(settings["tmpjobfile"])
+    # End of command line creation
+    
     if not settings["dry_run"]:
         supporting.make_directory(output_directory)
-        run_command(settings, benchmark, command)
+        run_raw_command(command)
         if settings["remote"]:
-            fix_json_file(output_file)
+            fix_json_file(output_file) # to fix FIO json output bug
+
 
 def fix_json_file(outputfile):
     """ Fix FIO BUG

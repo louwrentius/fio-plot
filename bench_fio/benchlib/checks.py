@@ -90,12 +90,6 @@ def check_settings(settings):
 
     check_fio_version()
 
-    if not os.path.exists(settings["template"]):
-        print()
-        print(f"The specified template {settings['template']} does not exist.")
-        print()
-        sys.exit(6)
-
     if settings["type"] not in ["device", "rbd"] and not settings["size"]:
         print()
         print("When the target is a file or directory, --size must be specified.")
@@ -116,10 +110,9 @@ def check_settings(settings):
             sys.exit(6)
 
     if settings["type"] == "rbd" and settings["ceph_pool"]:
-        if settings["template"] == "./fio-job-template.fio":
+        if not settings["engine"] == "rbd":
             print(
-                "Please specify the appropriate Fio template (--template).\n\
-                    The example fio-job-template-ceph.fio can be used."
+                f"\nPlease specify engine 'rbd' when benchmarking Ceph, not {settings['engine']}\n"
             )
             sys.exit(7)
 

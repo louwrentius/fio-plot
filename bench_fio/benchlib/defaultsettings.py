@@ -5,15 +5,20 @@ def get_default_settings():
     path = os.path.abspath(__file__)
     dir_path = os.path.dirname(path)
     settings = {}
+    settings["benchmarks"] = None
     settings["target"] = []
-    settings["template"] = os.path.join(dir_path, "..", "templates", "fio-job-template.fio")
+    settings["type"] = None
     settings["engine"] = "libaio"
     settings["mode"] = ["randread"]
+    settings["size"] = None
+    settings["block_size"] = ["4k"]
     settings["iodepth"] = [1, 2, 4, 8, 16, 32, 64]
     settings["numjobs"] = [1, 2, 4, 8, 16, 32, 64]
-    settings["block_size"] = ["4k"]
+    settings["rwmixread"] = None
+    settings["runtime"] = 60
+    settings["loops"] = 1
+    settings["time_based"] = False
     settings["direct"] = 1
-    settings["size"] = None
     settings["dry_run"] = False
     settings["precondition"] = False
     settings["quiet"] = False
@@ -24,10 +29,6 @@ def get_default_settings():
     settings["ss"] = False
     settings["ss_dur"] = None
     settings["ss_ramp"] = None
-    settings["rwmixread"] = None
-    settings["runtime"] = 60
-    settings["loops"] = 1
-    settings["time_based"] = False
     settings["extra_opts"] = []
     settings["loginterval"] = 1000
     settings["mixed"] = ["readwrite", "rw", "randrw"]
@@ -61,7 +62,6 @@ def get_default_settings():
         "loop_items",
         "filter_items",
         "precondition_template",
-        "template",
         "target",
         "output",
         "remote",
@@ -74,12 +74,16 @@ def get_default_settings():
         "basename_list"
     ]
     settings["basename_list"] = [
-        "template",
         "precondition_template"
     ]
     return settings
 
 def map_settings_to_fio():
+    """
+    At some point we should bite the bullet and make the breaking change
+    and rename all bench-fio settings to the fio-equivalent. Until then
+    we use this conversion table.
+    """
     mapping = {
         "mode": "rw",
         "engine": "ioengine",

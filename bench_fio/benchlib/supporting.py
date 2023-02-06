@@ -38,7 +38,7 @@ def make_directory(directory):
 
 
 def generate_output_directory(settings, benchmark):
-
+    settings["output"] = os.path.expanduser(settings["output"])
     if benchmark["mode"] in settings["mixed"]:
         directory = (
             f"{settings['output']}/{os.path.basename(benchmark['target'])}/"

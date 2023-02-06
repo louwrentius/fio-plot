@@ -9,23 +9,33 @@ from pathlib import Path
 from . import supporting
 
 
+def get_hostname_from_filename(f):
+    split = f.split(".")
+    rawhostname = split[3:]
+    hostname = ".".join(rawhostname)
+    return hostname
+
 def list_fio_log_files(directory):
     """Lists all .log files in a directory. Exits with an error if no files are found."""
     absolute_dir = os.path.abspath(directory)
     files = os.listdir(absolute_dir)
     fiologfiles = []
     for f in files:
+        absolutefilepath = os.path.join(absolute_dir, f)
+        structure = { "hostname": None, "filename": absolutefilepath}
         if f.endswith(".log"):
-            fiologfiles.append(os.path.join(absolute_dir, f))
+            fiologfiles.append(structure)
+        elif ".log." in f:
+            structure["hostname"] = get_hostname_from_filename(f)
+            fiologfiles.append(structure)
 
     if len(fiologfiles) == 0:
         print(
-            "\nCould not find any log files in the specified directory {str(absolute_dir)}"
+            f"\nCould not find any log files in the specified directory {str(absolute_dir)}"
         )
         print("\nAre the correct directories specified?")
         print("\nIf so, please check the -d -n and -r parameters.\n")
         sys.exit(1)
-
     return fiologfiles
 
 
@@ -40,7 +50,6 @@ def return_folder_name(filename, settings, override=False):
     segment_size = settings["xlabel_segment_size"]
     parent = settings["xlabel_parent"]
     child = settings["xlabel_depth"]
-
     raw_path = Path(filename).resolve()
 
     if override:
@@ -85,18 +94,21 @@ def return_filename_filter_string(settings):
 
 
 def filterLogFiles(settings, file_list):
-    """Returns a list of log files that matches the supplied filter string(s)."""
+    """
+    Returns a list of log files that matches the supplied filter string(s).
+    """
     searchstrings = return_filename_filter_string(settings)
-    # pprint.pprint(searchstrings)
+    #print(searchstrings)
     result = []
     for item in file_list:
         for searchstring in searchstrings:
-            filename = os.path.basename(item)
+            filename = os.path.basename(item["filename"])
             # print(filename)
             if re.search(r"^" + searchstring["searchstring"], filename):
                 data = {"filename": item}
                 data.update(searchstring)
-                data["directory"] = return_folder_name(item, settings, True)
+                data["directory"] = return_folder_name(item["filename"], settings, True)
+                data["hostname"] = item["hostname"]
                 result.append(data)
     # pprint.pprint(result)
     if len(result) > 0:
@@ -260,8 +272,8 @@ def readLogData(settings, inputfile):
     single file.
     """
     dataset = []
-    if os.path.exists(inputfile):
-        with open(inputfile) as csv_file:
+    if os.path.exists(inputfile["filename"]):
+        with open(inputfile["filename"]) as csv_file:
             csv.register_dialect("CustomDialect", skipinitialspace=True, strict=True)
             csv_reader = csv.DictReader(
                 csv_file,

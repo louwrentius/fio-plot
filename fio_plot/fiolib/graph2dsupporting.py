@@ -5,9 +5,9 @@ import pprint
 
 from . import (
     jsonimport,
+    jsonparsing,
     supporting
 )
-
 
 #
 # These functions below is just one big mess to get the legend labels to align.
@@ -16,7 +16,7 @@ def get_json_data(settings):
     list_of_json_files = jsonimport.list_json_files(settings, fail=False)
     if list_of_json_files:
         dataset = jsonimport.import_json_dataset(settings, list_of_json_files)
-        parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
+        parsed_data = jsonparsing.parse_json_data(settings, dataset)
         return parsed_data
     else:
         return None

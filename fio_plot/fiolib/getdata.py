@@ -6,7 +6,8 @@ from . import(
     jsonimport,
     bar2d,
     bar3d,
-    barhistogram as histogram
+    barhistogram as histogram,
+    jsonparsing
 )
 
 
@@ -39,9 +40,9 @@ def get_log_data(settings):
 
 def get_json_data(settings):
     list_of_json_files = jsonimport.list_json_files(settings)
-    # pprint.pprint(list_of_json_files)
+    #pprint.pprint(list_of_json_files)
     dataset = jsonimport.import_json_dataset(settings, list_of_json_files)
-    parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
+    parsed_data = jsonparsing.parse_json_data(settings, dataset)
     # pprint.pprint(parsed_data)
     return parsed_data
 
