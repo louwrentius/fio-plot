@@ -15,8 +15,8 @@ def get_nested_value(dictionary, key):
     return dictionary
 
 
-def check_for_steadystate(dataset, mode):
-    keys = dataset[0]["rawdata"][0]["jobs"][0].keys()
+def check_for_steadystate(record, mode):
+    keys = record["jobs"][0].keys()
     if "steadystate" in keys:
         return True
     else:
@@ -38,21 +38,23 @@ def validate_job_option_key(dataset, key):
         raise KeyError
 
 
-def validate_job_options(dataset, key):
+def validate_job_options(record, key):
     # Job options can either be in the job or in global options.
     # Sometimes some options are in one and others in the other.
     # We need to figure out which one.
+
+    
     jobOptionsRaw = ["jobs", 0, "job options"]
     try:
-        walk_dictionary(dataset[0]['rawdata'][0], jobOptionsRaw)
-        validate_job_option_key(dataset[0]['rawdata'][0], key)
+        walk_dictionary(record, jobOptionsRaw)
+        validate_job_option_key(record, key)
         return jobOptionsRaw
     except KeyError:
         return ['global options']
 
 
-def validate_number_of_jobs(dataset):
-    length = len(dataset[0]['rawdata'][0]['jobs'])
+def validate_number_of_jobs(record):
+    length = len(record['jobs'])
     if length > 1:
         print(f"\n Unfortunately, fio-plot can't deal (yet) with JSON files containing multiple ({length}) jobs\n")
         print("See also: https://github.com/louwrentius/fio-plot/issues/64")
@@ -115,27 +117,35 @@ def printkeys(data, depth=0, maxdepth=3):
             for item in data:
                 printkeys(item, depth+1)
 
+def validate_json_data(settings, record):
+    options = validate_job_options(record, "numjobs")
+    result = {"mode": None, "mapping": None}
+    if settings["rw"] == "randrw":
+        mode = settings["filter"][0]
+    elif settings["rw"] == "read" or settings["rw"] == "write":
+        mode = settings["rw"]
+    elif settings["rw"] == "rw":
+        mode = settings['filter'][0]
+    elif settings["rw"] == "readwrite":
+        mode = settings['filter'][0]
+    else:
+        mode = get_nested_value(record, options + ["rw"])[4:]
+    result["mode"] = mode
+    result["mapping"] = get_json_mapping(mode, record)
+    return result
+
 def build_json_mapping(settings, dataset):
     """
     This funcion traverses the relevant JSON structure to gather data
-    and store it in a flat dictionary.
+    and store it in a flat dictionary. We do this for each imported json file.
     """
     for item in dataset:
         item["data"] = []
         # printkeys(item["rawdata"]) # for debugging
         for record in item["rawdata"]:
-            options = validate_job_options(dataset, "numjobs")
-            if settings["rw"] == "randrw":
-               mode = settings["filter"][0]
-            elif settings["rw"] == "read" or settings["rw"] == "write":
-                mode = settings["rw"]
-            elif settings["rw"] == "rw":
-                mode = settings['filter'][0]
-            elif settings["rw"] == "readwrite":
-                mode = settings['filter'][0]
-            else:
-                mode = get_nested_value(record, options + ["rw"])[4:]
-            m = get_json_mapping(mode, dataset)
+            result = validate_json_data(settings, record)
+            mode = result["mode"]
+            m = result["mapping"]
             row = {
                 "iodepth": int(get_nested_value(record, m["iodepth"])),
                 "numjobs": int(get_nested_value(record, m["numjobs"])),

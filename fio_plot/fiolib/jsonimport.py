@@ -21,6 +21,8 @@ def validate_json_file(settings, jsondata):
 def filter_json_files(settings, filename):
     """A bit of a slow process, but guarantees that we get legal
     json files regardless of their names"""
+    iodepth = None
+    numjobs = None
     with open(filename, 'r') as candidate_file:
         try:
             candidate_json = json.load(candidate_file)
@@ -35,15 +37,15 @@ def filter_json_files(settings, filename):
                 if job_options["rw"] == settings["rw"]:
                     iodepth = int(job_options["iodepth"])
                     numjobs = int(job_options["numjobs"])
-                    if iodepth in settings["iodepth"] and numjobs in settings["numjobs"]:
-                        return filename
             else:
                 logger.debug(f"{filename} does not appear to be a valid fio json output file, skipping")
         except Exception as e:
             print(f"Filename: {filename}")
             print(f"Error: {repr(e)} - please report this as a bug and please include the JSON file if possible.")
             sys.exit(1)
-
+    if iodepth in settings["iodepth"] and numjobs in settings["numjobs"]:
+        return filename
+    # else means this file is valid but doesn't match iodepth/numjobs so no else statement
 
 def list_json_files(settings, fail=True):
     """List all JSON files that maches the command line settings."""

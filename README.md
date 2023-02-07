@@ -6,7 +6,9 @@ Fio-plot generates charts from FIO storage benchmark data. It can process FIO ou
 
 [fio]: https://github.com/axboe/fio
 
-To get to these charts, you need to follow this process:
+![barchart][2dchartiodepth]
+
+To make these charts yourself, you need to follow this process:
 
 1. Run your tests, maybe use the included benchmark script [bench-fio][bms]
 2. Determine which information you would like to show
