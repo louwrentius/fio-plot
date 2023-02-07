@@ -143,7 +143,9 @@ def check_settings(settings):
             settings["loop_items"].append("rwmixread")
    
     if settings["remote"]:
-        hostlist = settings["remote"]
+        hostlist = os.path.expanduser(settings["remote"])
+        settings["remote"] = hostlist
+
         if not os.path.exists(hostlist):
                 print(f"The list of remote hosts ({hostlist}) doesn't seem to exist.\n")
                 sys.exit(5)

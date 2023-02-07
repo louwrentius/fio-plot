@@ -2,7 +2,7 @@
  This benchmark script is provided alongside fio-plot. It automates the process of running multiple benchmarks with different parameters. For example, it allows you to gather data for different queue depths and/or number of simultaneous jobs. The benchmark script shows progress in real-time.
 
 #### Steady State
- It supports the [Fio "steady state"][fioss] feature, that stops a benchmark when the desired steady state is reached for a configure time duration.
+ It supports the [Fio "steady state"][fioss] feature, that stops a benchmark when the desired steady state is reached for a configured time duration.
 
  [fioss]: https://github.com/axboe/fio/blob/master/examples/steadystate.fio
 
@@ -14,7 +14,7 @@ This benchmark script supports running configure SSD preconditioning jobs that a
 
 An example with output:
 
-	./bench_fio --target /dev/md0 --type device --template fio-job-template.fio  --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --rwmixread 75 90 
+	./bench_fio --target /dev/md0 --type device --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --rwmixread 75 90 
 
 	████████████████████████████████████████████████████
 			+++ Fio Benchmark Script +++
@@ -83,21 +83,49 @@ An example configuration file is included in the templates folder called benchma
 Please notice that on the command line, multiple arguments are separated by spaces. However, within the INI file, 
 multiple arguments are separated by a comma.
 
+### Extra (custom) Fio parameters
+
+If you use the bench-fio comand line, extra options can be specified with the --extra-opts parameter like this:
+
+    --extra-opts parameter1=value parameter2=value
+
+Example:
+
+    --extra-opts norandommap=1 norefillbuffers=1
+
+If the INI file is  used to perform bench-fio benchmarks, those extra options can just be added to the file like
+a regular fio job file, one per line. 
+
+	norandommap = 1
+	norefillbuffers = 1
+
+You can put any valid fio option in the bench-fio INI file and those will be passed as-is to fio. Such parameters are
+marked with an asterix(*) when running bench-fio.
+
 ### Fio Client/Server support
 
-The Fio tool supports a client-server model where one host can issue a benchmark on one to hundreds of remote hosts.
-bench-fio supports this feature with the --remote and --remote-checks options. 
+The Fio tool supports a [client-server][clientserver] model where one host can issue a benchmark on just one remote host
+up to hundreds of remote hosts. Bench-fio supports this feature with the --remote and --remote-checks options. 
+
+[clientserver]: https://fio.readthedocs.io/en/latest/fio_doc.html#client-server
 
 The --remote argument requires a file containing one host per line as required by Fio. 
 
 	host01
 	host02
 
-The --remote-checks parameter first checks all specified hosts to determine if TCP port 8765 is open. 
-If not, the bechmark will be aborted before any benchmarks have started. Fio will start benchmarking 
-hosts that are available, but then abort when some host are found to be unreachable, which may not be desirable.
-Obiously, this check will take some time with a lot of hosts. 
+The host can either be specified as an IP-address or as a DNS name.
 
+So it would look like:
+
+	--remote /some/path/to/file.txt
+
+The --remote-checks parameter makes bench-fio check if all hosts are up before starting the benchmark. 
+Specifically, it checks if TCP port 8765 is open on a host.
+
+If one of the host fails this check bench-fio will never start actual benchmarks. By default, Fio will start benchmarking 
+hosts that are network-accessible, but then abort when one or more host are found to be unreachable. 
+As this may be undesirable, the --remote-checks parameter can avoid this scenario.
 
 ### Output
 
@@ -134,7 +162,6 @@ The .log files are ommitted.
 
 Please note that mixed workloads will get their own folder to prevent files being overwritten.
 Pure read/write/trim workloads will appear in the *device* folder.
-
 
 ### Usage
 
@@ -222,7 +249,6 @@ If you need to benchmark a Ceph RBD image, some tips:
 
 The --target should be the RBD image to benchmark 
 The --ceph-pool parameter should specify the pool 
-The --template parameter should point the the Ceph RBD specific fio-job-template-ceph.fio template (included.)
 
 ### Requirements
 
