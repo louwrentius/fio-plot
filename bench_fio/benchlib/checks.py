@@ -33,6 +33,8 @@ def check_target_type(target, filetype):
     """Validate path and file / directory type.
     It also returns the appropritate fio command line parameter based on the
     file type.
+
+    In case of target type 'file' it will be created if it doesn't exist, which is fio default behaviour'.
     """
 
     keys = ["file", "device", "directory", "rbd"]
@@ -42,6 +44,9 @@ def check_target_type(target, filetype):
     parameter = {keys[0]: "--filename", keys[1]: "--filename", keys[2]: "--directory"}
 
     if not filetype == "rbd":
+        
+        if filetype == "file":
+            return parameter[filetype]
 
         if not os.path.exists(target):
             print(f"Benchmark target {filetype} {target} does not exist.")
