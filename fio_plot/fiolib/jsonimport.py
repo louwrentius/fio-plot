@@ -98,7 +98,6 @@ def import_json_dataset(settings, dataset):
     """
     for item in dataset:
         item["rawdata"] = []
-        # pprint.pprint(item['files'])
         for f in item["files"]:
             item["rawdata"].append(import_json_data(f))
     return dataset
