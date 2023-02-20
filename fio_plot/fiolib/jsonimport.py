@@ -76,7 +76,6 @@ def list_json_files(settings, fail=True):
                 f"If so, please check the -d ({settings['iodepth']}) -n ({settings['numjobs']}) and -r ({settings['rw']}) parameters.\n"
             )
             sys.exit(1)
-    # pprint.pprint(json_files)
     return input_directories
 
 

@@ -43,7 +43,7 @@ def get_json_data(settings):
     #pprint.pprint(list_of_json_files)
     dataset = jsonimport.import_json_dataset(settings, list_of_json_files)
     parsed_data = jsonparsing.parse_json_data(settings, dataset)
-    # pprint.pprint(parsed_data)
+    #pprint.pprint(parsed_data[0]["data"])
     return parsed_data
 
 

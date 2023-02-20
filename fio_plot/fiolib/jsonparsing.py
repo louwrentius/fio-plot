@@ -1,100 +1,45 @@
-import os
-import sys
-import json
-import logging
+from operator import itemgetter
 import pprint
-
-def get_nested_value(dictionary, key):
-    """This function reads the data from the FIO JSON file based on the supplied
-    key (which is often a nested path within the JSON file).
-    """
-    if not key:
-        return None
-    for item in key:
-        dictionary = dictionary[item]
-    return dictionary
 
 
 def check_for_steadystate(record, mode):
-    keys = record["jobs"][0].keys()
-    if "steadystate" in keys:
+    keys = record["job options"].keys()
+    if "steadystate" in keys: # remember that we merged global options into job options to make them accessible
         return True
     else:
         return False
 
 
-def walk_dictionary(dictionary, path):
-    result = dictionary
-    for item in path:
-        result = result[item]
-    return result
-
-
-def validate_job_option_key(dataset, key):
-    mykeys = dataset['jobs'][0]['job options'].keys()
-    if key in mykeys:
-        return True
-    else:
-        raise KeyError
-
-
-def validate_job_options(record, key):
-    # Job options can either be in the job or in global options.
-    # Sometimes some options are in one and others in the other.
-    # We need to figure out which one.
-
-    
-    jobOptionsRaw = ["jobs", 0, "job options"]
-    try:
-        walk_dictionary(record, jobOptionsRaw)
-        validate_job_option_key(record, key)
-        return jobOptionsRaw
-    except KeyError:
-        return ['global options']
-
-
-def validate_number_of_jobs(record):
-    length = len(record['jobs'])
-    if length > 1:
-        print(f"\n Unfortunately, fio-plot can't deal (yet) with JSON files containing multiple ({length}) jobs\n")
-        print("See also: https://github.com/louwrentius/fio-plot/issues/64")
-        sys.exit(1)
-
-
-def get_json_mapping(mode, dataset):
+def get_json_mapping(mode, record):
     """This function contains a hard-coded mapping of FIO nested JSON data
     to a flat dictionary.
     """
-    validate_number_of_jobs(dataset)
-    root = ["jobs", 0]
-    jobOptions = validate_job_options(dataset, "numjobs")
-    data = root + [mode]
+    #print(record["job options"].keys())
     dictionary = {
-        "fio_version": ["fio version"],
-        "iodepth": (validate_job_options(dataset, "iodepth") + ["iodepth"]),
-        "numjobs": (validate_job_options(dataset, "numjobs") + ["numjobs"]),
-        "bs": (validate_job_options(dataset, "bs") + ["bs"]),
-        "rw": (validate_job_options(dataset, "rw") + ["rw"]),
-        "bw": (data + ["bw"]),
-        "iops": (data + ["iops"]),
-        "iops_stddev": (data + ["iops_stddev"]),
-        "lat_ns": (data + ["lat_ns", "mean"]),
-        "lat_stddev": (data + ["lat_ns", "stddev"]),
-        "latency_ms": (root + ["latency_ms"]),
-        "latency_us": (root + ["latency_us"]),
-        "latency_ns": (root + ["latency_ns"]),
-        "cpu_usr": (root + ["usr_cpu"]),
-        "cpu_sys": (root + ["sys_cpu"])
+        "job options": record["job options"],
+        "type": mode,
+        "iodepth": record["job options"]["iodepth"],
+        "numjobs": record["job options"]["numjobs"],
+        "bs": record["job options"]["bs"],
+        "rw": record["job options"]["rw"],
+        "bw": record[mode]["bw"],
+        "iops": record[mode]["iops"],
+        "iops_stddev": record[mode]["iops_stddev"],
+        "lat": record[mode]["lat_ns"]["mean"],
+        "lat_stddev": record[mode]["lat_ns"]["stddev"],
+        "latency_ms": record["latency_ms"],
+        "latency_us": record["latency_us"],
+        "latency_ns": record["latency_ns"],
+        "cpu_usr": record["usr_cpu"],
+        "cpu_sys": record["sys_cpu"]
     }
 
     # This is hideous, terrible code, I know.
-    if check_for_steadystate(dataset, mode):
-        dictionary["ss_attained"] = root + ["steadystate"] + ["attained"]
-        dictionary["ss_settings"] = ["global options"] + ["steadystate"]
-        dictionary["ss_data_bw_mean"] = root + ["steadystate"] + ["data"] + ["bw_mean"]
-        dictionary["ss_data_iops_mean"] = (
-                root + ["steadystate"] + ["data"] + ["iops_mean"]
-        )
+    if check_for_steadystate(record, mode):
+        dictionary["ss_attained"] = record["steadystate"]["attained"]
+        dictionary["ss_settings"] = record["job options"]["steadystate"] # remember we merged global options into job options
+        dictionary["ss_data_bw_mean"] = record["steadystate"]["data"]["bw_mean"]
+        dictionary["ss_data_iops_mean"] = record["steadystate"]["data"]["iops_mean"]
 
     else:
         dictionary["ss_attained"] = None
@@ -117,59 +62,76 @@ def printkeys(data, depth=0, maxdepth=3):
             for item in data:
                 printkeys(item, depth+1)
 
-def validate_json_data(settings, record):
-    options = validate_job_options(record, "numjobs")
-    result = {"mode": None, "mapping": None}
-    if settings["rw"] == "randrw":
-        mode = settings["filter"][0]
-    elif settings["rw"] == "read" or settings["rw"] == "write":
-        mode = settings["rw"]
-    elif settings["rw"] == "rw":
-        mode = settings['filter'][0]
-    elif settings["rw"] == "readwrite":
-        mode = settings['filter'][0]
-    else:
-        mode = get_nested_value(record, options + ["rw"])[4:]
-    result["mode"] = mode
-    result["mapping"] = get_json_mapping(mode, record)
-    return result
+def get_record_mode(settings): # any of the rw modes must be translated to read or write
+    mapping = {
+        "randrw": settings["filter"][0],
+        "read": "read",
+        "write": "write",
+        "rw": settings["filter"][0],
+        "readwrite": settings["filter"][0],
+        "randread": "read",
+        "randwrite": "write"
+    }
+    mode = mapping[settings["rw"]]
+    return mode
+
+def get_json_root_path(record):
+    rootpath = None
+    keys = record.keys()
+    if "jobs" in keys:
+        rootpath = "jobs"
+    if "client_stats" in keys:
+        rootpath = "client_stats"
+    if rootpath is None:
+        print("\nNo valid JSON root path found, this should never happen.\n")
+    return rootpath
+
+def return_data_row(settings, record):
+    mode = get_record_mode(settings)
+    data = get_json_mapping(mode, record)
+    #pprint.pprint(data)
+    return data
+
+
+def get_json_global_options(record):
+    options = {}
+    if "global options" in record.keys():
+        options = record["global options"]
+    return options
+
+
+def sort_list_of_dictionaries(settings, data):
+    #sortedlist = []
+    sortedlist = sorted(data, key=lambda k: (int(k["iodepth"]), int(k["numjobs"])))
+    #print(len(data))
+    #for x in settings["iodepth"]:
+    #    for y in settings ["numjobs"]:
+    #        for z in data:
+    #            if z["iodepth"] == x and z["numjobs"] == y:
+    #                print(f"{x} - {y} - {z['iodepth']} - {z['numjobs']}")    
+    #                sortedlist.append(z)
+    return sortedlist
 
 def build_json_mapping(settings, dataset):
     """
     This funcion traverses the relevant JSON structure to gather data
     and store it in a flat dictionary. We do this for each imported json file.
     """
-    for item in dataset:
-        item["data"] = []
-        # printkeys(item["rawdata"]) # for debugging
-        for record in item["rawdata"]:
-            result = validate_json_data(settings, record)
-            mode = result["mode"]
-            m = result["mapping"]
-            row = {
-                "iodepth": int(get_nested_value(record, m["iodepth"])),
-                "numjobs": int(get_nested_value(record, m["numjobs"])),
-                "bs": get_nested_value(record, m["bs"]),
-                "rw": get_nested_value(record, m["rw"]),
-                "iops": get_nested_value(record, m["iops"]),
-                "iops_stddev": get_nested_value(record, m["iops_stddev"]),
-                "lat": get_nested_value(record, m["lat_ns"]),
-                "lat_stddev": get_nested_value(record, m["lat_stddev"]),
-                "latency_ms": get_nested_value(record, m["latency_ms"]),
-                "latency_us": get_nested_value(record, m["latency_us"]),
-                "latency_ns": get_nested_value(record, m["latency_ns"]),
-                "bw": get_nested_value(record, m["bw"]),
-                "type": mode,
-                "cpu_sys": get_nested_value(record, m["cpu_sys"]),
-                "cpu_usr": get_nested_value(record, m["cpu_usr"]),
-                "ss_attained": get_nested_value(record, m["ss_attained"]),
-                "ss_data_bw_mean": get_nested_value(record, m["ss_data_bw_mean"]),
-                "ss_data_iops_mean": get_nested_value(record, m["ss_data_iops_mean"]),
-                "ss_settings": get_nested_value(record, m["ss_settings"]),
-                "fio_version": get_nested_value(record, m["fio_version"]),
-            }
-            item["data"].append(row)
-            # item["rawdata"] = None  # --> enable to throw away the data after parsing.
+    for directory in dataset: # for directory in list of directories
+        directory["data"] = []
+        for record in directory["rawdata"]: # each record is the raw JSON data of a file in a directory
+            #print(record.keys())
+            jsonrootpath = get_json_root_path(record)
+            globaloptions = get_json_global_options(record)
+            for job in record[jsonrootpath]:
+                job["job options"] = {**job["job options"], **globaloptions}
+                row = return_data_row(settings, job)  
+                row["fio_version"] = record["fio version"]
+                directory["data"].append(row)
+            directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
+            #print(f"{'='*10}")
+            #[print(f"{x['iodepth']} - {x['numjobs']}") for x in directory['data'] ]
+            #directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
     return dataset
 
 def parse_json_data(settings, dataset):

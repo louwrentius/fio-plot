@@ -174,7 +174,7 @@ def get_record_set(settings, dataset, dataset_types):
     """The supplied dataset, a list of flat dictionaries with data is filtered based
     on the parameters as set by the command line. The filtered data is also scaled and rounded.
     """
-    dataset = dataset[0]
+    #dataset = dataset[0]
     rw = settings["rw"]
     numjobs = settings["numjobs"]
     mismatch = 0
@@ -207,43 +207,46 @@ def get_record_set(settings, dataset, dataset_types):
         "ss_data_iops_mean": [],
     }
 
-    newlist = sorted(dataset["data"], key=itemgetter(settings["query"]))
+    for record in dataset:
+        for data in record['data']:
+            for x in settings["iodepth"]:
+                for y in settings["numjobs"]:
+                    #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
+                    #print(f"{settings['filter']}") 
+                    #print("=====")
+                    #pprint.pprint(data.keys())
+                    if (
+                        (int(data["iodepth"]) == int(x))
+                        and int(data["numjobs"]) == int(y)
+                        and data["rw"] == rw
+                        and data["type"] in settings["filter"]
+                    ):
+                        #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
+                        #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['iops']}")
+                        datadict["fio_version"].append(data["fio_version"])
+                        datadict["iops_series_raw"].append(data["iops"])
+                        datadict["lat_series_raw"].append(data["lat"])
+                        datadict["iops_stddev_series_raw"].append(data["iops_stddev"])
+                        datadict["lat_stddev_series_raw"].append(data["lat_stddev"])
+                        datadict["bs"].append(data["bs"])
+                        datadict["cpu"]["cpu_sys"].append(int(round(data["cpu_sys"], 0)))
+                        datadict["cpu"]["cpu_usr"].append(int(round(data["cpu_usr"], 0)))
 
-    for record in newlist:
-        for x in settings["iodepth"]:
-            for y in settings["numjobs"]:
-                #print(f"{x} - {record['iodepth']} + {y} - {record['numjobs']} + {record['rw']} + {record['type']}")
-                #print(f"{settings['filter']}") 
-                
-                if (
-                    (int(record["iodepth"]) == int(x))
-                    and int(record["numjobs"]) == int(y)
-                    and record["rw"] == rw
-                    and record["type"] in settings["filter"]
-                ):
-                    datadict["fio_version"].append(record["fio_version"])
-                    datadict["iops_series_raw"].append(record["iops"])
-                    datadict["lat_series_raw"].append(record["lat"])
-                    datadict["iops_stddev_series_raw"].append(record["iops_stddev"])
-                    datadict["lat_stddev_series_raw"].append(record["lat_stddev"])
-                    datadict["bs"].append(record["bs"])
-                    datadict["cpu"]["cpu_sys"].append(int(round(record["cpu_sys"], 0)))
-                    datadict["cpu"]["cpu_usr"].append(int(round(record["cpu_usr"], 0)))
-
-                    if "ss_attained" in record.keys():
-                        if record["ss_settings"]:
-                            datadict["ss_settings"].append(str(record["ss_settings"])),
-                            datadict["ss_attained"].append(int(record["ss_attained"])),
-                            datadict["ss_data_bw_mean"].append(
-                                int(round(record["ss_data_bw_mean"], 0))
-                            ),
-                            datadict["ss_data_iops_mean"].append(
-                                int(round(record["ss_data_iops_mean"], 0))
-                            ),
-                else:
-                    mismatch+=1
+                        if "ss_attained" in data.keys():
+                            if data["ss_settings"]:
+                                datadict["ss_settings"].append(str(data["ss_settings"])),
+                                datadict["ss_attained"].append(int(data["ss_attained"])),
+                                datadict["ss_data_bw_mean"].append(
+                                    int(round(data["ss_data_bw_mean"], 0))
+                                ),
+                                datadict["ss_data_iops_mean"].append(
+                                    int(round(data["ss_data_iops_mean"], 0))
+                                ),
+                    else:
+                        mismatch+=1
 
     validate_get_record_set(settings, mismatch, dataset)
+    #print(datadict['iops_series_raw'])
     return scale_data(datadict)
 
 
