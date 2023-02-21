@@ -16,6 +16,7 @@ def calculate_font_size(settings, x_axis):
     #
     # This hard-coded font sizing is ugly but if somebody knows a better algorithm...
     #
+    cols = len(x_axis)
     if settings["group_bars"]:
         if max_label_width >= 10:
             fontsize = 6
@@ -24,14 +25,14 @@ def calculate_font_size(settings, x_axis):
         else:
             fontsize = 8
     else:
-        if max_label_width >= 10:
+        if max_label_width >= 10 and cols > 8:
             fontsize = 5
-        elif max_label_width >=16:
+        elif max_label_width >=16 and cols > 8: 
             fontsize = 4
         else:
             fontsize = 8
+    print(f"Fontsize {fontsize}")
     return fontsize
-
 
 def create_bars_and_xlabels(settings, data, ax1, ax3):
 
@@ -60,23 +61,7 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
         rects1 = ax1.bar(x_pos, iops, width, color=color_iops)
         rects2 = ax3.bar(x_pos + width, latency, width, color=color_lat)
         if data["hostname_series"]:
-            labels = []
-            counter = 1
-            hostcounter = 0 
-            divide = int(len(data["hostname_series"]) / len(data["x_axis"])) # that int convert should work
-            #print(divide)
-            #print(len(data["hostname_series"]))
-            for host in data["hostname_series"]:
-                hostcounter += 1
-                attr = data["x_axis"][counter-1]
-                labels.append(f"{host}\n{attr}")
-                interval = len(data["x_axis"])
-                print(f"Interval {interval}")
-                print(f"Counter {counter}")
-                if hostcounter % divide == 0:
-                    counter += 1
-            #x_axis = data["hostname_series"]
-            x_axis = labels
+            x_axis = tables.format_hostname_labels(settings, data)
         else:
             x_axis = data["x_axis"]
         ltest = np.arange(0.45, (len(iops) * 2), 2)
@@ -99,7 +84,7 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
     return_data["rects2"] = rects2
     return_data["ax1"] = ax1
     return_data["ax3"] = ax3
-
+    return_data["fontsize"] = fontsize
     return return_data
 
 
@@ -127,6 +112,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     rects2 = return_data["rects2"]
     ax1 = return_data["ax1"]
     ax3 = return_data["ax3"]
+    fontsize = return_data["fontsize"]
 
     #
     # Set title
@@ -152,16 +138,16 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     shared.autolabel(rects2, ax3)
     #
     # Draw the standard deviation table
-    tables.create_stddev_table(settings, data, ax2)
+    tables.create_stddev_table(settings, data, ax2, fontsize)
     #
     # Draw the cpu usage table if requested
     # pprint.pprint(data)
 
     if settings["show_cpu"] and not settings["show_ss"]:
-        tables.create_cpu_table(settings, data, ax2)
+        tables.create_cpu_table(settings, data, ax2, fontsize)
 
     if settings["show_ss"] and not settings["show_cpu"]:
-        tables.create_steadystate_table(settings, data, ax2)
+        tables.create_steadystate_table(settings, data, ax2, fontsize)
 
     #
     # Create legend

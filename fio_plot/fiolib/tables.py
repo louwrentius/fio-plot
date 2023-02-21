@@ -44,7 +44,21 @@ def get_font(settings):
     return font
 
 
-def create_generic_table(settings, table_vals, ax2, rowlabels, location):
+def format_hostname_labels(settings, data):
+    labels = []
+    counter = 1
+    hostcounter = 0 
+    divide = int(len(data["hostname_series"]) / len(data["x_axis"])) # that int convert should work
+    for host in data["hostname_series"]:
+        hostcounter += 1
+        attr = data["x_axis"][counter-1]
+        labels.append(f"{host}\n{settings['graphtype'][-2:]} {attr}")
+        if hostcounter % divide == 0:
+            counter += 1
+    return labels
+
+
+def create_generic_table(settings, table_vals, ax2, rowlabels, location, fontsize):
     cols = len(table_vals[0])
     matrix = get_max_width(table_vals, cols)
     #matrix = [ x / 4 for x in matrix ]
@@ -70,9 +84,10 @@ def create_generic_table(settings, table_vals, ax2, rowlabels, location):
     else:
         linewidth = 0
     fontsettings = get_font(settings)
+    fontsettings.set_size(fontsize)
+    angle = 45
     if cols > 8:
-        fontsettings.set_size(5)
-        rotate = 45
+        rotate = angle
     else:
         rotate = 0
     counter = 0 
@@ -81,25 +96,27 @@ def create_generic_table(settings, table_vals, ax2, rowlabels, location):
         cell.set_text_props(fontproperties=fontsettings)
         if counter < (cols):
             cell.get_text().set_rotation(rotate)
-            cell.set_height(0.8)
-        cell.set_width(0.04)
-
+            if rotate == angle:
+                cell.set_height(0.8)
+        if fontsize == 8 and max(matrix) > 5:
+            cell.set_width(0.08)
+        else:
+            cell.set_width(0.04)
         counter += 1
 
-
-
-def create_cpu_table(settings, data, ax2):
+def create_cpu_table(settings, data, ax2, fontsize):
     table_vals = [data["x_axis"], data["cpu"]["cpu_usr"], data["cpu"]["cpu_sys"]]
 
     rowlabels = ["CPU Usage", "cpu_usr %", "cpu_sys %"]
     location = "lower center"
-    create_generic_table(settings, table_vals, ax2, rowlabels, location)
+    create_generic_table(settings, table_vals, ax2, rowlabels, location, fontsize)
 
 
-def create_stddev_table(settings, data, ax2):
+def create_stddev_table(settings, data, ax2, fontsize):
     #print(data)
     if data["hostname_series"]:
-        table_vals = [data["hostname_series"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
+        labels = format_hostname_labels(settings, data)
+        table_vals = [labels, data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
     else:
         table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
 
@@ -107,7 +124,7 @@ def create_stddev_table(settings, data, ax2):
 
     rowlabels = [table_name, "IOP/s \u03C3 %", "Latency \u03C3 %"]
     location = "lower right"
-    create_generic_table(settings, table_vals, ax2, rowlabels, location)
+    create_generic_table(settings, table_vals, ax2, rowlabels, location, fontsize)
 
 
 def convert_number_to_yes_no(data):
