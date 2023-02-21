@@ -67,11 +67,11 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
     ax1.set_xlabel(settings["label"])
     ax1.set_xticks(ltest)
     
+    fontsize = calculate_font_size(settings, x_axis)
     if settings["graphtype"] == "compare_graph":
-        fontsize = calculate_font_size(settings, x_axis)
         ax1.set_xticklabels(labels=x_axis, fontsize=fontsize)
     else:
-        ax1.set_xticklabels(labels=x_axis, rotation=-50)
+        ax1.set_xticklabels(labels=x_axis, fontsize=fontsize, rotation=-50)
 
     return_data["rects1"] = rects1
     return_data["rects2"] = rects2
@@ -95,7 +95,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     #
     # Puts in the credit source (often a name or url)
     supporting.plot_source(settings, plt, ax1)
-    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax1)
+    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax2)
 
     ax2.axis("off")
 

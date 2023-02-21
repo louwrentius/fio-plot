@@ -349,7 +349,21 @@ def scale_data(datadict):
     return datadict
 
 
+def get_auto_label_font_size(rects):
+    size = 0
+    number = len(rects)
+    if number <= 8:
+        size = 8
+    if number > 8 and number < 16:
+        size = 7
+    if number >= 16:
+        size = 5 
+    return size
+
+
 def autolabel(rects, axis):
+    fontsize = get_auto_label_font_size(rects)
+
     for rect in rects:
         height = rect.get_height()
         if height < 10:
@@ -363,11 +377,10 @@ def autolabel(rects, axis):
             formatter = "%dK"
         else:
             value = height
-
         axis.text(
             rect.get_x() + rect.get_width() / 2,
             1.015 * height,
             formatter % value,
             ha="center",
-            fontsize=8,
+            fontsize=fontsize,
         )
