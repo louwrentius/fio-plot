@@ -188,7 +188,7 @@ def get_record_set(settings, dataset, dataset_types):
             exit(1)
 
     labels = dataset_types[settings["query"]]
-
+    #print(labels)
     datadict = {
         "fio_version": [],
         "iops_series_raw": [],

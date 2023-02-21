@@ -60,7 +60,23 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
         rects1 = ax1.bar(x_pos, iops, width, color=color_iops)
         rects2 = ax3.bar(x_pos + width, latency, width, color=color_lat)
         if data["hostname_series"]:
-            x_axis = data["hostname_series"]
+            labels = []
+            counter = 1
+            hostcounter = 0 
+            divide = int(len(data["hostname_series"]) / len(data["x_axis"])) # that int convert should work
+            #print(divide)
+            #print(len(data["hostname_series"]))
+            for host in data["hostname_series"]:
+                hostcounter += 1
+                attr = data["x_axis"][counter-1]
+                labels.append(f"{host}\n{attr}")
+                interval = len(data["x_axis"])
+                print(f"Interval {interval}")
+                print(f"Counter {counter}")
+                if hostcounter % divide == 0:
+                    counter += 1
+            #x_axis = data["hostname_series"]
+            x_axis = labels
         else:
             x_axis = data["x_axis"]
         ltest = np.arange(0.45, (len(iops) * 2), 2)
