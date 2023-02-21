@@ -56,20 +56,22 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
 
         rects1 = ax1.bar(x_pos, iops, width, color=color_iops)
         rects2 = ax3.bar(x_pos + width, latency, width, color=color_lat)
-
-        x_axis = data["x_axis"]
+        if data["hostname_series"]:
+            x_axis = data["hostname_series"]
+        else:
+            x_axis = data["x_axis"]
         ltest = np.arange(0.45, (len(iops) * 2), 2)
 
     ax1.set_ylabel(data["y1_axis"]["format"])
     ax3.set_ylabel(data["y2_axis"]["format"])
     ax1.set_xlabel(settings["label"])
     ax1.set_xticks(ltest)
-
+    
     if settings["graphtype"] == "compare_graph":
         fontsize = calculate_font_size(settings, x_axis)
         ax1.set_xticklabels(labels=x_axis, fontsize=fontsize)
     else:
-        ax1.set_xticklabels(labels=x_axis)
+        ax1.set_xticklabels(labels=x_axis, rotation=-50)
 
     return_data["rects1"] = rects1
     return_data["rects2"] = rects2

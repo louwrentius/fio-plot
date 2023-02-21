@@ -49,7 +49,8 @@ def create_generic_table(settings, table_vals, ax2, rowlabels, location):
     matrix = get_max_width(table_vals, cols)
     # print(matrix)
     colwidths = calculate_colwidths(settings, cols, matrix)
-    # print(colwidths)
+    colwidths = [ x * 0.4 for x in colwidths]
+    print(colwidths)
 
     table = ax2.table(
         cellText=table_vals,
@@ -60,8 +61,7 @@ def create_generic_table(settings, table_vals, ax2, rowlabels, location):
         cellLoc="center",
         rasterized=False,
     )
-    table.auto_set_font_size(False)
-    table.set_fontsize(7)
+    table.auto_set_font_size(False) # Very Small
     table.scale(1, 1.2)
 
     if settings["table_lines"]:
@@ -83,7 +83,11 @@ def create_cpu_table(settings, data, ax2):
 
 
 def create_stddev_table(settings, data, ax2):
-    table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
+    print(data)
+    if data["hostname_series"]:
+        table_vals = [data["hostname_series"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
+    else:
+        table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
 
     table_name = settings["label"]
 

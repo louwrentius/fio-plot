@@ -9,6 +9,12 @@ def check_for_steadystate(record, mode):
     else:
         return False
 
+def check_for_hostname(record, mode):
+    keys = record.keys()
+    if "hostname" in keys: # remember that we merged global options into job options to make them accessible
+        return True
+    else:
+        return False
 
 def get_json_mapping(mode, record):
     """This function contains a hard-coded mapping of FIO nested JSON data
@@ -32,6 +38,7 @@ def get_json_mapping(mode, record):
         "latency_ns": record["latency_ns"],
         "cpu_usr": record["usr_cpu"],
         "cpu_sys": record["sys_cpu"]
+
     }
 
     # This is hideous, terrible code, I know.
@@ -46,6 +53,10 @@ def get_json_mapping(mode, record):
         dictionary["ss_settings"] = None
         dictionary["ss_data_bw_mean"] = None
         dictionary["ss_data_iops_mean"] = None
+    
+    if check_for_hostname(record, mode):
+        dictionary["hostname"] = record["hostname"]
+    
 
     return dictionary
 
@@ -120,14 +131,17 @@ def build_json_mapping(settings, dataset):
     for directory in dataset: # for directory in list of directories
         directory["data"] = []
         for record in directory["rawdata"]: # each record is the raw JSON data of a file in a directory
-            #print(record.keys())
             jsonrootpath = get_json_root_path(record)
             globaloptions = get_json_global_options(record)
             for job in record[jsonrootpath]:
-                job["job options"] = {**job["job options"], **globaloptions}
-                row = return_data_row(settings, job)  
-                row["fio_version"] = record["fio version"]
-                directory["data"].append(row)
+                #print(job.keys())
+                if job["jobname"] != "All clients":
+                    job["job options"] = {**job["job options"], **globaloptions}
+                    row = return_data_row(settings, job)  
+                    row["fio_version"] = record["fio version"]
+                    directory["data"].append(row)
+                else:
+                    directory["allclients"] = job
             directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
             #print(f"{'='*10}")
             #[print(f"{x['iodepth']} - {x['numjobs']}") for x in directory['data'] ]
@@ -136,5 +150,8 @@ def build_json_mapping(settings, dataset):
 
 def parse_json_data(settings, dataset):
     dataset = build_json_mapping(settings, dataset)
+    #for data in dataset:
+    #    for item in data['data']:
+    #        print(f"{item['hostname']} - {item['iodepth']} - {item['numjobs']} : iops {item['iops']}")
     return dataset
 

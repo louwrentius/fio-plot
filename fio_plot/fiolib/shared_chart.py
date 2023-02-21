@@ -205,6 +205,7 @@ def get_record_set(settings, dataset, dataset_types):
         "ss_attained": [],
         "ss_data_bw_mean": [],
         "ss_data_iops_mean": [],
+        "hostname_series": []
     }
 
     for record in dataset:
@@ -241,7 +242,10 @@ def get_record_set(settings, dataset, dataset_types):
                                 ),
                                 datadict["ss_data_iops_mean"].append(
                                     int(round(data["ss_data_iops_mean"], 0))
-                                ),
+                                )
+                        if "hostname" in data.keys():
+                            datadict["hostname_series"].append(data['hostname'])
+
                     else:
                         mismatch+=1
 
