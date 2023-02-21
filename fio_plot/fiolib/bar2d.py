@@ -11,20 +11,23 @@ from . import (
 
 def calculate_font_size(settings, x_axis):
     max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))
+    #print(max_label_width)
     fontsize = 0
     #
     # This hard-coded font sizing is ugly but if somebody knows a better algorithm...
     #
     if settings["group_bars"]:
-        if max_label_width > 10:
+        if max_label_width >= 10:
             fontsize = 6
         elif max_label_width > 15:
             fontsize = 5
         else:
             fontsize = 8
     else:
-        if max_label_width > 18:
+        if max_label_width >= 10:
             fontsize = 5
+        elif max_label_width >=16:
+            fontsize = 4
         else:
             fontsize = 8
     return fontsize
@@ -68,8 +71,11 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
     ax1.set_xticks(ltest)
     
     fontsize = calculate_font_size(settings, x_axis)
+    #print(fontsize)
     if settings["graphtype"] == "compare_graph":
         ax1.set_xticklabels(labels=x_axis, fontsize=fontsize)
+    elif settings["graphtype"] == "bargraph2d_qd" or settings["graphtype"] == "bargraph2d_nj":
+        ax1.set_xticklabels(labels=x_axis, fontsize=fontsize,)
     else:
         ax1.set_xticklabels(labels=x_axis, fontsize=fontsize, rotation=-50)
 

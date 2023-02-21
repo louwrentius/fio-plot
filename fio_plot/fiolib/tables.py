@@ -46,11 +46,11 @@ def get_font(settings):
 
 def create_generic_table(settings, table_vals, ax2, rowlabels, location):
     cols = len(table_vals[0])
-
     matrix = get_max_width(table_vals, cols)
+    #matrix = [ x / 4 for x in matrix ]
     #print(matrix)
     colwidths = calculate_colwidths(settings, cols, matrix)
-    colwidths = [ x * 0.4 for x in colwidths]
+    #colwidths = [ x * 0.4 for x in colwidths]
     #print(colwidths)
 
     table = ax2.table(
@@ -62,17 +62,30 @@ def create_generic_table(settings, table_vals, ax2, rowlabels, location):
         cellLoc="center",
         rasterized=False,
     )
-    table.auto_set_font_size(True) # Very Small
+    table.auto_set_font_size(False) # Very Small
     table.scale(1, 1.2)
 
     if settings["table_lines"]:
         linewidth = 0.25
     else:
         linewidth = 0
-
+    fontsettings = get_font(settings)
+    if cols > 8:
+        fontsettings.set_size(5)
+        rotate = 45
+    else:
+        rotate = 0
+    counter = 0 
     for key, cell in table.get_celld().items():
         cell.set_linewidth(linewidth)
-        cell.set_text_props(fontproperties=get_font(settings))
+        cell.set_text_props(fontproperties=fontsettings)
+        if counter < (cols):
+            cell.get_text().set_rotation(rotate)
+            cell.set_height(0.8)
+        cell.set_width(0.04)
+
+        counter += 1
+
 
 
 def create_cpu_table(settings, data, ax2):
