@@ -175,6 +175,7 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={"height_ratios": [7, 1]})
     ax3 = ax1.twinx()
     fig.set_size_inches(10, 6)
+    plt.margins(x=0.01)
 
     #
     # Puts in the credit source (often a name or url)
