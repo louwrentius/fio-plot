@@ -83,32 +83,28 @@ def create_generic_table(settings, data, table_vals, ax2, rowlabels, location, f
     else:
         linewidth = 0
     angle = 0
-    rotate_height = 0.8
-    if cols > 8 or max(matrix) > 10:
-        rotate = 55
-    if cols > 8 or max(matrix) > 12:
+    if cols > 8 and max(matrix) > 10:
         angle = 35
-    if cols > 10 and max(matrix) > 8:
-        angle = 65
-        rotate_height = 1
     rotate = angle
+    if rotate > 0 and settings["table_lines"]:
+        linewidth = 0
+        print("\n WARNING: Table lines disabled because of 'large' number of columns\n")
     counter = 0 
     for key, cell in table.get_celld().items():
         cell.set_linewidth(linewidth)
         if counter < (cols):
             cell.get_text().set_rotation(rotate)
             cell.set_fontsize(fontsize)
-            if rotate !=0:
-                cell.set_height(rotate_height)
-            elif "hostname_series" in data.keys():
+            if "hostname_series" in data.keys():
                 if data["hostname_series"]:
-                    cell.set_height(0.6)
+                    height = cell.get_height()
+                    cell.set_height(height * 2)
         else:
             cell.set_fontsize(settings["table_fontsize"])
         if fontsize == 8 and max(matrix) > 5:
             cell.set_width(0.08)
-        elif fontsize == 6 and max(matrix) > 9:
-            cell.set_width(0.1)
+        #elif fontsize == 6 and max(matrix) > 9:
+        #    cell.set_width(0.1)
         else:
             cell.set_width(0.042)
         counter += 1

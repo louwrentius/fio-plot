@@ -20,13 +20,11 @@ def calculate_font_size(settings, x_axis):
     if settings["group_bars"]:
         if max_label_width >= 10:
             fontsize = 6
-        elif max_label_width > 15:
-            fontsize = 5
         else:
             fontsize = 8
     else:
         if max_label_width >= 10 and cols > 8:
-            fontsize = 5
+            fontsize = 6
         else:
             fontsize = 8
     #print(f"Fontsize {fontsize}")

@@ -357,7 +357,7 @@ def get_auto_label_font_size(rects):
     if number > 8 and number < 16:
         size = 7
     if number >= 16:
-        size = 5 
+        size = 6 
     return size
 
 
