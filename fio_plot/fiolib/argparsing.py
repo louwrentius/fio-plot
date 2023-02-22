@@ -251,6 +251,12 @@ def set_arguments(settings):
         action="store_true",
     )
     ag.add_argument(
+        "--show-data",
+        help="When using the -C -l or -N option, iops/lat data is also shown in table format. It replaces \
+        the standard deviation table",
+        action="store_true",
+    )
+    ag.add_argument(
         "--show-ss",
         help="When using the -C or -l option, a table is added with steadystate data.",
         action="store_true",

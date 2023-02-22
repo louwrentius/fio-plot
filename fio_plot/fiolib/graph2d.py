@@ -124,9 +124,9 @@ def chart_2d_log_data(settings, dataset):
     ax = get_axis_for_label(axes)
     if jsondata[0]["data"] and not settings["disable_fio_version"]:
         fio_version = jsondata[0]["data"][0]["fio_version"]
-        supporting.plot_fio_version(settings, fio_version, plt, ax, -0.12)
+        supporting.plot_fio_version(settings, fio_version, plt, ax, -0.16)
     else:
-        supporting.plot_fio_version(settings, None, plt, ax, -0.12)
+        supporting.plot_fio_version(settings, None, plt, ax, -0.16)
 
     #
     # Print source

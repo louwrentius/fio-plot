@@ -63,10 +63,10 @@ def create_generic_table(settings, data, table_vals, ax2, rowlabels, location, f
     matrix = get_max_width(table_vals, cols)
     #matrix = [ x / 4 for x in matrix ]
     #print(matrix)
+    #print(fontsize)
     colwidths = calculate_colwidths(settings, cols, matrix)
     #colwidths = [ x * 0.4 for x in colwidths]
     #print(colwidths)
-
     table = ax2.table(
         cellText=table_vals,
         loc=location,
@@ -78,51 +78,83 @@ def create_generic_table(settings, data, table_vals, ax2, rowlabels, location, f
     )
     table.auto_set_font_size(False) # Very Small
     table.scale(1, 1.2)
-
     if settings["table_lines"]:
         linewidth = 0.25
     else:
         linewidth = 0
-    fontsettings = get_font(settings)
-    fontsettings.set_size(fontsize)
-    angle = 45
-    if cols > 8:
-        rotate = angle
-    else:
-        rotate = 0
+    angle = 0
+    rotate_height = 0.8
+    if cols > 8 or max(matrix) > 10:
+        rotate = 55
+    if cols > 8 or max(matrix) > 12:
+        angle = 35
+    if cols > 10 and max(matrix) > 8:
+        angle = 65
+        rotate_height = 1
+    rotate = angle
     counter = 0 
     for key, cell in table.get_celld().items():
         cell.set_linewidth(linewidth)
-        cell.set_text_props(fontproperties=fontsettings)
         if counter < (cols):
             cell.get_text().set_rotation(rotate)
-            if rotate == angle:
-                cell.set_height(0.8)
-            elif len(data["hostname_series"]) > 0:
-                cell.set_height(0.6)
+            cell.set_fontsize(fontsize)
+            if rotate !=0:
+                cell.set_height(rotate_height)
+            elif "hostname_series" in data.keys():
+                if data["hostname_series"]:
+                    cell.set_height(0.6)
+        else:
+            cell.set_fontsize(settings["table_fontsize"])
         if fontsize == 8 and max(matrix) > 5:
             cell.set_width(0.08)
+        elif fontsize == 6 and max(matrix) > 9:
+            cell.set_width(0.1)
         else:
-            cell.set_width(0.04)
+            cell.set_width(0.042)
         counter += 1
 
 def create_cpu_table(settings, data, ax2, fontsize):
     table_vals = [data["x_axis"], data["cpu"]["cpu_usr"], data["cpu"]["cpu_sys"]]
-
     rowlabels = ["CPU Usage", "cpu_usr %", "cpu_sys %"]
     location = "lower center"
     create_generic_table(settings, data, table_vals, ax2, rowlabels, location, fontsize)
 
 
+def scale_iops(data):
+    scaled = []
+    for x in data:
+        if len(str(x)) > 4:
+            scale = int(round((x/1000),0))
+            scaled.append(f"{scale}K")
+        elif len(str(x)) > 5:
+            scale = round((x/1000000),1)
+            scaled.append(f"{scale}M")
+        else:
+            scaled.append(str(x))
+    return scaled
+
+def create_values_table(settings, data, ax2, fontsize):
+    iops = scale_iops(data["y1_axis"]["data"])
+    table_vals = [data["x_axis"], iops, data["y2_axis"]["data"]]
+    if "hostname_series" in data.keys():
+        if data["hostname_series"]:
+            labels = format_hostname_labels(settings, data)
+            table_vals = [labels, iops, data["y2_axis"]["data"]]
+
+    rowlabels = ["IOPs/Lat", data["y1_axis"]["format"], data["y2_axis"]["format"]]
+    location = "lower right"
+    create_generic_table(settings, data, table_vals, ax2, rowlabels, location, fontsize)
+
 def create_stddev_table(settings, data, ax2, fontsize):
     #print(data)
-    if data["hostname_series"]:
-        labels = format_hostname_labels(settings, data)
-        table_vals = [labels, data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
+    table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]    
+    if "hostname_series" in data.keys():
+        if data["hostname_series"]:
+            labels = format_hostname_labels(settings, data)
+            table_vals = [labels, data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
+            table_name = f"Host+{settings['graphtype'][-2:]}"
     else:
-        table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
-
-    table_name = settings["label"]
+        table_name = settings["label"]
 
     rowlabels = [table_name, "IOP/s \u03C3 %", "Latency \u03C3 %"]
     location = "lower right"

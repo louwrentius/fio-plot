@@ -27,11 +27,9 @@ def calculate_font_size(settings, x_axis):
     else:
         if max_label_width >= 10 and cols > 8:
             fontsize = 5
-        elif max_label_width >=16 and cols > 8: 
-            fontsize = 4
         else:
             fontsize = 8
-    print(f"Fontsize {fontsize}")
+    #print(f"Fontsize {fontsize}")
     return fontsize
 
 def create_bars_and_xlabels(settings, data, ax1, ax3):
@@ -60,10 +58,11 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
 
         rects1 = ax1.bar(x_pos, iops, width, color=color_iops)
         rects2 = ax3.bar(x_pos + width, latency, width, color=color_lat)
-        if data["hostname_series"]:
-            x_axis = tables.format_hostname_labels(settings, data)
-        else:
-            x_axis = data["x_axis"]
+        x_axis = data["x_axis"]
+
+        if "hostname_series" in data.keys():
+            if data["hostname_series"]:
+                x_axis = tables.format_hostname_labels(settings, data)
         ltest = np.arange(0.45, (len(iops) * 2), 2)
 
     ax1.set_ylabel(data["y1_axis"]["format"])
@@ -98,7 +97,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={"height_ratios": [7, 1]})
     ax3 = ax1.twinx()
     fig.set_size_inches(10, 6)
-
+    plt.margins(x=0.01)
     #
     # Puts in the credit source (often a name or url)
     supporting.plot_source(settings, plt, ax1)
@@ -138,11 +137,14 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     shared.autolabel(rects2, ax3)
     #
     # Draw the standard deviation table
-    tables.create_stddev_table(settings, data, ax2, fontsize)
+    if settings["show_data"]:
+        tables.create_values_table(settings, data, ax2, fontsize)
+    else:
+        tables.create_stddev_table(settings, data, ax2, fontsize)
+    
     #
     # Draw the cpu usage table if requested
     # pprint.pprint(data)
-
     if settings["show_cpu"] and not settings["show_ss"]:
         tables.create_cpu_table(settings, data, ax2, fontsize)
 
@@ -177,7 +179,7 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     #
     # Puts in the credit source (often a name or url)
     supporting.plot_source(settings, plt, ax1)
-    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax1)
+    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax2)
 
     ax2.axis("off")
 
@@ -199,14 +201,18 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     # Labeling the top of the bars with their value
     shared.autolabel(rects1, ax1)
     shared.autolabel(rects2, ax3)
+    fontsize = calculate_font_size(settings, data["x_axis"])
 
-    tables.create_stddev_table(settings, data, ax2)
+    if settings["show_data"]:
+        tables.create_values_table(settings, data, ax2, fontsize)
+    else:
+        tables.create_stddev_table(settings, data, ax2, fontsize)
 
     if settings["show_cpu"] and not settings["show_ss"]:
-        tables.create_cpu_table(settings, data, ax2)
+        tables.create_cpu_table(settings, data, ax2, fontsize)
 
     if settings["show_ss"] and not settings["show_cpu"]:
-        tables.create_steadystate_table(settings, data, ax2)
+        tables.create_steadystate_table(settings, data, ax2, fontsize)
 
     # Create legend
     ax2.legend(
