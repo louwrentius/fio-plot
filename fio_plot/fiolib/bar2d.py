@@ -8,6 +8,18 @@ from . import (
     tables
 )
 
+def format_hostname_labels(settings, data):
+    labels = []
+    counter = 1
+    hostcounter = 0 
+    divide = int(len(data["hostname_series"]) / len(data["x_axis"])) # that int convert should work
+    for host in data["hostname_series"]:
+        hostcounter += 1
+        attr = data["x_axis"][counter-1]
+        labels.append(f"{host}\n{settings['graphtype'][-2:]} {attr}")
+        if hostcounter % divide == 0:
+            counter += 1
+    return labels
 
 def calculate_font_size(settings, x_axis):
     max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))
@@ -26,7 +38,8 @@ def calculate_font_size(settings, x_axis):
         if max_label_width >= 10 and cols > 8:
             fontsize = 6
         else:
-            fontsize = 8
+            fontsize = 8\
+            
     #print(f"Fontsize {fontsize}")
     return fontsize
 
@@ -60,7 +73,7 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
 
         if "hostname_series" in data.keys():
             if data["hostname_series"]:
-                x_axis = tables.format_hostname_labels(settings, data)
+                x_axis = format_hostname_labels(settings, data)
         ltest = np.arange(0.45, (len(iops) * 2), 2)
 
     ax1.set_ylabel(data["y1_axis"]["format"])

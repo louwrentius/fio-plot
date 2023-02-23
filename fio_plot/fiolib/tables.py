@@ -1,5 +1,5 @@
 import matplotlib.font_manager as font_manager
-
+import sys
 
 def get_widest_col(data):
 
@@ -44,25 +44,16 @@ def get_font(settings):
     return font
 
 
-def format_hostname_labels(settings, data):
-    labels = []
-    counter = 1
-    hostcounter = 0 
-    divide = int(len(data["hostname_series"]) / len(data["x_axis"])) # that int convert should work
-    for host in data["hostname_series"]:
-        hostcounter += 1
-        attr = data["x_axis"][counter-1]
-        labels.append(f"{host}\n{settings['graphtype'][-2:]} {attr}")
-        if hostcounter % divide == 0:
-            counter += 1
-    return labels
-
+def alternate_cell_height():
+    while True:
+        yield 0
+        yield 2
 
 def create_generic_table(settings, data, table_vals, ax2, rowlabels, location, fontsize):
     cols = len(table_vals[0])
     matrix = get_max_width(table_vals, cols)
     #matrix = [ x / 4 for x in matrix ]
-    #print(matrix)
+    print(matrix)
     #print(fontsize)
     colwidths = calculate_colwidths(settings, cols, matrix)
     #colwidths = [ x * 0.4 for x in colwidths]
@@ -78,33 +69,33 @@ def create_generic_table(settings, data, table_vals, ax2, rowlabels, location, f
     )
     table.auto_set_font_size(False) # Very Small
     table.scale(1, 1.2)
+    print(settings["table_lines"])
     if settings["table_lines"]:
         linewidth = 0.25
+        alpha = 1
     else:
+        alpha = 0
         linewidth = 0
-    angle = 0
-    if cols > 8 and max(matrix) > 10:
-        angle = 35
-    rotate = angle
-    if rotate > 0 and settings["table_lines"]:
-        linewidth = 0
-        print("\n WARNING: Table lines disabled because of 'large' number of columns\n")
     counter = 0 
+    alternator = alternate_cell_height()
     for key, cell in table.get_celld().items():
         cell.set_linewidth(linewidth)
+        flip = next(alternator)
+        
         if counter < (cols):
-            cell.get_text().set_rotation(rotate)
+            cell._text.set_verticalalignment('bottom')
+            cell.set_alpha(alpha)
             cell.set_fontsize(fontsize)
+            height = cell.get_height()
             if "hostname_series" in data.keys():
                 if data["hostname_series"]:
-                    height = cell.get_height()
-                    cell.set_height(height * 2)
+                    cell.set_height(height * flip)
+            else:
+                cell.set_height(height * flip)
         else:
             cell.set_fontsize(settings["table_fontsize"])
         if fontsize == 8 and max(matrix) > 5:
             cell.set_width(0.08)
-        #elif fontsize == 6 and max(matrix) > 9:
-        #    cell.set_width(0.1)
         else:
             cell.set_width(0.042)
         counter += 1
@@ -134,25 +125,51 @@ def create_values_table(settings, data, ax2, fontsize):
     table_vals = [data["x_axis"], iops, data["y2_axis"]["data"]]
     if "hostname_series" in data.keys():
         if data["hostname_series"]:
-            labels = format_hostname_labels(settings, data)
-            table_vals = [labels, iops, data["y2_axis"]["data"]]
-
-    rowlabels = ["IOPs/Lat", data["y1_axis"]["format"], data["y2_axis"]["format"]]
+            tabledata = create_data_for_table_with_hostname_data(settings, data)
+            table_vals = tabledata["table_vals"]
+            rowlabels = tabledata["rowlabels"]
+    else:
+        rowlabels = ["IOPs/Lat", data["y1_axis"]["format"], data["y2_axis"]["format"]]
     location = "lower right"
     create_generic_table(settings, data, table_vals, ax2, rowlabels, location, fontsize)
+
+def get_host_metric_data(data):
+    returndata = []
+    counter = 1
+    hostcounter = 0 
+    divide = int(len(data["hostname_series"]) / len(data["x_axis"])) # that int convert should work
+    for host in data["hostname_series"]:
+        hostcounter += 1
+        metricvalue = data["x_axis"][counter-1]
+        returndata.append({ "hostname": host, "value": metricvalue })
+        if hostcounter % divide == 0:
+            counter += 1
+    return returndata
+
+def create_data_for_table_with_hostname_data(settings, data):
+    returndata = {
+        "table_vals": None,
+        "rowlabels": None
+    }
+    hostmetric = get_host_metric_data(data)
+    hostnames = [ x["hostname"] for x in hostmetric ]
+    metric = [ x["value"] for x in hostmetric ]
+    returndata["table_vals"] = [hostnames, metric ,data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
+    metricname = f"{settings['graphtype'][-2:]}"
+    returndata["rowlabels"] = ["hostname", metricname, "IOP/s \u03C3 %", "Latency \u03C3 %"]
+    return returndata
 
 def create_stddev_table(settings, data, ax2, fontsize):
     #print(data)
     table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]    
     if "hostname_series" in data.keys():
         if data["hostname_series"]:
-            labels = format_hostname_labels(settings, data)
-            table_vals = [labels, data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
-            table_name = f"Host+{settings['graphtype'][-2:]}"
+            tabledata = create_data_for_table_with_hostname_data(settings, data)
+            table_vals = tabledata["table_vals"]
+            rowlabels = tabledata["rowlabels"]
     else:
         table_name = settings["label"]
-
-    rowlabels = [table_name, "IOP/s \u03C3 %", "Latency \u03C3 %"]
+        rowlabels = [table_name, "IOP/s \u03C3 %", "Latency \u03C3 %"]
     location = "lower right"
     create_generic_table(settings, data, table_vals, ax2, rowlabels, location, fontsize)
 
@@ -164,9 +181,14 @@ def convert_number_to_yes_no(data):
         newlist.append(lookup[item])
     return newlist
 
-
 def create_steadystate_table(settings, data, ax2):
     # pprint.pprint(data)
+
+    ## This error is required until I address this
+    if "hostname_series" in data.keys():
+        print(f"\n Sorry, the steady state table is not compatible (yet) with client/server data\n")
+        sys.exit(1)
+
     if data["ss_attained"]:
         data["ss_attained"] = convert_number_to_yes_no(data["ss_attained"])
         table_vals = [
