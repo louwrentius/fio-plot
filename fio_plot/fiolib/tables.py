@@ -44,10 +44,12 @@ def get_font(settings):
     return font
 
 
-def alternate_cell_height():
+def alternate_cell_height(number=2,stepsize=14):
+    start = 5
+    stop = start + (number * stepsize)
     while True:
-        yield 0
-        yield 2
+        for x in range(start, stop, stepsize):
+            yield x / 10
 
 def create_generic_table(settings, data, table_vals, ax2, rowlabels, location, fontsize):
     cols = len(table_vals[0])
@@ -77,11 +79,13 @@ def create_generic_table(settings, data, table_vals, ax2, rowlabels, location, f
         alpha = 0
         linewidth = 0
     counter = 0 
-    alternator = alternate_cell_height()
+    if max(matrix) <= 10:
+        alternator = alternate_cell_height()
+    else:
+        alternator = alternate_cell_height(3,14)
     for key, cell in table.get_celld().items():
         cell.set_linewidth(linewidth)
         flip = next(alternator)
-        
         if counter < (cols):
             cell._text.set_verticalalignment('bottom')
             cell.set_alpha(alpha)
@@ -97,7 +101,7 @@ def create_generic_table(settings, data, table_vals, ax2, rowlabels, location, f
         if fontsize == 8 and max(matrix) > 5:
             cell.set_width(0.08)
         else:
-            cell.set_width(0.042)
+           cell.set_width(0.042)
         counter += 1
 
 def create_cpu_table(settings, data, ax2, fontsize):
@@ -125,9 +129,10 @@ def create_values_table(settings, data, ax2, fontsize):
     table_vals = [data["x_axis"], iops, data["y2_axis"]["data"]]
     if "hostname_series" in data.keys():
         if data["hostname_series"]:
-            tabledata = create_data_for_table_with_hostname_data(settings, data)
+            tabledata = create_data_for_table_with_hostname_data(settings, data, "data")
             table_vals = tabledata["table_vals"]
-            rowlabels = tabledata["rowlabels"]
+            metricname = tabledata["metricname"]
+            rowlabels = [ "Hostname", metricname , "IOP/s", "Latency"]
     else:
         rowlabels = ["IOPs/Lat", data["y1_axis"]["format"], data["y2_axis"]["format"]]
     location = "lower right"
@@ -146,27 +151,24 @@ def get_host_metric_data(data):
             counter += 1
     return returndata
 
-def create_data_for_table_with_hostname_data(settings, data):
-    returndata = {
-        "table_vals": None,
-        "rowlabels": None
-    }
+def create_data_for_table_with_hostname_data(settings, data, type):
+    returndata = {}
     hostmetric = get_host_metric_data(data)
-    hostnames = [ x["hostname"] for x in hostmetric ]
-    metric = [ x["value"] for x in hostmetric ]
-    returndata["table_vals"] = [hostnames, metric ,data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]
-    metricname = f"{settings['graphtype'][-2:]}"
-    returndata["rowlabels"] = ["hostname", metricname, "IOP/s \u03C3 %", "Latency \u03C3 %"]
+    returndata["hostnames"] = [ x["hostname"] for x in hostmetric ]
+    returndata["metric"] = [ x["value"] for x in hostmetric ]
+    returndata["table_vals"] = [ returndata["hostnames"], returndata["metric"], data["y1_axis"][type], data["y2_axis"][type]]
+    returndata["metricname"] = f"{settings['graphtype'][-2:]}"
     return returndata
 
 def create_stddev_table(settings, data, ax2, fontsize):
-    #print(data)
+    print(data["y1_axis"].keys())
     table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]    
     if "hostname_series" in data.keys():
         if data["hostname_series"]:
-            tabledata = create_data_for_table_with_hostname_data(settings, data)
+            tabledata = create_data_for_table_with_hostname_data(settings, data, "stddev")
             table_vals = tabledata["table_vals"]
-            rowlabels = tabledata["rowlabels"]
+            metricname = tabledata["metricname"]
+            rowlabels = [ "Hostname", metricname , "IOP/s \u03C3 %", "Latency \u03C3 %"]
     else:
         table_name = settings["label"]
         rowlabels = [table_name, "IOP/s \u03C3 %", "Latency \u03C3 %"]
@@ -183,7 +185,6 @@ def convert_number_to_yes_no(data):
 
 def create_steadystate_table(settings, data, ax2):
     # pprint.pprint(data)
-
     ## This error is required until I address this
     if "hostname_series" in data.keys():
         print(f"\n Sorry, the steady state table is not compatible (yet) with client/server data\n")
