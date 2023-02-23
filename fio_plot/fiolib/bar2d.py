@@ -5,7 +5,8 @@ import pprint
 from . import (
     supporting,
     shared_chart as shared,
-    tables
+    tables,
+    table_support as ts
 )
 
 def format_hostname_labels(settings, data):
@@ -22,7 +23,7 @@ def format_hostname_labels(settings, data):
     return labels
 
 def calculate_font_size(settings, x_axis):
-    max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))
+    max_label_width = max(ts.get_max_width([x_axis], len(x_axis)))
     #print(max_label_width)
     fontsize = 0
     #
@@ -38,9 +39,7 @@ def calculate_font_size(settings, x_axis):
         if max_label_width >= 10 and cols > 8:
             fontsize = 6
         else:
-            fontsize = 8\
-            
-    #print(f"Fontsize {fontsize}")
+            fontsize = 8
     return fontsize
 
 def create_bars_and_xlabels(settings, data, ax1, ax3):
