@@ -165,7 +165,6 @@ def create_single_label(settings, item, rw, supportdata):
     # print(maxlabelsize)
     mylabel = create_label(item)
     mylabel = get_padding(mylabel, supportdata["maxlabelsize"])
-    print(item)
     labelset = {
         "name": mylabel,
         "rw": rw,
