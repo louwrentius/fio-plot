@@ -31,10 +31,13 @@ def get_log_data(settings):
     for input_dir in settings["input_directory"]:
         benchmarkfiles.extend(logdata.list_fio_log_files(input_dir))
     logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
-    # pprint.pprint(logfiles)
+    #pprint.pprint(logfiles)
     rawdata = logdata.readLogDataFromFiles(settings, logfiles)
-    # pprint.pprint(rawdata)
+    #pprint.pprint(rawdata)
     merged = logdata.mergeDataSet(settings, rawdata)
+    [ print(merged[x]["data"]["hostname"]) for x in range(len(merged))]
+    #print(merged)
+    #print(len(merged))
     return merged
 
 

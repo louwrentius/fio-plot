@@ -24,8 +24,6 @@ def chart_2d_log_data(settings, dataset):
     #
     data = supporting.process_dataset(settings, dataset)
     datatypes = data["datatypes"]
-    directories = logdata.get_unique_directories(dataset)
-    #pprint.pprint(data)
     #
     # Create matplotlib figure and first axis. The 'host' axis is used for
     # x-axis and as a basis for the second and third y-axis
@@ -73,7 +71,6 @@ def chart_2d_log_data(settings, dataset):
 
     ## Get axix limits 
     
-
     supportdata = {
         "lines": [],
         "labels": [],
@@ -83,8 +80,7 @@ def chart_2d_log_data(settings, dataset):
         "maximum": supporting.get_highest_maximum(settings, data),
         "axes": axes,
         "host": host,
-        "maxlabelsize": support2d.get_max_label_size(settings, data, directories),
-        "directories": directories,
+        "maxlabelsize": support2d.get_max_label_size(settings, data),
     }
 
     supportdata["fontP"].set_size("xx-small")

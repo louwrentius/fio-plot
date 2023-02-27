@@ -230,8 +230,8 @@ def process_dataset(settings, dataset):
                 datatypes.append(item["type"])
                 #pprint.pprint(item['data'][rw])
                 unpacked = list(zip(*item["data"][rw]))
-                
-                item[rw] = {}
+                item["hostname"] = item["data"]["hostname"]
+                item[rw] = { }
 
                 item[rw]["xvalues"] = unpacked[0]
                 item[rw]["yvalues"] = unpacked[1]
@@ -239,7 +239,7 @@ def process_dataset(settings, dataset):
                 scaled_xaxis = scale_xaxis_time(item[rw]["xvalues"])
                 item["xlabel"] = scaled_xaxis["format"]
                 item[rw]["xvalues"] = scaled_xaxis["data"]
-
+               
                 itemtype = []
                 if isinstance(item["type"], str):
                     itemtype.append(item["type"])
@@ -250,6 +250,7 @@ def process_dataset(settings, dataset):
                         scale_factors_lat.append(get_scale_factor_lat(item[rw]["yvalues"]))
                     if x == "bw":
                         scale_factors_bw.append(get_scale_factor_bw(item[rw]["yvalues"]))
+                #print(item["hostname"])
         if settings["draw_total"] and len(settings["filter"]) == 2:
             readdata = item["read"]["yvalues"]
             writedata = item["write"]["yvalues"]
@@ -260,7 +261,7 @@ def process_dataset(settings, dataset):
                 scale_factors_lat.append(get_scale_factor_lat(item["total"]["yvalues"]))
             if "bw" in item["type"]:
                 scale_factors_bw.append(get_scale_factor_bw(item["total"]["yvalues"]))
-        
+        #print(item["hostname"])
         item.pop("data")
         new_list.append(item)
 
