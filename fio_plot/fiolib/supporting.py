@@ -413,7 +413,7 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-def plot_source(settings, plt, ax1, vertical=-0.12):
+def plot_source(settings, plt, ax1, vertical=-0.14):
     if settings["source"]:
         calculation = len(settings["source"]) / 130
         horizontal = 1 - calculation

@@ -20,6 +20,7 @@ def get_json_mapping(mode, record):
     """This function contains a hard-coded mapping of FIO nested JSON data
     to a flat dictionary.
     """
+    print(record)
     #print(record["job options"].keys())
     dictionary = {
         "job options": record["job options"],
@@ -133,19 +134,19 @@ def build_json_mapping(settings, dataset):
         for record in directory["rawdata"]: # each record is the raw JSON data of a file in a directory
             jsonrootpath = get_json_root_path(record)
             globaloptions = get_json_global_options(record)
+            joboptions = None
             for job in record[jsonrootpath]:
-                #print(job.keys())
                 if job["jobname"] != "All clients":
                     job["job options"] = {**job["job options"], **globaloptions}
-                    row = return_data_row(settings, job)  
-                    row["fio_version"] = record["fio version"]
-                    directory["data"].append(row)
+                    if not joboptions:               
+                        joboptions = job["job options"]
                 else:
-                    directory["allclients"] = job
+                    job["job options"] = joboptions    
+                    job["hostname"] = "All clients"
+                row = return_data_row(settings, job)  
+                row["fio_version"] = record["fio version"]
+                directory["data"].append(row)
             directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
-            #print(f"{'='*10}")
-            #[print(f"{x['iodepth']} - {x['numjobs']}") for x in directory['data'] ]
-            #directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
     return dataset
 
 def parse_json_data(settings, dataset):
