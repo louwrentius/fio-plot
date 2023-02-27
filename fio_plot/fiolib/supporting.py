@@ -223,48 +223,52 @@ def process_dataset(settings, dataset):
     """
     This first loop is to unpack the data in series and add scale the xaxis
     """
-   
+    
     for item in dataset:
-        for rw in settings["filter"]:
-            if len(item["data"][rw]) > 0:
-                datatypes.append(item["type"])
-                #pprint.pprint(item['data'][rw])
-                unpacked = list(zip(*item["data"][rw]))
-                item["hostname"] = item["data"]["hostname"]
-                item[rw] = { }
+        for record in item["data"]:
+            for rw in settings["filter"]:
+                if len(record[rw]) > 0:
+                    datatypes.append(item["type"])
+                    #pprint.pprint(item['data'][rw])
+                    unpacked = list(zip(*record[rw]))
+                    record["type"] = item["type"]
+                    record["iodepth"] = item["iodepth"]
+                    record["numjobs"] = item["numjobs"]
+                    record["directory"] = item["directory"]
+                    record[rw] = { }
 
-                item[rw]["xvalues"] = unpacked[0]
-                item[rw]["yvalues"] = unpacked[1]
+                    record[rw]["xvalues"] = unpacked[0]
+                    record[rw]["yvalues"] = unpacked[1]
 
-                scaled_xaxis = scale_xaxis_time(item[rw]["xvalues"])
-                item["xlabel"] = scaled_xaxis["format"]
-                item[rw]["xvalues"] = scaled_xaxis["data"]
-               
-                itemtype = []
-                if isinstance(item["type"], str):
-                    itemtype.append(item["type"])
-                if isinstance(item["type"], list):
-                    itemtype = item["type"]
-                for x in itemtype:
-                    if x == "lat":
-                        scale_factors_lat.append(get_scale_factor_lat(item[rw]["yvalues"]))
-                    if x == "bw":
-                        scale_factors_bw.append(get_scale_factor_bw(item[rw]["yvalues"]))
-                #print(item["hostname"])
-        if settings["draw_total"] and len(settings["filter"]) == 2:
-            readdata = item["read"]["yvalues"]
-            writedata = item["write"]["yvalues"]
-            item["total"] = {}
-            item["total"]["yvalues"] = [x + y for x, y in zip(readdata, writedata)]
-            item["total"]["xvalues"] = item["read"]["xvalues"] # hack
-            if "lat" in item["type"]:
-                scale_factors_lat.append(get_scale_factor_lat(item["total"]["yvalues"]))
-            if "bw" in item["type"]:
-                scale_factors_bw.append(get_scale_factor_bw(item["total"]["yvalues"]))
-        #print(item["hostname"])
-        item.pop("data")
-        new_list.append(item)
-
+                    scaled_xaxis = scale_xaxis_time(record[rw]["xvalues"])
+                    record["xlabel"] = scaled_xaxis["format"]
+                    record[rw]["xvalues"] = scaled_xaxis["data"]
+                
+                    itemtype = []
+                    if isinstance(item["type"], str):
+                        itemtype.append(item["type"])
+                    if isinstance(item["type"], list):
+                        itemtype = item["type"]
+                    for x in itemtype:
+                        if x == "lat":
+                            scale_factors_lat.append(get_scale_factor_lat(record[rw]["yvalues"]))
+                        if x == "bw":
+                            scale_factors_bw.append(get_scale_factor_bw(record[rw]["yvalues"]))
+                    #print(item["hostname"])
+                    if settings["draw_total"] and len(settings["filter"]) == 2:
+                        readdata = record["read"]["yvalues"]
+                        writedata = record["write"]["yvalues"]
+                        record["total"] = {}
+                        record["total"]["yvalues"] = [x + y for x, y in zip(readdata, writedata)]
+                        record["total"]["xvalues"] = record["read"]["xvalues"] # hack
+                        if "lat" in item["type"]:
+                            scale_factors_lat.append(get_scale_factor_lat(record["total"]["yvalues"]))
+                        if "bw" in item["type"]:
+                            scale_factors_bw.append(get_scale_factor_bw(record["total"]["yvalues"]))
+                    #print(item["hostname"])
+                    new_list.append(record)
+    item.pop("data")
+    
     """
     This second loop assures that all data is scaled with the same factor
     """
@@ -281,43 +285,44 @@ def process_dataset(settings, dataset):
     for item in new_list:
         for rw in modi:
             if rw in item.keys():
-                if item["type"] == "lat":
-                    scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor_lat)
-                    item[rw]["ylabel"] = scaled_data["format"]
-                    item[rw]["yvalues"] = scaled_data["data"]
+                if isinstance(item[rw], dict):
+                    if item["type"] == "lat":
+                        scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor_lat)
+                        item[rw]["ylabel"] = scaled_data["format"]
+                        item[rw]["yvalues"] = scaled_data["data"]
 
-                elif item["type"] == "bw":
-                    scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor_bw)
-                    item[rw]["ylabel"] = scaled_data["format"]
-                    item[rw]["yvalues"] = scaled_data["data"]
-                else:
-                    item[rw]["ylabel"] = lookupTable(item["type"])["ylabel"]
+                    elif item["type"] == "bw":
+                        scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor_bw)
+                        item[rw]["ylabel"] = scaled_data["format"]
+                        item[rw]["yvalues"] = scaled_data["data"]
+                    else:
+                        item[rw]["ylabel"] = lookupTable(item["type"])["ylabel"]
 
-                max = np.max(item[rw]["yvalues"])
-                mean = np.mean(item[rw]["yvalues"])
-                stdv = round((np.std(item[rw]["yvalues"]) / mean) * 100, 2)
-                percentile = round(
-                    np.percentile(item[rw]["yvalues"], settings["percentile"]), 2
-                )
+                    max = np.max(item[rw]["yvalues"])
+                    mean = np.mean(item[rw]["yvalues"])
+                    stdv = round((np.std(item[rw]["yvalues"]) / mean) * 100, 2)
+                    percentile = round(
+                        np.percentile(item[rw]["yvalues"], settings["percentile"]), 2
+                    )
 
-                if mean > 1:
-                    mean = round(mean, 2)
-                if mean <= 1:
-                    mean = round(mean, 3)
-                if mean >= 20:
-                    mean = int(round(mean, 0))
+                    if mean > 1:
+                        mean = round(mean, 2)
+                    if mean <= 1:
+                        mean = round(mean, 3)
+                    if mean >= 20:
+                        mean = int(round(mean, 0))
 
-                if percentile > 1:
-                    percentile = round(percentile, 2)
-                if percentile <= 1:
-                    percentile = round(percentile, 3)
-                if percentile >= 20:
-                    percentile = int(round(percentile, 0))
+                    if percentile > 1:
+                        percentile = round(percentile, 2)
+                    if percentile <= 1:
+                        percentile = round(percentile, 3)
+                    if percentile >= 20:
+                        percentile = int(round(percentile, 0))
 
-                item[rw]["max"] = max
-                item[rw]["mean"] = mean
-                item[rw]["stdv"] = stdv
-                item[rw]["percentile"] = percentile
+                    item[rw]["max"] = max
+                    item[rw]["mean"] = mean
+                    item[rw]["stdv"] = stdv
+                    item[rw]["percentile"] = percentile
 
         final_list.append(item)
 
@@ -336,8 +341,9 @@ def get_highest_maximum(settings, data):
     for item in data["dataset"]:
         for rw in settings["filter"]:
             if rw in item.keys():
-                if item[rw]["max"] > highest_max[rw][item["type"]]:
-                    highest_max[rw][item["type"]] = item[rw]["max"]
+                if isinstance(item[rw], dict):
+                    if item[rw]["max"] > highest_max[rw][item["type"]]:
+                        highest_max[rw][item["type"]] = item[rw]["max"]
     
     for rw in settings["filter"]:
         for metric in highest_max[rw].keys():

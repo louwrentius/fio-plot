@@ -130,9 +130,13 @@ def mergeSingleDataSet(data, datatype):
     dataset containing the summed/averaged data.
     """
     #print(data[0].keys())
-    mergedSet = None
-    hostlist = ds.get_hosts_from_data(data)
-    mergedSet = ds.mergeLogDataSet(data, datatype)
+    mergedSet = []
+    #hostlist = ds.get_hosts_from_data(data)
+    for record in data:
+        result = ds.newMergeLogDataSet(record, datatype)
+        mergedSet.append(result)
+    #mergedSet = ds.mergeLogDataSet(data, datatype, hostlist)
+    #print(mergedSet)
     return mergedSet
 
 

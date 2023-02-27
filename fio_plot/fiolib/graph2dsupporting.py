@@ -114,7 +114,6 @@ def get_colors(settings):
 
 def drawline(settings, item, rw, supportdata):
     axes = supportdata["axes"]
-
     if settings["enable_markers"]:
         marker_value = supportdata["marker_list"].pop(0)
     else:
@@ -166,7 +165,7 @@ def create_single_label(settings, item, rw, supportdata):
     # print(maxlabelsize)
     mylabel = create_label(item)
     mylabel = get_padding(mylabel, supportdata["maxlabelsize"])
-
+    print(item)
     labelset = {
         "name": mylabel,
         "rw": rw,
