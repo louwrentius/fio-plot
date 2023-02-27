@@ -200,6 +200,18 @@ This is the command-line used to generate this graph:
 
     fio-plot -i SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Historgram of SSD" -H -r randread -d 16 -n 16
 
+## Fio client server mechanism.
+
+Fio supports a [client-server][cs] model where one fio client can run a benchmark on multiple machines (servers) in parallel.
+The bench-fio tool supports this type of benchmark, see the readme for more details. For the fio-plot tool the data
+will be rendered based on hostname automatically.
+
+[cs]: https://fio.readthedocs.io/en/latest/fio_doc.html#client-server
+
+![csdemo][csdemo]
+
+[csdemo]: https://louwrentius.com/static/images/fio-client-server-demo.png
+
 ## Benchmark script
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
 you to gather data for different queue depths and/or number of simultaneous jobs. The benchmark script shows progress in real-time.
