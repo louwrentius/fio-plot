@@ -30,6 +30,7 @@ def filter_options(settings, config, mapping, benchmark, output_directory):
             for item in settings["extra_opts"]:
                 key, value = item.split("=")
                 config['FIOJOB'][key] = str(value)
+        #print(f"key: {key} - Value: {value} - {type(value)}")
 
     config['FIOJOB']["write_bw_log"] = f"{output_directory}/{benchmark['mode']}-iodepth-{benchmark['iodepth']}-numjobs-{benchmark['numjobs']}"
     config['FIOJOB']["write_lat_log"] = f"{output_directory}/{benchmark['mode']}-iodepth-{benchmark['iodepth']}-numjobs-{benchmark['numjobs']}"
