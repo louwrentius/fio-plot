@@ -82,6 +82,7 @@ def run_precondition_benchmark(settings, device, run):
             settings_copy = copy.deepcopy(settings)
             settings_copy["template"] = settings["precondition_template"]
             settings_copy["runtime"] = None # want to test entire device
+            settings_copy["time_based"] = False
             template = supporting.import_fio_template(settings["precondition_template"])
             benchmark = {
                 "target": device,

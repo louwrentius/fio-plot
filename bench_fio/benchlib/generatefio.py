@@ -15,17 +15,17 @@ def filter_options(settings, config, mapping, benchmark, output_directory):
     for k,v in settings.items():
         key = k
         value = v
-        if key in settings["loop_items"]:
+        if key in settings["loop_items"]:  # This is looping throught the benchmark parameters
             value = benchmark[k]
-        if key in mapping.keys():
+        if key in mapping.keys(): # This is about translating bench-fio parameters to fio parameters
             key = mapping[key]
         if isinstance(value, bool):
             value = boolean[str(value)]
-        if key == "type":
+        if key == "type":  # we check if we target a file directory or block device
             devicetype = checks.check_target_type(benchmark["target"], settings)
             config['FIOJOB'][devicetype] = benchmark["target"]
         if value and not isinstance(value, list) and key not in settings["exclude_list"]:
-            config['FIOJOB'][key] = str(value).replace('%', '%%')
+            config['FIOJOB'][key] = str(value).replace('%', '%%') # just add all key values, % character needs replacing
         if settings["extra_opts"]:
             for item in settings["extra_opts"]:
                 key, value = item.split("=")
