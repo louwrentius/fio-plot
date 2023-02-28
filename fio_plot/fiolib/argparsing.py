@@ -309,14 +309,16 @@ def set_arguments(settings):
     ag.add_argument(
         "--table-fontsize", help="Standard deviation table / CPU table font size", type=int,  default=settings["table_fontsize"]
     )
-    ag.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    
+    group.add_argument(
         "--include-hosts",
         help="Only create graphs for these hosts (when parsing client-server benchmark data)",
         type=str,
         nargs="+",
         default=None,
     )
-    ag.add_argument(
+    group.add_argument(
         "--exclude-hosts",
         help="Graph all hosts except for those listed (when parsing client-server benchmark data)",
         type=str,

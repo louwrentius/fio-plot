@@ -148,6 +148,7 @@ def run_preflight_checks(settings):
     if not len(settings["filter"]) == 2 and settings["draw_total"]:
         print(f"\n When --draw-total is specified, \"-f read write\" (default) must be specified. \n")
         sys.exit(1)
+        
 
 def post_flight_check(parser, option_found):
     if not option_found:
