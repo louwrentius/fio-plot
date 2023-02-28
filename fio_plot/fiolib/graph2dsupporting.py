@@ -225,3 +225,4 @@ def generate_labelset(settings, supportdata):
         values.insert(position, header)
 
     return (values, ncol)
+

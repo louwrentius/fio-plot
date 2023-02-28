@@ -91,7 +91,8 @@ def chart_2d_log_data(settings, dataset):
     for item in data["dataset"]:
         for rw in settings["filter"]:
             if isinstance(item[rw], dict):
-                support2d.drawline(settings, item, rw, supportdata)
+                if supporting.filter_hosts(settings, item):
+                    support2d.drawline(settings, item, rw, supportdata)
 
     #
     # Generating the legend

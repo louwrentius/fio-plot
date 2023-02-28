@@ -480,3 +480,20 @@ def write_png_metadata(filename, settings):
         else:
             metadata.add_text(k, str(v))
     targetImage.save(filename, pnginfo=metadata)
+
+def filter_hosts(settings, item):
+    outcome = None
+    hostname = item["hostname"]
+    if settings["include_hosts"]:
+        if hostname in settings["include_hosts"]:
+            outcome = True
+        else:
+            outcome = False
+    elif settings["exclude_hosts"]:
+        if hostname in settings["exclude_hosts"]:
+            outcome = False
+        else:
+            outcome = True
+    else:
+        outcome = True   
+    return outcome

@@ -113,15 +113,7 @@ def get_json_global_options(record):
 
 
 def sort_list_of_dictionaries(settings, data):
-    #sortedlist = []
     sortedlist = sorted(data, key=lambda k: (int(k["iodepth"]), int(k["numjobs"])))
-    #print(len(data))
-    #for x in settings["iodepth"]:
-    #    for y in settings ["numjobs"]:
-    #        for z in data:
-    #            if z["iodepth"] == x and z["numjobs"] == y:
-    #                print(f"{x} - {y} - {z['iodepth']} - {z['numjobs']}")    
-    #                sortedlist.append(z)
     return sortedlist
 
 def build_json_mapping(settings, dataset):

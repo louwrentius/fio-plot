@@ -222,6 +222,11 @@ def get_record_set(settings, dataset, dataset_types):
                         and data["rw"] == rw
                         and data["type"] in settings["filter"]
                     ):
+                        if "hostname" in data.keys():
+                            if supporting.filter_hosts(settings, data):
+                                datadict["hostname_series"].append(data['hostname'])    
+                            else:
+                                continue
                         #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
                         #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['iops']}")
                         datadict["fio_version"].append(data["fio_version"])
@@ -243,9 +248,6 @@ def get_record_set(settings, dataset, dataset_types):
                                 datadict["ss_data_iops_mean"].append(
                                     int(round(data["ss_data_iops_mean"], 0))
                                 )
-                        if "hostname" in data.keys():
-                            datadict["hostname_series"].append(data['hostname'])
-
                     else:
                         mismatch+=1
 
