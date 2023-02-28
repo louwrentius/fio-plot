@@ -271,6 +271,12 @@ def get_arguments(settings):
         type=int,
         default=settings["remote_timeout"],    
     )
+    ag.add_argument(
+        "--create",
+        help="Create target files if they don't exist. This is the default for fio but not for bench_fio",
+        action="store_true",
+        default=False,
+    )
     return parser
 
 def get_argument_description():
@@ -305,6 +311,7 @@ def get_argument_description():
         "destructive": "Allow destructive writes",
         "remote":"Use remote server",
         "remote_checks": "Check remote for open TCP port",
-        "remote_timeout": "Check remote timeout (s)"
+        "remote_timeout": "Check remote timeout (s)",
+        "create": "Create if target doesn't exist"
     }
     return descriptions

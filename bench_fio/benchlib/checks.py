@@ -62,7 +62,7 @@ def check_target_type(target, settings):
 
     if not filetype == "rbd":
 
-        if not os.path.exists(target) and not settings["remote"]:
+        if not os.path.exists(target) and not settings["remote"] and not settings["create"]:
             print(f"Benchmark target {filetype} {target} does not exist.")
             sys.exit(10)
 
@@ -74,7 +74,7 @@ def check_target_type(target, settings):
 
         path_target = Path(target)  # path library needs to operate on path object
 
-        if not settings["remote"]:
+        if not settings["remote"] and not settings["create"]:
             if check(path_target):
                 return parameter[filetype]
             else:
@@ -100,7 +100,7 @@ def check_settings(settings):
         print()
         sys.exit(4)
 
-    if settings["type"] == "directory" and not settings["remote"]:
+    if settings["type"] == "directory" and not settings["remote"] and not settings["create"]:
         for item in settings["target"]:
             if not os.path.exists(item):
                 print(f"\nThe target directory ({item}) doesn't seem to exist.\n")

@@ -39,6 +39,7 @@ def get_default_settings():
     settings["remote_checks"] = False
     settings["remote_timeout"] = 2
     settings["tmpjobfile"] = "/tmp/tmpjobfile.fio"
+    settings["create"] = False
     settings["loop_items"] = [
         "target",
         "mode",
@@ -74,7 +75,8 @@ def get_default_settings():
         "basename_list",
         "destructive",
         "precondition",
-        "template"
+        "template",
+        "create"
     ]
     settings["basename_list"] = [
         "precondition_template"
