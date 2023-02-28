@@ -20,7 +20,7 @@ def get_json_mapping(mode, record):
     """This function contains a hard-coded mapping of FIO nested JSON data
     to a flat dictionary.
     """
-    print(record)
+    #print(record)
     #print(record["job options"].keys())
     dictionary = {
         "job options": record["job options"],
