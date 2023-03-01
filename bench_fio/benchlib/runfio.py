@@ -17,8 +17,15 @@ def drop_caches():
     command = ["echo", "3", ">", "/proc/sys/vm/drop_caches"]
     run_raw_command(command)
 
+def handle_error(outputfile):
+    if outputfile: 
+        if os.path.exists(outputfile):
+            with open(f"{outputfile}", 'r') as input:
+                data = input.read().splitlines() 
+                for line in data:
+                    print(line)
 
-def run_raw_command(command):
+def run_raw_command(command, outputfile = None):
     try: 
         result = subprocess.run(
             command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -26,8 +33,9 @@ def run_raw_command(command):
         if result.returncode > 0 or (len(str(result.stderr)) > 3):
             stdout = result.stdout.decode("UTF-8").strip()
             stderr = result.stderr.decode("UTF-8").strip()
-            print(f"\nAn error occurred: stderr: {stderr} - stdout: {stdout}")
-            sys.exit(1)
+            print(f"\nAn error occurred: stderr: {stderr} - stdout: {stdout} - returncode: {result.returncode} \n")
+            handle_error(outputfile) # it seems that the JSON output file contains STDERR/STDOUT error data
+            sys.exit(result.returncode)
     except KeyboardInterrupt:
         print(f"\n ctrl-c pressed - Aborted by user....\n")
         sys.exit(1)
@@ -55,7 +63,7 @@ def run_fio(settings, benchmark):
     
     if not settings["dry_run"]:
         supporting.make_directory(output_directory)
-        run_raw_command(command)
+        run_raw_command(command, output_file)
         if settings["remote"]:
             fix_json_file(output_file) # to fix FIO json output bug
 

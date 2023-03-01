@@ -2,7 +2,8 @@
 
 [FIO][fio] is a tool for benchmarking storage devices. FIO helps to assess the storage performance in terms of IOPS and latency.
 
-Fio-plot generates charts from FIO storage benchmark data. It can process FIO output in JSON format. It can also process FIO log file output (in CSV format). Checkout the many examples below.
+Fio-plot generates charts from FIO storage benchmark data. It can process FIO output in JSON format. It can also process FIO log file output (in CSV format).
+It also includes bench-fio, a benchmark tool to automate benchmarking with FIO. Checkout the many examples below.
 
 [fio]: https://github.com/axboe/fio
 
@@ -18,7 +19,7 @@ To make these charts yourself, you need to follow this process:
 
 ## Quick installation guide:
 
-Ubuntu 18.04 LTS: please run this command first: 
+Ubuntu 18.04+ LTS: please run this command first: 
 
     apt install zlib1g-dev libjpeg-dev python3-pip
 
