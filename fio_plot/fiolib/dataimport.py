@@ -129,12 +129,25 @@ def mergeSingleDataSet(data, datatype):
     For examle, iodepth = 1 and numjobs = 8. The function returns one single
     dataset containing the summed/averaged data.
     """
-    #print(data[0].keys())
+    for x in data: 
+        print(f"{x['hostname']} - {x['filename']}")
     mergedSet = []
     #hostlist = ds.get_hosts_from_data(data)
+    hostdatamerged = {}
+
     for record in data:
-        result = ds.newMergeLogDataSet(record, datatype)
-        mergedSet.append(result)
+        if record["hostname"]:
+            hostdatamerged[record["hostname"]] = []
+            hostdatamerged[record["hostname"]].append(record)
+        else:
+            result = ds.newMergeLogDataSet(record, datatype)
+            mergedSet.append(result)
+    
+    if hostdatamerged:
+        for key in hostdatamerged.keys():
+            for record in hostdatamerged[key]:
+                 result = ds.newMergeLogDataSet(record, datatype)
+                 mergedSet.append(result)
     #mergedSet = ds.mergeLogDataSet(data, datatype, hostlist)
     #print(mergedSet)
     return mergedSet

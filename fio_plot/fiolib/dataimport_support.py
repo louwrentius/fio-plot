@@ -34,18 +34,6 @@ def getMergeOperation(datatype):
     opfunc = operationMapping[datatype]
     return opfunc
 
-def metaMergeLogDataSet(data, datatype, hostlist):
-    merged = []
-    if hostlist:
-        for host in hostlist:
-            print(host)
-            result = mergeLogDataSet(data, datatype, host)
-            print(result)
-            merged.append(result)
-    else:
-        merged = mergeLogDataSet(data, datatype, None)
-    return merged
-    
 
 def newMergeLogDataSet(record, datatype):
     mergedSet = {"read": [], "write": [], "hostname": record["hostname"]}
@@ -68,26 +56,3 @@ def newMergeLogDataSet(record, datatype):
     return mergedSet
 
 
-def mergeLogDataSet(data, datatype, host=None):
-    mergedSet = {"read": [], "write": [], "hostname": host[0]}
-    lookup = {"read": 0, "write": 1}
-    for rw in ["read", "write"]:
-        for column in ["timestamp", "value"]:
-            unmergedSet = []
-            for record in data:
-                templist = []
-                if record["hostname"]:
-                    if record["hostname"] == host:
-                        mergedSet["hostname"] = record["hostname"]
-                for row in record["data"]:
-                    if int(row["rwt"]) == lookup[rw]:
-                        templist.append(int(row[column]))
-                unmergedSet.append(templist)
-            if column == "value":
-                oper = getMergeOperation(datatype)
-            else:
-                oper = getMergeOperation(column)
-            merged = [oper(x) for x in zip(*unmergedSet)]
-            mergedSet[rw].append(merged)
-        mergedSet[rw] = list(zip(*mergedSet[rw]))
-    return mergedSet
