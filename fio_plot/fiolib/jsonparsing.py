@@ -1,6 +1,6 @@
-from operator import itemgetter
-import pprint
-import statistics
+from . import (
+    jsonparsing_support as jsonsupport
+)
 
 def check_for_steadystate(record, mode):
     keys = record["job options"].keys()
@@ -9,23 +9,7 @@ def check_for_steadystate(record, mode):
     else:
         return False
 
-def check_for_hostname(record):
-    keys = record.keys()
-    if "hostname" in keys: # remember that we merged global options into job options to make them accessible
-        return True
-    else:
-        return False
-    
-def check_for_valid_hostname(record):
-    result = None
-    if check_for_hostname(record):
-        if record["hostname"]:
-            result = True
-        else:
-            result = False
-    else:
-        result = False
-    return result
+
 
 def get_json_mapping(mode, record):
     """This function contains a hard-coded mapping of FIO nested JSON data
@@ -66,7 +50,7 @@ def get_json_mapping(mode, record):
         dictionary["ss_data_bw_mean"] = None
         dictionary["ss_data_iops_mean"] = None
     
-    if check_for_hostname(record):
+    if jsonsupport.check_for_hostname(record):
         dictionary["hostname"] = record["hostname"]
     
 
@@ -127,29 +111,7 @@ def sort_list_of_dictionaries(settings, data):
     sortedlist = sorted(data, key=lambda k: (int(k["iodepth"]), int(k["numjobs"])))
     return sortedlist
 
-def merge_job_data(settings, hosts):
-  
-    processed = []
 
-    for host in hosts.keys():
-        iops = []
-        bw = []
-        lat = []
-        template = { "type": hosts[host][0]["type"], "iodepth": hosts[host][0]["iodepth"], "numjobs": hosts[host][0]["numjobs"], "hostname": host, "fio_version": hosts[host][0]["fio_version"], \
-                     "rw": hosts[host][0]["rw"], "bs": hosts[host][0]["bs"]
-                    }    
-
-        for job in hosts[host]:
-            iops.append(job["iops"])
-            bw.append(job["bw"])
-            lat.append(job["lat"])
-
-        template["iops"] = sum(iops)
-        template["bw"] = sum(bw)
-        template["lat"] = statistics.mean(lat)
-        processed.append(template)
-
-    return processed
 
 def build_json_mapping(settings, dataset):
     """
@@ -164,11 +126,8 @@ def build_json_mapping(settings, dataset):
             joboptions = None
             hosts = {}
             jobs = []
+            just_append = False
             for job in record[jsonrootpath]:
-                if check_for_valid_hostname(job):
-                    hostname = job["hostname"]
-                    if hostname not in hosts.keys():
-                        hosts[hostname] = []
                 if job["jobname"] != "All clients":
                     job["job options"] = {**job["job options"], **globaloptions}
                     if not joboptions:               
@@ -176,6 +135,10 @@ def build_json_mapping(settings, dataset):
                 else:
                     job["job options"] = joboptions    
                     job["hostname"] = "All clients"
+                if jsonsupport.check_for_valid_hostname(job):
+                    hostname = job["hostname"]
+                    if hostname not in hosts.keys():
+                        hosts[hostname] = []
                 row = return_data_row(settings, job)  
                 row["fio_version"] = record["fio version"]
                 if hosts:
@@ -184,13 +147,17 @@ def build_json_mapping(settings, dataset):
                     jobs.append(row)
             if hosts:
                 for host in hosts.keys():
-                    if len(hosts[host]) > 1:
-                        directory["data"] = merge_job_data(settings, hosts)
+                    if len(hosts[host]) > 1 or host == "All clients":
+                        print(host)
+                        directory["data"] = jsonsupport.merge_job_data(settings, hosts)
                     else:
-                        directory["data"] = [ x for x in hosts[host] ]
+                        just_append = True
             else:
-                directory["data"] = jobs
-            directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
+                just_append = True
+            if just_append:
+                [ directory["data"].append(x) for x in jobs ]
+
+    directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
     return dataset
 
 def parse_json_data(settings, dataset):

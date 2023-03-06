@@ -1,7 +1,6 @@
 import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 import sys
-import pprint
 
 from . import (
     jsonimport,

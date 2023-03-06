@@ -259,7 +259,6 @@ def get_record_set(settings, dataset, dataset_types):
                         mismatch+=1
 
     validate_get_record_set(settings, mismatch, dataset)
-    #print(datadict['iops_series_raw'])
     return scale_data(datadict)
 
 

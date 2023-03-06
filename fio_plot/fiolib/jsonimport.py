@@ -2,7 +2,6 @@ import os
 import sys
 import json
 import logging
-import pprint
 
 logger = logging.getLogger(__name__)
 
