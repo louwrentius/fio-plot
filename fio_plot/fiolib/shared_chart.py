@@ -169,24 +169,8 @@ def get_record_set_improved(settings, dataset, dataset_types):
     validate_get_record_set(settings, mismatch, dataset)
     return scale_data(datadict)
 
-
-def get_record_set(settings, dataset, dataset_types):
-    """The supplied dataset, a list of flat dictionaries with data is filtered based
-    on the parameters as set by the command line. The filtered data is also scaled and rounded.
-    """
-    #dataset = dataset[0]
-    rw = settings["rw"]
+def return_empty_data_dict(settings, dataset_types):
     numjobs = settings["numjobs"]
-    mismatch = 0
-
-    if settings["rw"] == "randrw":
-        if len(settings["filter"]) > 1 or not settings["filter"]:
-            print(
-                "Since we are processing randrw data, you must specify a filter for either"
-                "read or write data, not both."
-            )
-            exit(1)
-
     labels = dataset_types[settings["query"]]
     #print(labels)
     datadict = {
@@ -207,6 +191,34 @@ def get_record_set(settings, dataset, dataset_types):
         "ss_data_iops_mean": [],
         "hostname_series": []
     }
+    return datadict
+
+def get_record_set(settings, dataset, dataset_types):
+    """The supplied dataset, a list of flat dictionaries with data is filtered based
+    on the parameters as set by the command line. The filtered data is also scaled and rounded.
+    """
+    #dataset = dataset[0]
+    rw = settings["rw"]
+    mismatch = 0
+
+    if settings["rw"] == "randrw":
+        if len(settings["filter"]) > 1 or not settings["filter"]:
+            print(
+                "Since we are processing randrw data, you must specify a filter for either"
+                "read or write data, not both."
+            )
+            exit(1)
+
+    datadict = return_empty_data_dict(settings, dataset_types)    
+
+    hostnamejobholder = {}
+    for item in dataset:
+        for record in item["data"]:
+            if record["hostname"]:
+                if record["hostname"] not in hostnamejobholder.keys():
+                    hostnamejobholder[record["hostname"]] = []
+                hostnamejobholder[record["hostname"]].append(record)                
+    print(hostnamejobholder.keys())
 
     for record in dataset:
         for data in record['data']:

@@ -129,27 +129,33 @@ def mergeSingleDataSet(data, datatype):
     For examle, iodepth = 1 and numjobs = 8. The function returns one single
     dataset containing the summed/averaged data.
     """
+    print("==============")
     for x in data: 
-        print(f"{x['hostname']} - {x['filename']}")
+        print(f"Merge single dataset - {x['hostname']} - {x['filename']} - {type(x['data'])}")
     mergedSet = []
-    #hostlist = ds.get_hosts_from_data(data)
     hostdatamerged = {}
+    regulardatamerged = []
 
     for record in data:
         if record["hostname"]:
-            hostdatamerged[record["hostname"]] = []
+            if record["hostname"] not in hostdatamerged.keys():
+                hostdatamerged[record["hostname"]] = []
             hostdatamerged[record["hostname"]].append(record)
         else:
-            result = ds.newMergeLogDataSet(record, datatype)
-            mergedSet.append(result)
-    
+            result = regulardatamerged.append(record)
+ 
+    #for host in hostdatamerged.keys():
+    #    print(f"{host} - {len(hostdatamerged[host])}")
     if hostdatamerged:
-        for key in hostdatamerged.keys():
-            for record in hostdatamerged[key]:
-                 result = ds.newMergeLogDataSet(record, datatype)
-                 mergedSet.append(result)
+        for host in hostdatamerged.keys():
+            result = ds.newMergeLogDataSet(hostdatamerged[host], datatype, host)
+            mergedSet.append(result)
+    elif regulardatamerged:
+        mergedSet.append(ds.newMergeLogDataSet(regulardatamerged,datatype))
+    else:
+        print("ERROR")
+        sys.exit(1)
     #mergedSet = ds.mergeLogDataSet(data, datatype, hostlist)
-    #print(mergedSet)
     return mergedSet
 
 

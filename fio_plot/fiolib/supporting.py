@@ -227,6 +227,7 @@ def process_dataset(settings, dataset):
     for item in dataset:
         for record in item["data"]:
             for rw in settings["filter"]:
+                #print(f"========================{record}")
                 if len(record[rw]) > 0:
                     datatypes.append(item["type"])
                     #pprint.pprint(item['data'][rw])

@@ -35,17 +35,18 @@ def getMergeOperation(datatype):
     return opfunc
 
 
-def newMergeLogDataSet(record, datatype):
-    mergedSet = {"read": [], "write": [], "hostname": record["hostname"]}
+def newMergeLogDataSet(data, datatype, hostname=None):
+    mergedSet = {"read": [], "write": [], "hostname": hostname}
     lookup = {"read": 0, "write": 1}
     for rw in ["read", "write"]:
         for column in ["timestamp", "value"]:
             unmergedSet = []
-            templist = []
-            for row in record["data"]:
-                if int(row["rwt"]) == lookup[rw]:
-                    templist.append(int(row[column]))
-            unmergedSet.append(templist)
+            for record in data:
+                templist = []
+                for row in record["data"]:
+                    if int(row["rwt"]) == lookup[rw]:
+                        templist.append(int(row[column]))
+                unmergedSet.append(templist)
             if column == "value":
                 oper = getMergeOperation(datatype)
             else:
