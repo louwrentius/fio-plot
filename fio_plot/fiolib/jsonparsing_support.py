@@ -18,8 +18,17 @@ def check_for_valid_hostname(record):
         result = False
     return result
 
-def merge_job_data(settings, hosts):
-  
+def merge_job_data(hosts):
+    """
+    When we are facing client data with numjobs >1 we need to sum or average values.
+    Each job of numjobs creates a separate job entry and if we for instance use iops,
+    we need to summ all job records for that particular hosts to get the total iops
+    for that host. 
+
+    This function is a comrpomise, as I only deal with iops, bw and lat. Any other
+    data is discarted and this is why the standard deviation data and cpu data is not copied over.
+    Frankly, I would not know how to deal with that data anyway, so it's left out.
+    """
     processed = []
 
     for host in hosts.keys():
@@ -124,7 +133,7 @@ def merge_job_data_if_hostnames(settings, hosts, directory):
         for host in hosts.keys():
             if len(hosts[host]) > 1 or host == "All clients":
                 #print(host)
-                directory["data"] = merge_job_data(settings, hosts)
+                directory["data"] = merge_job_data(hosts)
             else:
                 just_append = True
     else:

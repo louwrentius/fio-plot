@@ -48,6 +48,9 @@ def process_json_record(settings, directory, record, jsonrootpath, globaloptions
     jobs = []
     just_append = False
     for job in record[jsonrootpath]:
+        # This section is just to deal with the "All clients" job included in 
+        # client / server JSON output
+        #
         if job["jobname"] != "All clients":
             job["job options"] = {**job["job options"], **globaloptions}
             if not joboptions:               
@@ -55,6 +58,9 @@ def process_json_record(settings, directory, record, jsonrootpath, globaloptions
         else:
             job["job options"] = joboptions    
             job["hostname"] = "All clients"
+        #
+        # End of section
+        #
         if jsonsupport.check_for_valid_hostname(job):
             hostname = job["hostname"]
             if hostname not in hosts.keys():
