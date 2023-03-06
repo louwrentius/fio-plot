@@ -45,6 +45,8 @@ def create_values_table(settings, data, ax2, fontsize):
 
 
 def create_stddev_table(settings, data, ax2, fontsize):
+    if not data["y2_axis"]["stddev"]:
+        return None
     table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]    
     table_name = settings["label"]
     rowlabels = [table_name, "IOP/s \u03C3 %", "Latency \u03C3 %"]

@@ -211,15 +211,6 @@ def get_record_set(settings, dataset, dataset_types):
 
     datadict = return_empty_data_dict(settings, dataset_types)    
 
-    hostnamejobholder = {}
-    for item in dataset:
-        for record in item["data"]:
-            if record["hostname"]:
-                if record["hostname"] not in hostnamejobholder.keys():
-                    hostnamejobholder[record["hostname"]] = []
-                hostnamejobholder[record["hostname"]].append(record)                
-    print(hostnamejobholder.keys())
-
     for record in dataset:
         for data in record['data']:
             for x in settings["iodepth"]:
@@ -236,19 +227,23 @@ def get_record_set(settings, dataset, dataset_types):
                     ):
                         if "hostname" in data.keys():
                             if supporting.filter_hosts(settings, data):
-                                datadict["hostname_series"].append(data['hostname'])    
+                                datadict["hostname_series"].append(data['hostname'])  
                             else:
                                 continue
                         #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
                         #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['iops']}")
+
                         datadict["fio_version"].append(data["fio_version"])
                         datadict["iops_series_raw"].append(data["iops"])
                         datadict["lat_series_raw"].append(data["lat"])
-                        datadict["iops_stddev_series_raw"].append(data["iops_stddev"])
-                        datadict["lat_stddev_series_raw"].append(data["lat_stddev"])
                         datadict["bs"].append(data["bs"])
-                        datadict["cpu"]["cpu_sys"].append(int(round(data["cpu_sys"], 0)))
-                        datadict["cpu"]["cpu_usr"].append(int(round(data["cpu_usr"], 0)))
+                        if "iops_stddev" in data.keys():
+                            datadict["iops_stddev_series_raw"].append(data["iops_stddev"])
+                            datadict["lat_stddev_series_raw"].append(data["lat_stddev"])
+                        
+                        if "cpu_sys" in data.keys():
+                            datadict["cpu"]["cpu_sys"].append(int(round(data["cpu_sys"], 0)))
+                            datadict["cpu"]["cpu_usr"].append(int(round(data["cpu_usr"], 0)))
 
                         if "ss_attained" in data.keys():
                             if data["ss_settings"]:

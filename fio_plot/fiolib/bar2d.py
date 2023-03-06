@@ -101,9 +101,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     """This function is responsible for drawing iops/latency bars for a
     particular iodepth."""
     dataset_types = shared.get_dataset_types(dataset)
-    #pprint.pprint(dataset)
     data = shared.get_record_set(settings, dataset, dataset_types)
-    # pprint.pprint(data)
     fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={"height_ratios": [7, 1]})
     ax3 = ax1.twinx()
     fig.set_size_inches(10, 6)
