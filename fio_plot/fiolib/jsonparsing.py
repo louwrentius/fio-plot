@@ -42,8 +42,35 @@ def sort_list_of_dictionaries(settings, data):
     return sortedlist
 
 
+def process_json_record(settings, directory, record, jsonrootpath, globaloptions):
+    joboptions = None
+    hosts = {}
+    jobs = []
+    just_append = False
+    for job in record[jsonrootpath]:
+        if job["jobname"] != "All clients":
+            job["job options"] = {**job["job options"], **globaloptions}
+            if not joboptions:               
+                joboptions = job["job options"]
+        else:
+            job["job options"] = joboptions    
+            job["hostname"] = "All clients"
+        if jsonsupport.check_for_valid_hostname(job):
+            hostname = job["hostname"]
+            if hostname not in hosts.keys():
+                hosts[hostname] = []
+        row = jsonsupport.return_data_row(settings, job)  
+        row["fio_version"] = record["fio version"]
+        if hosts:
+            hosts[hostname].append(row)
+        else:
+            jobs.append(row)
+    just_append = jsonsupport.merge_job_data_if_hostnames(settings, hosts, directory)
+    if just_append:
+        [ directory["data"].append(x) for x in jobs ]
 
-def build_json_mapping(settings, dataset):
+
+def parse_json_data(settings, dataset):
     """
     This funcion traverses the relevant JSON structure to gather data
     and store it in a flat dictionary. We do this for each imported json file.
@@ -53,15 +80,10 @@ def build_json_mapping(settings, dataset):
         for record in directory["rawdata"]: # each record is the raw JSON data of a file in a directory
             jsonrootpath = get_json_root_path(record)
             globaloptions = get_json_global_options(record)
-            jsonsupport.process_json_record(settings, directory, record, jsonrootpath, globaloptions)
+            process_json_record(settings, directory, record, jsonrootpath, globaloptions)
 
     directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
     return dataset
 
-def parse_json_data(settings, dataset):
-    dataset = build_json_mapping(settings, dataset)
-    #for data in dataset:
-    #    for item in data['data']:
-    #        print(f"{item['hostname']} - {item['iodepth']} - {item['numjobs']} : iops {item['iops']}")
-    return dataset
+
 

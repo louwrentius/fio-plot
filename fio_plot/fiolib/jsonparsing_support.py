@@ -43,45 +43,6 @@ def merge_job_data(settings, hosts):
     return processed
 
 
-
-def process_json_record(settings, directory, record, jsonrootpath, globaloptions):
-    joboptions = None
-    hosts = {}
-    jobs = []
-    just_append = False
-    for job in record[jsonrootpath]:
-        if job["jobname"] != "All clients":
-            job["job options"] = {**job["job options"], **globaloptions}
-            if not joboptions:               
-                joboptions = job["job options"]
-        else:
-            job["job options"] = joboptions    
-            job["hostname"] = "All clients"
-        if check_for_valid_hostname(job):
-            hostname = job["hostname"]
-            if hostname not in hosts.keys():
-                hosts[hostname] = []
-        row = return_data_row(settings, job)  
-        row["fio_version"] = record["fio version"]
-        if hosts:
-            hosts[hostname].append(row)
-        else:
-            jobs.append(row)
-    if hosts:
-        for host in hosts.keys():
-            if len(hosts[host]) > 1 or host == "All clients":
-                #print(host)
-                directory["data"] = merge_job_data(settings, hosts)
-            else:
-                just_append = True
-    else:
-        just_append = True
-    if just_append:
-        [ directory["data"].append(x) for x in jobs ]
-
-
-
-
 def return_data_row(settings, record):
     mode = get_record_mode(settings)
     data = get_json_mapping(mode, record)
@@ -152,3 +113,22 @@ def check_for_steadystate(record, mode):
         return True
     else:
         return False
+
+def merge_job_data_if_hostnames(settings, hosts, directory):
+    """
+    This function returns a boolean but it operates on the data in the directory
+    variable, be aware.
+    """
+    just_append = False
+    if hosts:
+        for host in hosts.keys():
+            if len(hosts[host]) > 1 or host == "All clients":
+                #print(host)
+                directory["data"] = merge_job_data(settings, hosts)
+            else:
+                just_append = True
+    else:
+        just_append = True
+    return just_append
+
+
