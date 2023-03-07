@@ -37,15 +37,13 @@ def get_json_global_options(record):
     return options
 
 
-def sort_list_of_dictionaries(settings, data):
+def sort_list_of_dictionaries(data):
     sortedlist = sorted(data, key=lambda k: (int(k["iodepth"]), int(k["numjobs"])))
     return sortedlist
 
 
-def process_json_record(settings, directory, record, jsonrootpath, globaloptions):
+def process_json_record(settings, directory, record, jsonrootpath, globaloptions, returndata):
     joboptions = None
-    hosts = {}
-    jobs = []
     just_append = False
     for job in record[jsonrootpath]:
         # This section is just to deal with the "All clients" job included in 
@@ -63,32 +61,44 @@ def process_json_record(settings, directory, record, jsonrootpath, globaloptions
         #
         if jsonsupport.check_for_valid_hostname(job):
             hostname = job["hostname"]
-            if hostname not in hosts.keys():
-                hosts[hostname] = []
+            if hostname not in returndata["hosts"].keys():
+                returndata["hosts"][hostname] = []
         row = jsonsupport.return_data_row(settings, job)  
         row["fio_version"] = record["fio version"]
-        if hosts:
-            hosts[hostname].append(row)
+        if returndata["hosts"]:
+            returndata["hosts"][hostname].append(row)
         else:
-            jobs.append(row)
-    just_append = jsonsupport.merge_job_data_if_hostnames(settings, hosts, directory)
+            returndata["jobs"].append(row)
+    just_append = jsonsupport.merge_job_data_if_hostnames(settings, returndata["hosts"], directory)
     if just_append:
-        [ directory["data"].append(x) for x in jobs ]
-
+        [ directory["data"].append(x) for x in returndata["jobs"] ]
+    return returndata
+    #for x in hosts.keys():
+    #    for y in hosts[x]:
+    #        print(y["iodepth"])
 
 def parse_json_data(settings, dataset):
     """
     This funcion traverses the relevant JSON structure to gather data
     and store it in a flat dictionary. We do this for each imported json file.
     """
+    returndata = { "hosts": {}, "jobs": []} ### this is our memory to re
     for directory in dataset: # for directory in list of directories
         directory["data"] = []
+        
         for record in directory["rawdata"]: # each record is the raw JSON data of a file in a directory
             jsonrootpath = get_json_root_path(record)
             globaloptions = get_json_global_options(record)
-            process_json_record(settings, directory, record, jsonrootpath, globaloptions)
+            #for item in record["client_stats"]:
+            #    if "job options" in item.keys():
+            #        print(item["job options"]["iodepth"])
+            returndata = process_json_record(settings, directory, record, jsonrootpath, globaloptions, returndata)
 
-    directory["data"] = sort_list_of_dictionaries(settings, directory["data"])
+    #for directory in dataset:
+    #    for item in directory["data"]:
+    #        print(item["iodepth"])
+
+    directory["data"] = sort_list_of_dictionaries(directory["data"])
     return dataset
 
 

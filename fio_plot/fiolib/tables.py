@@ -45,7 +45,7 @@ def create_values_table(settings, data, ax2, fontsize):
 
 
 def create_stddev_table(settings, data, ax2, fontsize):
-    if not data["y2_axis"]["stddev"]:
+    if not data["y2_axis"]["stddev"] or settings["show_ss"]:
         return None
     table_vals = [data["x_axis"], data["y1_axis"]["stddev"], data["y2_axis"]["stddev"]]    
     table_name = settings["label"]
@@ -60,12 +60,14 @@ def create_stddev_table(settings, data, ax2, fontsize):
     create_generic_table(settings, data, table_vals, ax2, rowlabels, location, fontsize)
 
 
-def create_steadystate_table(settings, data, ax2):
+def create_steadystate_table(settings, data, ax2, fontsize):
     # pprint.pprint(data)
     ## This error is required until I address this
+    
     if "hostname_series" in data.keys():
-        print(f"\n Sorry, the steady state table is not compatible (yet) with client/server data\n")
-        sys.exit(1)
+        if data["hostname_series"]:
+            print(f"\n Sorry, the steady state table is not compatible (yet) with client/server data\n")
+            sys.exit(1)
 
     if data["ss_attained"]:
         data["ss_attained"] = ts.convert_number_to_yes_no(data["ss_attained"])
@@ -83,7 +85,7 @@ def create_steadystate_table(settings, data, ax2):
             f"{data['ss_settings'][0]} attained",
         ]
         location = "lower center"
-        create_generic_table(settings, table_vals, ax2, rowlabels, location)
+        create_generic_table(settings, data, table_vals, ax2, rowlabels, location, fontsize)
     else:
         print(
             "\n No steadystate data was found, so the steadystate table cannot be displayed.\n"

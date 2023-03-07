@@ -55,7 +55,8 @@ def merge_job_data(hosts):
 def return_data_row(settings, record):
     mode = get_record_mode(settings)
     data = get_json_mapping(mode, record)
-    #pprint.pprint(data)
+    #print("=============")
+    #print(data)
     return data
 
 def get_record_mode(settings): # any of the rw modes must be translated to read or write

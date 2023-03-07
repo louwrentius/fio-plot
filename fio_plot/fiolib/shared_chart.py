@@ -197,7 +197,10 @@ def get_record_set(settings, dataset, dataset_types):
     """The supplied dataset, a list of flat dictionaries with data is filtered based
     on the parameters as set by the command line. The filtered data is also scaled and rounded.
     """
-    #dataset = dataset[0]
+    #for x in dataset: #(DEBUG)
+    #    for y in x["data"]:
+    #        print(y["iodepth"])
+        
     rw = settings["rw"]
     mismatch = 0
 
@@ -215,7 +218,7 @@ def get_record_set(settings, dataset, dataset_types):
         for data in record['data']:
             for x in settings["iodepth"]:
                 for y in settings["numjobs"]:
-                    #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
+                    #print(f"Settings {x} - JSON {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
                     #print(f"{settings['filter']}") 
                     #print("=====")
                     #pprint.pprint(data.keys())
@@ -225,13 +228,15 @@ def get_record_set(settings, dataset, dataset_types):
                         and data["rw"] == rw
                         and data["type"] in settings["filter"]
                     ):
+                        #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
+                        #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['iops']}")
                         if "hostname" in data.keys():
                             if supporting.filter_hosts(settings, data):
                                 datadict["hostname_series"].append(data['hostname'])  
                             else:
                                 continue
-                        #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
-                        #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['iops']}")
+
+                        
 
                         datadict["fio_version"].append(data["fio_version"])
                         datadict["iops_series_raw"].append(data["iops"])

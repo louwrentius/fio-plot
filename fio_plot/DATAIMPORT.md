@@ -48,10 +48,14 @@ We have now collected the raw data, but to use it in graphs, we need to further 
 
 5. The jsonparsing.py module is responsible for pulling all the relevant data from the imported JSON data and put it in a flat dictionary. 
 
-There is a hard-coded mapping of the fields to particular JSON-paths. The way it is setup currently means that we can't work with fio JSON data containing multiple jobs.
-For users, the best way to deal with this is to use bench-fio for benchmarking as it generates a separate fio JSON output file for each benchmark test. 
+To support the client/server mechanism of Fio, we need to be able to process JSON files containing multiple jobs. This support has only been build-in specifically for client/server JSON data.
+Such data is recognisable as there is no "jobs" key in the JSON data but only "client_stats" which contains individual jobs for each host (server) running FIO. If a benchmark is run with numjobs = 4 (for example)
+this means that there will be 4 jobs in the JSON data with benchmark results for a particular host. That data is summed together to provide a total for a particular host. 
 
-This solution does unfortunately not work for the client-server mechanism that fio supports. (Note: fio client-server benchmarking is supported by bench-fio.) Each test does still generate one JSON output file, but it contains the results of all servers.Instead of a ["jobs"] section, there is a "["client_stats"]" section in the JSON output that works the same way. It's a list of job results, each one the result of one particular server.
+The client/server data also contains a special job called "All clients" that sums the benchmark results across all hosts. We get this for free from the JSON so we don't need to calculate this. 
+This "All clients" data can be filtered out with the --exclude-host or --include-host parameters of fio-plot. 
+
+Be aware that fio-plot does not support "regular" non-client-server jobs containing more than one job-record. 
 
 6. The build_json_mapping function is fed with the dataset created in step 5 by the jsonparsing code. This is just a list of dictionaries. Each dictionary has a "rawdata" key containing the actual JSON data. The build_json_mapping adds a "data" key to each dictionary in the provided dataset, and the value contains a newly created dictionary of all the data of interest. That dictionary is just a flat dictionary, no nested structure like the original raw JSON. To create this flat dictionary, we use a semi-hard-coded mapping between the values and the "path" in the JSON structure.
 This mapping is provided by the  get_json_mapping function. 
