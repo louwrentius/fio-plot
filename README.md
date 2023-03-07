@@ -209,9 +209,14 @@ will be rendered based on hostname automatically.
 
 [cs]: https://fio.readthedocs.io/en/latest/fio_doc.html#client-server
 
-![csdemo][csdemo]
+![csdemo][csdemo1]
 
-[csdemo]: https://louwrentius.com/static/images/fio-client-server-demo.png
+![csdemo][csdemo2]
+
+[csdemo1]: https://louwrentius.com/static/images/fio-client-server-demo.png
+[csdemo2]: https://louwrentius.com/static/images/fio-client-server-demo-2.png
+
+The --include-hosts and --exclude-hosts parameters allow filtering to only display the desired hosts.
 
 ## Benchmark script
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
