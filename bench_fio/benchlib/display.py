@@ -27,8 +27,11 @@ def parse_settings_for_display(settings):
 def calculate_duration(settings, tests):
     number_of_tests = len(tests) * settings["loops"]
     time_per_test = settings["runtime"]
-    duration_in_seconds = number_of_tests * time_per_test
-    duration = str(datetime.timedelta(seconds=duration_in_seconds))
+    if time_per_test:
+        duration_in_seconds = number_of_tests * time_per_test
+        duration = str(datetime.timedelta(seconds=duration_in_seconds))
+    else:
+        duration = None
     return duration
 
 def print_header(settings, ds):
@@ -43,8 +46,11 @@ def print_header(settings, ds):
 def print_duration(settings, tests, ds):
     fl = ds["fl"]
     duration = calculate_duration(settings, tests)
-    estimated = "Estimated duration"
-    print(f"{estimated:<{fl}}: {duration:<}")
+    if duration:
+        estimated = "Estimated duration"
+        print(f"{estimated:<{fl}}: {duration:<}")
+    else:
+        print(f"Unable to estimate runtime (not an error)")
 
 def print_options(settings, ds):
     data = ds["data"]

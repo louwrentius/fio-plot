@@ -1,6 +1,6 @@
 ## fio-plot
 
-[FIO][fio] is a tool for benchmarking storage devices. FIO helps to assess the storage performance in terms of IOPS and latency.
+[FIO][fio] is a tool for benchmarking storage devices. FIO helps to assess the storage performance in terms of IOP/s and latency.
 
 Fio-plot generates charts from FIO storage benchmark data. It can process FIO output in JSON format. It can also process FIO log file output (in CSV format).
 It also includes bench-fio, a benchmark tool to automate benchmarking with FIO. Checkout the many examples below.
