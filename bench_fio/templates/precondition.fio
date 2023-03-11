@@ -1,6 +1,6 @@
 [precondition]
-name=1m
-ioengine=sync
+name=precondition
+ioengine=libaio
 direct=1
 bs=1m
 rw=write
