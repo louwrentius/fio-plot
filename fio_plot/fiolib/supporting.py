@@ -139,8 +139,8 @@ def get_scale_factor_bw_ss(dataset):
 def lookupTable(metric):
 
     lookup = {
-        "iops": {"ylabel": "IOPS", "label_pos": 0, "label_rot": "vertical"},
-        "bw": {"ylabel": "Througput (KB/s)", "label_pos": -55, "label_rot": "vertical"},
+        "iops": {"ylabel": "IOPS", "label_pos": 5, "label_rot": "vertical"},
+        "bw": {"ylabel": "Througput (KB/s)", "label_pos": 5, "label_rot": "vertical"},
         "lat": {"ylabel": "LAT Latency (ms)", "label_pos": 5, "label_rot": "vertical"},
         "slat": {
             "ylabel": "SLAT Latency (ms)",
