@@ -152,7 +152,6 @@ def drawline(settings, item, rw, supportdata):
     # Label Axis
     #
     padding = axes[f"{item['type']}_pos"]
-    print(padding)
     axes[item["type"]].set_ylabel(item[rw]["ylabel"], labelpad=padding)
     #
     # Add line to legend

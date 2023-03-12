@@ -244,7 +244,12 @@ def parse_raw_cvs_data(settings, dataset):
                 previous_timestamp = int(dataset[index - 1]["timestamp"])
                 distance = int(item["timestamp"]) - previous_timestamp
                 number_of_seconds = int(distance / 1000)
-                average_value = int(item["value"]) / distance * mean
+                try:
+                    average_value = int(item["value"]) / distance * mean
+                except ZeroDivisionError as e:
+                    print(e)
+                    print(f"{item['value']} - {distance} - {mean}")
+                    continue
                 for x in range(number_of_seconds):
                     temp_dict = dict(item)
                     temp_dict["value"] = average_value
