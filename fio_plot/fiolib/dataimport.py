@@ -111,7 +111,6 @@ def filterLogFiles(settings, file_list):
                 data["directory"] = return_folder_name(item["filename"], settings, True)
                 data["hostname"] = item["hostname"]
                 result.append(data)
-    #pprint.pprint(result)
     if len(result) > 0:
         return result
     else:

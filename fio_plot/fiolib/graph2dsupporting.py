@@ -55,7 +55,7 @@ def get_padding(label, maxlabelsize):
 
 
 def scale_2dgraph_yaxis(settings, item, rw, maximum):
-    factordict = {"iops": 1.05, "lat": 1.25, "bw": 1.5}
+    factordict = {"iops": 1.05, "lat": 1.25, "bw": 1.5, "slat": 1.25, "clat": 1.25 }
     min_y = 0
     if settings["min_y"] == "None":
         min_y = None

@@ -270,6 +270,12 @@ def set_arguments(settings):
         "--max-lat", help="Maximum latency value on y-axis", type=int, default=None
     )
     ag.add_argument(
+        "--max-clat", help="Maximum completion latency value on y-axis", type=int, default=None
+    )
+    ag.add_argument(
+        "--max-slat", help="Maximum submission latency value on y-axis", type=int, default=None
+    )
+    ag.add_argument(
         "--max-iops", help="Maximum IOPs value on y-axis", type=int, default=None
     )
     ag.add_argument(

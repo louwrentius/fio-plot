@@ -159,10 +159,9 @@ def lookupTable(metric):
 def generate_axes(ax, datatypes):
 
     axes = {}
-    metrics = ["iops", "lat", "bw", "clat", "slat"]
+    metrics = ["iops", "bw", "lat", "clat", "slat"]
     tkw = dict(size=4, width=1.5)
     first_not_used = True
-
     for item in metrics:
         if item in datatypes:
             if first_not_used:
@@ -251,7 +250,7 @@ def process_dataset(settings, dataset):
                     if isinstance(item["type"], list):
                         itemtype = item["type"]
                     for x in itemtype:
-                        if x == "lat":
+                        if x in ["lat", "clat", "slat"]:
                             scale_factors_lat.append(get_scale_factor_lat(record[rw]["yvalues"]))
                         if x == "bw":
                             scale_factors_bw.append(get_scale_factor_bw(record[rw]["yvalues"]))
@@ -262,7 +261,7 @@ def process_dataset(settings, dataset):
                         record["total"] = {}
                         record["total"]["yvalues"] = [x + y for x, y in zip(readdata, writedata)]
                         record["total"]["xvalues"] = record["read"]["xvalues"] # hack
-                        if "lat" in item["type"]:
+                        if item["type"] in ["lat", "clat", "slat"]:
                             scale_factors_lat.append(get_scale_factor_lat(record["total"]["yvalues"]))
                         if "bw" in item["type"]:
                             scale_factors_bw.append(get_scale_factor_bw(record["total"]["yvalues"]))
@@ -273,7 +272,6 @@ def process_dataset(settings, dataset):
     """
     This second loop assures that all data is scaled with the same factor
     """
-
     if len(scale_factors_lat) > 0:
         scale_factor_lat = get_largest_scale_factor(scale_factors_lat)
     if len(scale_factors_bw) > 0:
@@ -287,7 +285,7 @@ def process_dataset(settings, dataset):
         for rw in modi:
             if rw in item.keys():
                 if isinstance(item[rw], dict):
-                    if item["type"] == "lat":
+                    if item["type"] in ["lat", "clat", "slat"]:
                         scaled_data = scale_yaxis(item[rw]["yvalues"], scale_factor_lat)
                         item[rw]["ylabel"] = scaled_data["format"]
                         item[rw]["yvalues"] = scaled_data["data"]
@@ -335,9 +333,9 @@ def process_dataset(settings, dataset):
 
 def get_highest_maximum(settings, data):
     highest_max = {
-        "read": {"iops": 0, "lat": 0, "bw": 0},
-        "write": {"iops": 0, "lat": 0, "bw": 0},
-        "total": {"iops": 0, "lat": 0, "bw": 0 }
+        "read": {"iops": 0, "lat": 0, "bw": 0, "clat": 0, "slat": 0},
+        "write": {"iops": 0, "lat": 0, "bw": 0, "clat": 0, "slat": 0},
+        "total": {"iops": 0, "lat": 0, "bw": 0, "clat": 0, "slat": 0}
     }
     for item in data["dataset"]:
         for rw in settings["filter"]:
