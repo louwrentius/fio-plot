@@ -375,8 +375,13 @@ def create_title_and_sub(
     #
     plt.suptitle(settings["title"],fontsize=settings["title_fontsize"])
     subtitle = None
+    if bs:
+        str(bs).strip("[]")
+    else:
+        bs = ""
     sub_title_items = {
         "rw": settings["rw"],
+        "bs": bs,
         "iodepth": str(settings["iodepth"]).strip("[]"),
         "numjobs": str(settings["numjobs"]).strip("[]"),
         "type": str(settings["type"]).strip("[]").replace("'", ""),
