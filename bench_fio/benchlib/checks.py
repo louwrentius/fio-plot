@@ -94,6 +94,12 @@ def check_settings(settings):
         settings["runtime"] = None
         settings["size"] = "100%"
 
+        if settings["type"] is not "device":
+            print()
+            print("Preconditioning only makes sense for (flash) devices, not files or directories.")
+            print()
+            sys.exit(9)
+
     if settings["type"] not in ["device", "rbd"] and not settings["size"]:
         print()
         print("When the target is a file or directory, --size must be specified.")

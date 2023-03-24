@@ -39,8 +39,9 @@ def filter_json_files(settings, filename):
             else:
                 logger.debug(f"{filename} does not appear to be a valid fio json output file, skipping")
         except Exception as e:
-            print(f"Filename: {filename}")
-            print(f"Error: {repr(e)} - please report this as a bug and please include the JSON file if possible.")
+            print(f"\n\nFilename: {filename}")
+            print(f"Error: {repr(e)}\n") 
+            print("First, open the file and check for errors at the top.\nYou can remove the error lines and the JSON will likely parse\nbut results may not be trustworthy.\nIf there are no error linkes at the top, please report this as a bug\nand please include the JSON file if possible.\n\n")
             sys.exit(1)
     if iodepth in settings["iodepth"] and numjobs in settings["numjobs"]:
         return filename
