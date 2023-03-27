@@ -36,12 +36,8 @@ def main():
     parser = rawsettings[0]
     routing_dict = getdata.get_routing_dict()
     graphtype = settings["graphtype"]
-
     settings = getdata.configure_default_settings(settings, routing_dict, graphtype)
-
     data = routing_dict[graphtype]["get_data"](settings)
-    #print(data)
     routing_dict[graphtype]["function"](settings, data)
     option_found = True
-
     checks.post_flight_check(parser, option_found)

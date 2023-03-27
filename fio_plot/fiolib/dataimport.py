@@ -1,31 +1,42 @@
 import os
 import sys
 import csv
-
-# import pprint as pprint
+import pprint as pprint
 import re
 import statistics
 from pathlib import Path
-from . import supporting
+from . import dataimport_support as ds
 
+def get_hostname_from_filename(f):
+    split = f.split(".")
+    rawhostname = split[3:]
+    hostname = ".".join(rawhostname)
+    return hostname
 
 def list_fio_log_files(directory):
-    """Lists all .log files in a directory. Exits with an error if no files are found."""
+    """
+    Lists all .log files in a directory. Exits with an error if no files are found.
+    client/server log files ending in the hostname are also detected.
+    """
     absolute_dir = os.path.abspath(directory)
     files = os.listdir(absolute_dir)
     fiologfiles = []
     for f in files:
+        absolutefilepath = os.path.join(absolute_dir, f)
+        structure = { "hostname": None, "filename": absolutefilepath}
         if f.endswith(".log"):
-            fiologfiles.append(os.path.join(absolute_dir, f))
+            fiologfiles.append(structure)
+        elif ".log." in f:
+            structure["hostname"] = get_hostname_from_filename(f)
+            fiologfiles.append(structure)
 
     if len(fiologfiles) == 0:
         print(
-            "\nCould not find any log files in the specified directory {str(absolute_dir)}"
+            f"\nCould not find any log files in the specified directory {str(absolute_dir)}"
         )
         print("\nAre the correct directories specified?")
         print("\nIf so, please check the -d -n and -r parameters.\n")
         sys.exit(1)
-
     return fiologfiles
 
 
@@ -40,7 +51,6 @@ def return_folder_name(filename, settings, override=False):
     segment_size = settings["xlabel_segment_size"]
     parent = settings["xlabel_parent"]
     child = settings["xlabel_depth"]
-
     raw_path = Path(filename).resolve()
 
     if override:
@@ -85,20 +95,22 @@ def return_filename_filter_string(settings):
 
 
 def filterLogFiles(settings, file_list):
-    """Returns a list of log files that matches the supplied filter string(s)."""
+    """
+    Returns a list of log files that matches the supplied filter string(s).
+    """
     searchstrings = return_filename_filter_string(settings)
-    # pprint.pprint(searchstrings)
+    #print(searchstrings)
     result = []
     for item in file_list:
         for searchstring in searchstrings:
-            filename = os.path.basename(item)
+            filename = os.path.basename(item["filename"])
             # print(filename)
             if re.search(r"^" + searchstring["searchstring"], filename):
                 data = {"filename": item}
                 data.update(searchstring)
-                data["directory"] = return_folder_name(item, settings, True)
+                data["directory"] = return_folder_name(item["filename"], settings, True)
+                data["hostname"] = item["hostname"]
                 result.append(data)
-    # pprint.pprint(result)
     if len(result) > 0:
         return result
     else:
@@ -111,53 +123,37 @@ def filterLogFiles(settings, file_list):
         exit(1)
 
 
-def getMergeOperation(datatype):
-    """FIO log files with a numjobs larger than 1 generates a separate file
-    for each job thread. So if numjobs is 8, there will be eight files.
-
-    We need to merge the data from all those job files into one result.
-    Depending on the type of data, we must sum or average the data.
-
-    This function returns the appropriate function/operation based on the type.
-    """
-
-    operationMapping = {
-        "iops": sum,
-        "lat": statistics.mean,
-        "clat": statistics.mean,
-        "slat": statistics.mean,
-        "bw": sum,
-        "timestamp": statistics.mean,
-    }
-
-    opfunc = operationMapping[datatype]
-    return opfunc
-
-
 def mergeSingleDataSet(data, datatype):
     """In this function we merge all data for one particular set of files.
     For examle, iodepth = 1 and numjobs = 8. The function returns one single
     dataset containing the summed/averaged data.
     """
-    mergedSet = {"read": [], "write": []}
-    lookup = {"read": 0, "write": 1}
+    #print("==============")
+    #for x in data: 
+    #    print(f"Merge single dataset - {x['hostname']} - {x['filename']} - {type(x['data'])}")
+    mergedSet = []
+    hostdatamerged = {}
+    regulardatamerged = []
 
-    for rw in ["read", "write"]:
-        for column in ["timestamp", "value"]:
-            unmergedSet = []
-            for record in data:
-                templist = []
-                for row in record["data"]:
-                    if int(row["rwt"]) == lookup[rw]:
-                        templist.append(int(row[column]))
-                unmergedSet.append(templist)
-            if column == "value":
-                oper = getMergeOperation(datatype)
-            else:
-                oper = getMergeOperation(column)
-            merged = [oper(x) for x in zip(*unmergedSet)]
-            mergedSet[rw].append(merged)
-        mergedSet[rw] = list(zip(*mergedSet[rw]))
+    for record in data:
+        if record["hostname"]:
+            if record["hostname"] not in hostdatamerged.keys():
+                hostdatamerged[record["hostname"]] = []
+            hostdatamerged[record["hostname"]].append(record)
+        else:
+            result = regulardatamerged.append(record)
+
+
+    if hostdatamerged:
+        for host in hostdatamerged.keys():
+            result = ds.newMergeLogDataSet(hostdatamerged[host], datatype, host)
+            mergedSet.append(result)
+    elif regulardatamerged:
+        mergedSet.append(ds.newMergeLogDataSet(regulardatamerged,datatype))
+    else:
+        print("ERROR")
+        sys.exit(1)
+    #mergedSet = ds.mergeLogDataSet(data, datatype, hostlist)
     return mergedSet
 
 
@@ -188,6 +184,7 @@ def mergeDataSet(settings, dataset):
                 "iodepth": filterstring["iodepth"],
                 "numjobs": filterstring["numjobs"],
                 "directory": directory,
+                
             }
             data = []
             for item in dataset:
@@ -196,7 +193,9 @@ def mergeDataSet(settings, dataset):
                     and item["directory"] == directory
                 ):
                     data.append(item)
-            newdata = mergeSingleDataSet(data, filterstring["type"])
+            
+            newdata = mergeSingleDataSet(data, filterstring["type"]) # read write hostname
+            #print(newdata["hostname"])
             record["data"] = newdata
             mergedSets.append(record)
     return mergedSets
@@ -224,15 +223,15 @@ def parse_raw_cvs_data(settings, dataset):
         sys.exit(1)
 
     if mean > 1000:
-        print(
-            f"\n{supporting.bcolors.WARNING}Warning: > 1000msec log interval found\n"
-            f"{supporting.bcolors.ENDC}"
-            "\nIf the log_avg_msec parameter used to generate the log data is < 1000 msec\n"
-            "it is stronly advised to cross-verify the output of the graph with the\n"
-            "appropriate values found in the .json output if available.\n\n"
-            "It may be advised to rerun your benchmarks with log_avg_msec = 1000 or higher\n"
-            "to achieve correct results.\n\n"
-        )
+        #print(
+        #    f"\n{supporting.bcolors.WARNING}Warning: > 1000msec log interval found\n"
+        #    f"{supporting.bcolors.ENDC}"
+        #    "\nIf the log_avg_msec parameter used to generate the log data is < 1000 msec\n"
+        #    "it is stronly advised to cross-verify the output of the graph with the\n"
+        #    "appropriate values found in the .json output if available.\n\n"
+        #    "It may be advised to rerun your benchmarks with log_avg_msec = 1000 or higher\n"
+        #    "to achieve correct results.\n\n"
+        #)
 
         # log data with a log_avg_msec higher than 1000 msec should be converted back
         # to values per 1000 msec
@@ -244,7 +243,12 @@ def parse_raw_cvs_data(settings, dataset):
                 previous_timestamp = int(dataset[index - 1]["timestamp"])
                 distance = int(item["timestamp"]) - previous_timestamp
                 number_of_seconds = int(distance / 1000)
-                average_value = int(item["value"]) / distance * mean
+                try:
+                    average_value = int(item["value"]) / distance * mean
+                except ZeroDivisionError as e:
+                    print(e)
+                    print(f"{item['value']} - {distance} - {mean}")
+                    continue
                 for x in range(number_of_seconds):
                     temp_dict = dict(item)
                     temp_dict["value"] = average_value
@@ -260,8 +264,9 @@ def readLogData(settings, inputfile):
     single file.
     """
     dataset = []
-    if os.path.exists(inputfile):
-        with open(inputfile) as csv_file:
+    if os.path.exists(inputfile["filename"]):
+        #print(inputfile)
+        with open(inputfile["filename"]) as csv_file:
             csv.register_dialect("CustomDialect", skipinitialspace=True, strict=True)
             csv_reader = csv.DictReader(
                 csv_file,
@@ -280,7 +285,7 @@ def readLogDataFromFiles(settings, inputfiles):
     data = []
     for inputfile in inputfiles:
         logdata = readLogData(settings, inputfile["filename"])
-        logdict = {"data": logdata}
+        logdict = {"data": logdata, "hostname": inputfile["hostname"]}
         logdict.update(inputfile)
         data.append(logdict)
     return data

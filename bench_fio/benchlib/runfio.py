@@ -8,100 +8,90 @@ import time
 
 from . import ( 
     supporting,
-    checks
+    generatefio,
+    defaultsettings
 )
 
 
-def check_fio_version(settings):
-    """The 3.x series .json format is different from the 2.x series format.
-    This breaks fio-plot, thus this older version is not supported.
-    """
-
-    command = ["fio", "--version"]
-    result = run_raw_command(command).stdout
-    result = result.decode("UTF-8").strip()
-    if "fio-3" in result:
-        return True
-    elif "fio-2" in result:
-        print(f"Your Fio version ({result}) is not compatible. Please use Fio-3.x")
-        sys.exit(1)
-    else:
-        print("Could not detect Fio version.")
-        sys.exit(1)
-
-
-def drop_caches(settings):
+def drop_caches():
     command = ["echo", "3", ">", "/proc/sys/vm/drop_caches"]
     run_raw_command(command)
 
+def handle_error(outputfile):
+    if outputfile: 
+        if os.path.exists(outputfile):
+            with open(f"{outputfile}", 'r') as input:
+                data = input.read().splitlines() 
+                for line in data:
+                    print(line)
 
-def run_raw_command(command, env=None):
+def run_raw_command(command, outputfile = None):
     try: 
         result = subprocess.run(
-            command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
+            command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         if result.returncode > 0 or (len(str(result.stderr)) > 3):
             stdout = result.stdout.decode("UTF-8").strip()
             stderr = result.stderr.decode("UTF-8").strip()
-            print(f"\nAn error occurred: {stderr} - {stdout}")
-            sys.exit(1)
+            print(f"\nAn error occurred: stderr: {stderr} - stdout: {stdout} - returncode: {result.returncode} \n")
+            handle_error(outputfile) # it seems that the JSON output file contains STDERR/STDOUT error data
+            sys.exit(result.returncode)
     except KeyboardInterrupt:
         print(f"\n ctrl-c pressed - Aborted by user....\n")
         sys.exit(1)
     return result
 
 
-def run_command(settings, benchmark, command):
-    """This command sets up the environment that is used in conjunction
-    with the Fio .ini job file.
-    """
-    output_directory = supporting.generate_output_directory(settings, benchmark)
-    env = os.environ
-    settings = supporting.convert_dict_vals_to_str(settings)
-    benchmark = supporting.convert_dict_vals_to_str(benchmark)
-    env.update(settings)
-    env.update(benchmark)
-    env.update({"OUTPUT": output_directory})
-    run_raw_command(command, env)
-
-
 def run_fio(settings, benchmark):
     output_directory = supporting.generate_output_directory(settings, benchmark)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
-
+    generatefio.generate_fio_job_file(settings, benchmark, output_directory)
+    
+    ### We build up the fio command line here
     command = [
-        "fio",
-        "--output-format=json",
-        f"--output={output_file}",
-        settings["template"],
+        "fio"
     ]
+    
+    command.append("--output-format=json")
+    command.append(f"--output={output_file}") # fio bug
 
-    command = supporting.expand_command_line(command, settings, benchmark)
+    if settings["remote"]:
+        command.append(f"--client={settings['remote']}")
 
-    target_parameter = checks.check_target_type(benchmark["target"], settings["type"])
-    if target_parameter:
-        command.append(f"{target_parameter}={benchmark['target']}")
-
+    command.append(settings["tmpjobfile"])
+    # End of command line creation
+    
     if not settings["dry_run"]:
         supporting.make_directory(output_directory)
-        run_command(settings, benchmark, command)
-    # else:
-    #    pprint.pprint(command)
+        run_raw_command(command, output_file)
+        if settings["remote"]:
+            fix_json_file(output_file) # to fix FIO json output bug
 
+
+def fix_json_file(outputfile):
+    """ Fix FIO BUG
+        See #731 on github
+        Purely for client server support, proposed solutions don't work
+    """
+    with open(f"{outputfile}", 'r') as input:
+         data = input.readlines()
+    
+    with open(f"{outputfile}", 'w') as output:
+        for line in data:
+            if not line.startswith("<"):
+                output.write(line)
+         
 
 def run_precondition_benchmark(settings, device, run):
-
     if settings["precondition"] and settings["destructive"]:
         if not settings["precondition_repeat"] and run > 1:
             pass # only run once if precondition_repeat is not set
         else:
             settings_copy = copy.deepcopy(settings)
             settings_copy["template"] = settings["precondition_template"]
-            # make precondition run the whole disk
-            settings_copy["entire_device"] = True
-
+            settings_copy["runtime"] = None # want to test entire device
+            settings_copy["time_based"] = False
             template = supporting.import_fio_template(settings["precondition_template"])
-
             benchmark = {
                 "target": device,
                 "mode": template["precondition"]["rw"],
@@ -110,6 +100,14 @@ def run_precondition_benchmark(settings, device, run):
                 "numjobs": template["precondition"]["numjobs"],
                 "run": run,
             }
+            mapping = defaultsettings.map_settings_to_fio()
+            for key, value in dict(template["precondition"]).items():
+                for x, y in mapping.items():
+                    if str(key) == str(y):
+                        settings_copy[mapping[x]] = value
+                    else:
+                        settings_copy[key] = value
+            #print(settings_copy)
             run_fio(settings_copy, benchmark)
 
     elif settings["precondition"] and not settings["destructive"]:
@@ -124,13 +122,13 @@ def run_benchmarks(settings, benchmarks):
         for benchmark in ProgressBar(benchmarks):
             run += 1
             run_precondition_benchmark(settings, benchmark["target"], run)
-            drop_caches(settings)
+            drop_caches()
             run_fio(settings, benchmark)
     else:
         for benchmark in benchmarks:
             run += 1
             run_precondition_benchmark(settings, benchmark["target"], run)
-            drop_caches(settings)
+            drop_caches()
             run_fio(settings, benchmark)
 
 

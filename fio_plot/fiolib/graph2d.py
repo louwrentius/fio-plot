@@ -24,8 +24,7 @@ def chart_2d_log_data(settings, dataset):
     #
     data = supporting.process_dataset(settings, dataset)
     datatypes = data["datatypes"]
-    directories = logdata.get_unique_directories(dataset)
-    #pprint.pprint(data)
+    #print(data)
     #
     # Create matplotlib figure and first axis. The 'host' axis is used for
     # x-axis and as a basis for the second and third y-axis
@@ -39,9 +38,23 @@ def chart_2d_log_data(settings, dataset):
     #
     axes = supporting.generate_axes(host, datatypes)
     #
+    # We try to retrieve the fio version and benchmark block size from 
+    # the JSON data
+    #
+    jsondata = support2d.get_json_data(settings)
+    #
     # Create title and subtitle
     #
-    supporting.create_title_and_sub(settings, plt)
+    if jsondata:
+        if "job options" in jsondata[0]["data"][0].keys():
+            blocksize = jsondata[0]["data"][0]["job options"]["bs"]
+        elif "bs" in jsondata[0]["data"][0].keys():
+            blocksize = jsondata[0]["data"][0]["bs"]
+        else:
+            blocksize = "Please report bug at github.com/louwrentius/fio-plot"
+    else:
+        blocksize = None
+    supporting.create_title_and_sub(settings, bs=blocksize, plt=plt)
 
     #
     # The extra offsets are requred depending on the size of the legend, which
@@ -73,7 +86,6 @@ def chart_2d_log_data(settings, dataset):
 
     ## Get axix limits 
     
-
     supportdata = {
         "lines": [],
         "labels": [],
@@ -83,8 +95,7 @@ def chart_2d_log_data(settings, dataset):
         "maximum": supporting.get_highest_maximum(settings, data),
         "axes": axes,
         "host": host,
-        "maxlabelsize": support2d.get_max_label_size(settings, data, directories),
-        "directories": directories,
+        "maxlabelsize": support2d.get_max_label_size(settings, data),
     }
 
     supportdata["fontP"].set_size("xx-small")
@@ -94,8 +105,9 @@ def chart_2d_log_data(settings, dataset):
     #
     for item in data["dataset"]:
         for rw in settings["filter"]:
-            if rw in item.keys():
-                support2d.drawline(settings, item, rw, supportdata)
+            if isinstance(item[rw], dict):
+                if supporting.filter_hosts(settings, item):
+                    support2d.drawline(settings, item, rw, supportdata)
 
     #
     # Generating the legend
@@ -120,14 +132,13 @@ def chart_2d_log_data(settings, dataset):
     #
     # A ton of work to get the Fio-version from .json output if it exists.
     #
-    jsondata = support2d.get_json_data(settings)
     ax = get_axis_for_label(axes)
     if jsondata[0]["data"] and not settings["disable_fio_version"]:
         fio_version = jsondata[0]["data"][0]["fio_version"]
-        supporting.plot_fio_version(settings, fio_version, plt, ax, -0.12)
+        supporting.plot_fio_version(settings, fio_version, plt, ax, -0.16)
     else:
-        supporting.plot_fio_version(settings, None, plt, ax, -0.12)
-
+        supporting.plot_fio_version(settings, None, plt, ax, -0.16)
+    
     #
     # Print source
     #

@@ -1,5 +1,5 @@
 [precondition]
-name=1m
+name=precondition
 ioengine=libaio
 direct=1
 bs=1m
@@ -7,12 +7,8 @@ rw=write
 iodepth=64
 numjobs=1
 buffered=0
-size=100%
+size=100%%
 loops=2
 randrepeat=0
 norandommap=1
 refill_buffers=1
-write_bw_log=${OUTPUT}/${MODE}-iodepth-64-numjobs-1
-write_lat_log=${OUTPUT}/${MODE}-iodepth-64-numjobs-1
-write_iops_log=${OUTPUT}/${MODE}-iodepth-64-numjobs-1
-log_avg_msec=${LOGINTERVAL}

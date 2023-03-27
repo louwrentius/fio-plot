@@ -9,7 +9,7 @@ def get_default_settings():
     settings["subtitle_fontsize"] = 10
     settings["credit_fontsize"] = 10
     settings["source_fontsize"] = 8
-    settings["table_fontsize"] = 10
+    settings["table_fontsize"] = 8
     settings["tablecolumn_spacing"] = 0.01
     settings["colors"] = [None]
     return settings

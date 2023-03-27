@@ -1,12 +1,15 @@
 ## fio-plot
 
-[FIO][fio] is a tool for benchmarking storage devices. FIO helps to assess the storage performance in terms of IOPS and latency.
+[FIO][fio] is a tool for benchmarking storage devices. FIO helps to assess the storage performance in terms of IOP/s and latency.
 
-Fio-plot generates charts from FIO storage benchmark data. It can process FIO output in JSON format. It can also process FIO log file output (in CSV format). Checkout the many examples below.
+Fio-plot generates charts from FIO storage benchmark data. It can process FIO output in JSON format. It can also process FIO log file output (in CSV format).
+It also includes bench-fio, a benchmark tool to automate benchmarking with FIO. Checkout the many examples below.
 
 [fio]: https://github.com/axboe/fio
 
-To get to these charts, you need to follow this process:
+![barchart][2dchartiodepth]
+
+To make these charts yourself, you need to follow this process:
 
 1. Run your tests, maybe use the included benchmark script [bench-fio][bms]
 2. Determine which information you would like to show
@@ -16,7 +19,7 @@ To get to these charts, you need to follow this process:
 
 ## Quick installation guide:
 
-Ubuntu 18.04 LTS: please run this command first: 
+Ubuntu 18.04+ LTS: please run this command first: 
 
     apt install zlib1g-dev libjpeg-dev python3-pip
 
@@ -34,6 +37,10 @@ If you don't want to install fio-plot system-wide, you can make a virtual enviro
     pip3 install fio-plot
 
 When you source the virtual environment, fio-plot and bench-fio will be in your executable path. 
+
+If you want to install from source, you can clone the repository and run 
+
+    python3 setup.py install
 
 ## Configuration command-line vs. INI
 
@@ -193,6 +200,23 @@ The FIO JSON output also contains latency histogram data. It's available in a ns
 This is the command-line used to generate this graph:
 
     fio-plot -i SAMSUNG_860_PRO/ --source "https://louwrentius.com"  -T "Historgram of SSD" -H -r randread -d 16 -n 16
+
+## Fio client server mechanism.
+
+Fio supports a [client-server][cs] model where one fio client can run a benchmark on multiple machines (servers) in parallel.
+The bench-fio tool supports this type of benchmark, see the readme for more details. For the fio-plot tool the data
+will be rendered based on hostname automatically.
+
+[cs]: https://fio.readthedocs.io/en/latest/fio_doc.html#client-server
+
+![csdemo][csdemo1]
+
+![csdemo][csdemo2]
+
+[csdemo1]: https://louwrentius.com/static/images/fio-client-server-demo.png
+[csdemo2]: https://louwrentius.com/static/images/fio-client-server-demo-2.png
+
+The --include-hosts and --exclude-hosts parameters allow filtering to only display the desired hosts.
 
 ## Benchmark script
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows

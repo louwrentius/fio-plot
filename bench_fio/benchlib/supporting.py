@@ -38,7 +38,7 @@ def make_directory(directory):
 
 
 def generate_output_directory(settings, benchmark):
-
+    settings["output"] = os.path.expanduser(settings["output"])
     if benchmark["mode"] in settings["mixed"]:
         directory = (
             f"{settings['output']}/{os.path.basename(benchmark['target'])}/"
@@ -51,35 +51,6 @@ def generate_output_directory(settings, benchmark):
         directory = directory + f"/run-{benchmark['run']}"
 
     return directory
-
-
-def expand_command_line(command, settings, benchmark):
-    if settings["size"]:
-        command.append(f"--size={settings['size']}")
-
-    if settings["runtime"] and not settings["entire_device"]:
-        command.append(f"--runtime={settings['runtime']}")
-
-    if settings["time_based"]:
-        command.append("--time_based")
-
-    if settings["rwmixread"] and benchmark["mode"] in settings["mixed"]:
-        command.append(f"--rwmixread={benchmark['rwmixread']}")
-
-    if settings["extra_opts"]:
-        for option in settings["extra_opts"]:
-            option = str(option)
-            command.append("--" + option)
-
-    if settings["ss"]:
-        command.append(f"--steadystate={settings['ss']}")
-        if settings["ss_dur"]:
-            command.append(f"--ss_dur={settings['ss_dur']}")
-        if settings["ss_ramp"]:
-            command.append(f"--ss_ramp={settings['ss_ramp']}")
-
-    return command
-
 
 def import_fio_template(template):
     config = configparser.ConfigParser()

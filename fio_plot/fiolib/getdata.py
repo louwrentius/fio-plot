@@ -6,7 +6,8 @@ from . import(
     jsonimport,
     bar2d,
     bar3d,
-    barhistogram as histogram
+    barhistogram as histogram,
+    jsonparsing
 )
 
 
@@ -30,19 +31,22 @@ def get_log_data(settings):
     for input_dir in settings["input_directory"]:
         benchmarkfiles.extend(logdata.list_fio_log_files(input_dir))
     logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
-    # pprint.pprint(logfiles)
+    #pprint.pprint(logfiles)
     rawdata = logdata.readLogDataFromFiles(settings, logfiles)
-    # pprint.pprint(rawdata)
+    #pprint.pprint(rawdata)
     merged = logdata.mergeDataSet(settings, rawdata)
+    #[ print(merged[x]["data"]["hostname"]) for x in range(len(merged))]
+    #print(merged)
+    #print(len(merged))
     return merged
 
 
 def get_json_data(settings):
     list_of_json_files = jsonimport.list_json_files(settings)
-    # pprint.pprint(list_of_json_files)
+    #pprint.pprint(list_of_json_files)
     dataset = jsonimport.import_json_dataset(settings, list_of_json_files)
-    parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
-    # pprint.pprint(parsed_data)
+    parsed_data = jsonparsing.parse_json_data(settings, dataset)
+    #pprint.pprint(parsed_data[0]["data"])
     return parsed_data
 
 

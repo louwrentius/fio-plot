@@ -169,26 +169,10 @@ def get_record_set_improved(settings, dataset, dataset_types):
     validate_get_record_set(settings, mismatch, dataset)
     return scale_data(datadict)
 
-
-def get_record_set(settings, dataset, dataset_types):
-    """The supplied dataset, a list of flat dictionaries with data is filtered based
-    on the parameters as set by the command line. The filtered data is also scaled and rounded.
-    """
-    dataset = dataset[0]
-    rw = settings["rw"]
+def return_empty_data_dict(settings, dataset_types):
     numjobs = settings["numjobs"]
-    mismatch = 0
-
-    if settings["rw"] == "randrw":
-        if len(settings["filter"]) > 1 or not settings["filter"]:
-            print(
-                "Since we are processing randrw data, you must specify a filter for either"
-                "read or write data, not both."
-            )
-            exit(1)
-
     labels = dataset_types[settings["query"]]
-
+    #print(labels)
     datadict = {
         "fio_version": [],
         "iops_series_raw": [],
@@ -205,43 +189,79 @@ def get_record_set(settings, dataset, dataset_types):
         "ss_attained": [],
         "ss_data_bw_mean": [],
         "ss_data_iops_mean": [],
+        "hostname_series": []
     }
+    return datadict
 
-    newlist = sorted(dataset["data"], key=itemgetter(settings["query"]))
+def get_record_set(settings, dataset, dataset_types):
+    """The supplied dataset, a list of flat dictionaries with data is filtered based
+    on the parameters as set by the command line. The filtered data is also scaled and rounded.
+    """
+    #for x in dataset: #(DEBUG)
+    #    for y in x["data"]:
+    #        print(y["iodepth"])
+        
+    rw = settings["rw"]
+    mismatch = 0
 
-    for record in newlist:
-        for x in settings["iodepth"]:
-            for y in settings["numjobs"]:
-                #print(f"{x} - {record['iodepth']} + {y} - {record['numjobs']} + {record['rw']} + {record['type']}")
-                #print(f"{settings['filter']}") 
-                
-                if (
-                    (int(record["iodepth"]) == int(x))
-                    and int(record["numjobs"]) == int(y)
-                    and record["rw"] == rw
-                    and record["type"] in settings["filter"]
-                ):
-                    datadict["fio_version"].append(record["fio_version"])
-                    datadict["iops_series_raw"].append(record["iops"])
-                    datadict["lat_series_raw"].append(record["lat"])
-                    datadict["iops_stddev_series_raw"].append(record["iops_stddev"])
-                    datadict["lat_stddev_series_raw"].append(record["lat_stddev"])
-                    datadict["bs"].append(record["bs"])
-                    datadict["cpu"]["cpu_sys"].append(int(round(record["cpu_sys"], 0)))
-                    datadict["cpu"]["cpu_usr"].append(int(round(record["cpu_usr"], 0)))
+    if settings["rw"] == "randrw":
+        if len(settings["filter"]) > 1 or not settings["filter"]:
+            print(
+                "Since we are processing randrw data, you must specify a filter for either"
+                "read or write data, not both."
+            )
+            exit(1)
 
-                    if "ss_attained" in record.keys():
-                        if record["ss_settings"]:
-                            datadict["ss_settings"].append(str(record["ss_settings"])),
-                            datadict["ss_attained"].append(int(record["ss_attained"])),
-                            datadict["ss_data_bw_mean"].append(
-                                int(round(record["ss_data_bw_mean"], 0))
-                            ),
-                            datadict["ss_data_iops_mean"].append(
-                                int(round(record["ss_data_iops_mean"], 0))
-                            ),
-                else:
-                    mismatch+=1
+    datadict = return_empty_data_dict(settings, dataset_types)    
+
+    for record in dataset:
+        for data in record['data']:
+            for x in settings["iodepth"]:
+                for y in settings["numjobs"]:
+                    #print(f"Settings {x} - JSON {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
+                    #print(f"{settings['filter']}") 
+                    #print("=====")
+                    #pprint.pprint(data.keys())
+                    if (
+                        (int(data["iodepth"]) == int(x))
+                        and int(data["numjobs"]) == int(y)
+                        and data["rw"] == rw
+                        and data["type"] in settings["filter"]
+                    ):
+                        #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['rw']} + {data['type']}")
+                        #print(f"{x} - {data['iodepth']} + {y} - {data['numjobs']} + {data['iops']}")
+                        if "hostname" in data.keys():
+                            if supporting.filter_hosts(settings, data):
+                                datadict["hostname_series"].append(data['hostname'])  
+                            else:
+                                continue
+
+                        
+
+                        datadict["fio_version"].append(data["fio_version"])
+                        datadict["iops_series_raw"].append(data["iops"])
+                        datadict["lat_series_raw"].append(data["lat"])
+                        datadict["bs"].append(data["bs"])
+                        if "iops_stddev" in data.keys():
+                            datadict["iops_stddev_series_raw"].append(data["iops_stddev"])
+                            datadict["lat_stddev_series_raw"].append(data["lat_stddev"])
+                        
+                        if "cpu_sys" in data.keys():
+                            datadict["cpu"]["cpu_sys"].append(int(round(data["cpu_sys"], 0)))
+                            datadict["cpu"]["cpu_usr"].append(int(round(data["cpu_usr"], 0)))
+
+                        if "ss_attained" in data.keys():
+                            if data["ss_settings"]:
+                                datadict["ss_settings"].append(str(data["ss_settings"])),
+                                datadict["ss_attained"].append(int(data["ss_attained"])),
+                                datadict["ss_data_bw_mean"].append(
+                                    int(round(data["ss_data_bw_mean"], 0))
+                                ),
+                                datadict["ss_data_iops_mean"].append(
+                                    int(round(data["ss_data_iops_mean"], 0))
+                                )
+                    else:
+                        mismatch+=1
 
     validate_get_record_set(settings, mismatch, dataset)
     return scale_data(datadict)
@@ -342,7 +362,21 @@ def scale_data(datadict):
     return datadict
 
 
+def get_auto_label_font_size(rects):
+    size = 0
+    number = len(rects)
+    if number <= 8:
+        size = 8
+    if number > 8 and number < 16:
+        size = 7
+    if number >= 16:
+        size = 6 
+    return size
+
+
 def autolabel(rects, axis):
+    fontsize = get_auto_label_font_size(rects)
+
     for rect in rects:
         height = rect.get_height()
         if height < 10:
@@ -356,11 +390,10 @@ def autolabel(rects, axis):
             formatter = "%dK"
         else:
             value = height
-
         axis.text(
             rect.get_x() + rect.get_width() / 2,
             1.015 * height,
             formatter % value,
             ha="center",
-            fontsize=8,
+            fontsize=fontsize,
         )

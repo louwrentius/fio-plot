@@ -1,13 +1,12 @@
 import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 import sys
-import pprint
 
 from . import (
     jsonimport,
+    jsonparsing,
     supporting
 )
-
 
 #
 # These functions below is just one big mess to get the legend labels to align.
@@ -16,23 +15,26 @@ def get_json_data(settings):
     list_of_json_files = jsonimport.list_json_files(settings, fail=False)
     if list_of_json_files:
         dataset = jsonimport.import_json_dataset(settings, list_of_json_files)
-        parsed_data = jsonimport.get_flat_json_mapping(settings, dataset)
+        parsed_data = jsonparsing.parse_json_data(settings, dataset)
         return parsed_data
     else:
         return None
 
 
-def create_label(settings, item, directories):
-    mydir = f"{item['directory']}"
+def create_label(item):
+    if item["hostname"]:
+        mydir = item["hostname"]
+    else:
+        mydir = f"{item['directory']}"
     return mydir
 
 
-def get_max_label_size(settings, data, directories):
+def get_max_label_size(settings, data):
     labels = []
     for item in data["dataset"]:
         for rw in settings["filter"]:
             if rw in item.keys():
-                label = create_label(settings, item, directories)
+                label = create_label(item)
                 labels.append(label)
 
     maxlabelsize = 0
@@ -53,7 +55,7 @@ def get_padding(label, maxlabelsize):
 
 
 def scale_2dgraph_yaxis(settings, item, rw, maximum):
-    factordict = {"iops": 1.05, "lat": 1.25, "bw": 1.5}
+    factordict = {"iops": 1.05, "lat": 1.25, "bw": 1.5, "slat": 1.25, "clat": 1.25 }
     min_y = 0
     if settings["min_y"] == "None":
         min_y = None
@@ -111,14 +113,17 @@ def get_colors(settings):
 
 def drawline(settings, item, rw, supportdata):
     axes = supportdata["axes"]
-
     if settings["enable_markers"]:
         marker_value = supportdata["marker_list"].pop(0)
     else:
         marker_value = None
 
-    xvalues = item[rw]["xvalues"]
-    yvalues = item[rw]["yvalues"]
+    if settings["truncate_xaxis"]:
+        xvalues = item[rw]["xvalues"][:settings["truncate_xaxis"]]
+        yvalues = item[rw]["yvalues"][:settings["truncate_xaxis"]]
+    else:
+        xvalues = item[rw]["xvalues"]
+        yvalues = item[rw]["yvalues"]
     
     #
     # Use a moving average as configured by the commandline option
@@ -161,9 +166,8 @@ def drawline(settings, item, rw, supportdata):
 
 def create_single_label(settings, item, rw, supportdata):
     # print(maxlabelsize)
-    mylabel = create_label(settings, item, supportdata["directories"])
+    mylabel = create_label(item)
     mylabel = get_padding(mylabel, supportdata["maxlabelsize"])
-
     labelset = {
         "name": mylabel,
         "rw": rw,
@@ -224,3 +228,4 @@ def generate_labelset(settings, supportdata):
         values.insert(position, header)
 
     return (values, ncol)
+

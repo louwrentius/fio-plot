@@ -2,8 +2,6 @@
 import argparse
 import sys
 
-from . import runfio
-
 
 def check_args(settings):
     """Some basic error handling."""
@@ -18,10 +16,6 @@ def check_args(settings):
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(2)
-
-    if not runfio.check_fio_version(settings):
-        parser.print_help()
-        sys.exit(3)
 
     return args
 
@@ -66,14 +60,6 @@ def get_arguments(settings):
         help="Output directory for .json and .log output. If a read/write mix is specified,\
                     separate directories for each mix will be created.",
         required=True,
-    )
-    ag.add_argument(
-        "-j",
-        "--template",
-        help=f"Fio job file in INI format. A file is already included and this parameter is only required if you create \
-            your own custom Fio job. \
-            (Default: {settings['template']})",
-        default=settings["template"],
     )
     ag.add_argument(
         "-b",
@@ -228,7 +214,7 @@ def get_arguments(settings):
         help="Allows you to add extra options, \
         for example, options that are specific to the selected ioengine. It \
              can be any other Fio option. Example: --extra-opts norandommap=1 invalidate=0\
-                 You may also choose to add those options to the fio_template.fio file.",
+                 this can also be specified in the bench-fio ini file",
         nargs="+",
     )
     ag.add_argument(
@@ -261,12 +247,41 @@ def get_arguments(settings):
         action="store_true",
         default=False,
     )
+    ag.add_argument(
+        "--remote",
+        help=f"Uses Fio client/server mechanism. Argument requires file with name host.list\
+         containing one host per line.\
+            ({settings['remote']}). Usage example: --remote host.list",
+        type=str,
+        default=settings["remote"],       
+    )
+    ag.add_argument(
+        "--remote-checks",
+        help=f"When Fio client/server is used, we run a preflight check if all hosts are up \
+        using a TCP port check before we run the benchmark. Otherwise some hosts start benchmarking\
+        until a down host times out, which may be undesirable. ({settings['remote_checks']}).",
+        action="store_true",
+        default=False,      
+    )
+    ag.add_argument(
+        "--remote-timeout",
+        help=f"When Fio client/server is used, we run a preflight check if all hosts are up \
+        using a TCP port check before we run the benchmark. Otherwise some hosts start benchmarking\
+        until a down host times out, which may be undesirable. ({settings['remote_checks']}).",
+        type=int,
+        default=settings["remote_timeout"],    
+    )
+    ag.add_argument(
+        "--create",
+        help="Create target files if they don't exist. This is the default for fio but not for bench_fio",
+        action="store_true",
+        default=False,
+    )
     return parser
-
 
 def get_argument_description():
     descriptions = {
-        "target": "Test target",
+        "target": "Test target(s)",
         "template": "Job template",
         "engine": "I/O Engine",
         "mode": "Test mode (read/write)",
@@ -293,6 +308,10 @@ def get_argument_description():
         "ss_ramp": "Steady state rampup",
         "entire_device": "Benchmark entire device",
         "ceph_pool": "Ceph RBD pool",
-        "destructive": "Allow destructive writes"
+        "destructive": "Allow destructive writes",
+        "remote":"Use remote server",
+        "remote_checks": "Check remote for open TCP port",
+        "remote_timeout": "Check remote timeout (s)",
+        "create": "Create if target doesn't exist"
     }
     return descriptions

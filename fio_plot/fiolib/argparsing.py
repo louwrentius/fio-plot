@@ -208,6 +208,15 @@ def set_arguments(settings):
         choices=["read", "write"],
     )
     ag.add_argument(
+        "--truncate-xaxis",
+        help="Force x-axis timeschale to be at most (x) seconds/minutes/hours long (depends on autoscaling). \
+            Sometimes devices may take a much longer time to complete than others and for readability it's \
+            best to truncate the x-axis.",
+        type=int,
+        default=None,
+    )
+
+    ag.add_argument(
         "--xlabel-depth",
         help="\
             Can be used to truncate the most significant folder name from the label. \
@@ -251,6 +260,12 @@ def set_arguments(settings):
         action="store_true",
     )
     ag.add_argument(
+        "--show-data",
+        help="When using the -C -l or -N option, iops/lat data is also shown in table format. It replaces \
+        the standard deviation table",
+        action="store_true",
+    )
+    ag.add_argument(
         "--show-ss",
         help="When using the -C or -l option, a table is added with steadystate data.",
         action="store_true",
@@ -262,6 +277,12 @@ def set_arguments(settings):
     )
     ag.add_argument(
         "--max-lat", help="Maximum latency value on y-axis", type=int, default=None
+    )
+    ag.add_argument(
+        "--max-clat", help="Maximum completion latency value on y-axis", type=int, default=None
+    )
+    ag.add_argument(
+        "--max-slat", help="Maximum submission latency value on y-axis", type=int, default=None
     )
     ag.add_argument(
         "--max-iops", help="Maximum IOPs value on y-axis", type=int, default=None
@@ -303,7 +324,22 @@ def set_arguments(settings):
     ag.add_argument(
         "--table-fontsize", help="Standard deviation table / CPU table font size", type=int,  default=settings["table_fontsize"]
     )
-
+    group = parser.add_mutually_exclusive_group()
+    
+    group.add_argument(
+        "--include-hosts",
+        help="Only create graphs for these hosts (when parsing client-server benchmark data)",
+        type=str,
+        nargs="+",
+        default=None,
+    )
+    group.add_argument(
+        "--exclude-hosts",
+        help="Graph all hosts except for those listed (when parsing client-server benchmark data)",
+        type=str,
+        nargs="+",
+        default=None,
+    )
     return parser
 
 def get_command_line_arguments(parser):

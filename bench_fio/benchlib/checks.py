@@ -3,7 +3,7 @@ import shutil
 import sys
 import os
 from pathlib import Path
-
+from . import runfio
 
 def check_if_fio_exists():
     command = "fio"
@@ -12,6 +12,23 @@ def check_if_fio_exists():
         print()
         sys.exit(1)
 
+
+def check_fio_version():
+    """The 3.x series .json format is different from the 2.x series format.
+    This breaks fio-plot, thus this older version is not supported.
+    """
+
+    command = ["fio", "--version"]
+    result = runfio.run_raw_command(command).stdout
+    result = result.decode("UTF-8").strip()
+    if "fio-3" in result:
+        return True
+    elif "fio-2" in result:
+        print(f"Your Fio version ({result}) is not compatible. Please use Fio-3.x")
+        sys.exit(1)
+    else:
+        print("Could not detect Fio version.")
+        sys.exit(1)
 
 def check_encoding():
     try:
@@ -29,26 +46,23 @@ def check_encoding():
         print()
         exit(90)
 
-def check_target_type(target, filetype):
+def check_target_type(target, settings):
     """Validate path and file / directory type.
     It also returns the appropritate fio command line parameter based on the
     file type.
 
-    In case of target type 'file' it will be created if it doesn't exist, which is fio default behaviour'.
+    NEEDS OVERHAUL
     """
-
+    filetype = settings["type"]
     keys = ["file", "device", "directory", "rbd"]
 
     test = {keys[0]: Path.is_file, keys[1]: Path.is_block_device, keys[2]: Path.is_dir}
 
-    parameter = {keys[0]: "--filename", keys[1]: "--filename", keys[2]: "--directory"}
+    parameter = {keys[0]: "filename", keys[1]: "filename", keys[2]: "directory"}
 
     if not filetype == "rbd":
-        
-        if filetype == "file":
-            return parameter[filetype]
 
-        if not os.path.exists(target):
+        if not os.path.exists(target) and not settings["remote"] and not settings["create"]:
             print(f"Benchmark target {filetype} {target} does not exist.")
             sys.exit(10)
 
@@ -60,10 +74,92 @@ def check_target_type(target, filetype):
 
         path_target = Path(target)  # path library needs to operate on path object
 
-        if check(path_target):
-            return parameter[filetype]
+        if not settings["remote"] and not settings["create"]:
+            if check(path_target):
+                return parameter[filetype]
+            else:
+                print(f"Target {filetype} {target} is not {filetype}.")
+                sys.exit(10)
         else:
-            print(f"Target {filetype} {target} is not {filetype}.")
-            sys.exit(10)
+            return parameter[filetype]
     else:
         return None
+
+def check_settings(settings):
+    """Some basic error handling."""
+
+    check_fio_version()
+
+    if settings["entire_device"]:
+        settings["runtime"] = None
+        settings["size"] = "100%"
+
+        if settings["type"] is not "device":
+            print()
+            print("Preconditioning only makes sense for (flash) devices, not files or directories.")
+            print()
+            sys.exit(9)
+
+    if settings["type"] not in ["device", "rbd"] and not settings["size"]:
+        print()
+        print("When the target is a file or directory, --size must be specified.")
+        print()
+        sys.exit(4)
+
+    if settings["type"] == "directory" and not settings["remote"] and not settings["create"]:
+        for item in settings["target"]:
+            if not os.path.exists(item):
+                print(f"\nThe target directory ({item}) doesn't seem to exist.\n")
+                sys.exit(5)
+
+    if settings["type"] == "rbd":
+        if not settings["ceph_pool"]:
+            print(
+                "\nCeph pool (--ceph-pool) must be specified when target type is rbd.\n"
+            )
+            sys.exit(6)
+
+    if settings["type"] == "rbd" and settings["ceph_pool"]:
+        if not settings["engine"] == "rbd":
+            print(
+                f"\nPlease specify engine 'rbd' when benchmarking Ceph, not {settings['engine']}\n"
+            )
+            sys.exit(7)
+
+    if not settings["output"]:
+        print()
+        print("Must specify mandatory --output parameter (name of benchmark output folder)")
+        print()
+        sys.exit(9)
+
+    mixed_count = 0
+    for mode in settings["mode"]:
+        writemodes = ['write', 'randwrite', 'rw', 'readwrite', 'trimwrite']
+        if mode in writemodes and not settings["destructive"]:
+            print(f"\n Mode {mode} will overwrite data on {settings['target']} but destructive flag not set.\n")
+            sys.exit(1)
+        if mode in settings["mixed"]:
+            mixed_count+=1
+            if not settings["rwmixread"]:
+                print(
+                    "\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n"
+                )
+                sys.exit(8)
+        if mixed_count > 0:
+            settings["loop_items"].append("rwmixread")
+   
+    if settings["remote"]:
+        hostlist = os.path.expanduser(settings["remote"])
+        settings["remote"] = hostlist
+
+        if not os.path.exists(hostlist):
+                print(f"The list of remote hosts ({hostlist}) doesn't seem to exist.\n")
+                sys.exit(5)
+            
+    if settings["precondition_template"]:
+        if not os.path.exists(settings["precondition_template"]):
+            print(f"Precondition template ({settings['precondition_template']}) doesn't seem to exist.\n")
+            sys.exit(5)    
+    
+    if not settings["precondition"]:
+        settings["filter_items"].append("precondition_template")

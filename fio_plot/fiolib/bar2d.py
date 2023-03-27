@@ -5,30 +5,42 @@ import pprint
 from . import (
     supporting,
     shared_chart as shared,
-    tables
+    tables,
+    table_support as ts
 )
 
+def format_hostname_labels(settings, data):
+    labels = []
+    counter = 1
+    hostcounter = 0 
+    divide = int(len(data["hostname_series"]) / len(data["x_axis"])) # that int convert should work
+    for host in data["hostname_series"]:
+        hostcounter += 1
+        attr = data["x_axis"][counter-1]
+        labels.append(f"{host}\n{settings['graphtype'][-2:]} {attr}")
+        if hostcounter % divide == 0:
+            counter += 1
+    return labels
 
 def calculate_font_size(settings, x_axis):
-    max_label_width = max(tables.get_max_width([x_axis], len(x_axis)))
+    max_label_width = max(ts.get_max_width([x_axis], len(x_axis)))
+    #print(max_label_width)
     fontsize = 0
     #
     # This hard-coded font sizing is ugly but if somebody knows a better algorithm...
     #
+    cols = len(x_axis)
     if settings["group_bars"]:
-        if max_label_width > 10:
+        if max_label_width >= 10:
             fontsize = 6
-        elif max_label_width > 15:
-            fontsize = 5
         else:
             fontsize = 8
     else:
-        if max_label_width > 18:
-            fontsize = 5
+        if max_label_width >= 10 and cols > 8:
+            fontsize = 6
         else:
             fontsize = 8
     return fontsize
-
 
 def create_bars_and_xlabels(settings, data, ax1, ax3):
 
@@ -56,26 +68,32 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
 
         rects1 = ax1.bar(x_pos, iops, width, color=color_iops)
         rects2 = ax3.bar(x_pos + width, latency, width, color=color_lat)
-
         x_axis = data["x_axis"]
+
+        if "hostname_series" in data.keys():
+            if data["hostname_series"]:
+                x_axis = format_hostname_labels(settings, data)
         ltest = np.arange(0.45, (len(iops) * 2), 2)
 
     ax1.set_ylabel(data["y1_axis"]["format"])
     ax3.set_ylabel(data["y2_axis"]["format"])
     ax1.set_xlabel(settings["label"])
     ax1.set_xticks(ltest)
-
+    
+    fontsize = calculate_font_size(settings, x_axis)
+    #print(fontsize)
     if settings["graphtype"] == "compare_graph":
-        fontsize = calculate_font_size(settings, x_axis)
         ax1.set_xticklabels(labels=x_axis, fontsize=fontsize)
+    elif settings["graphtype"] == "bargraph2d_qd" or settings["graphtype"] == "bargraph2d_nj":
+        ax1.set_xticklabels(labels=x_axis, fontsize=fontsize,)
     else:
-        ax1.set_xticklabels(labels=x_axis)
+        ax1.set_xticklabels(labels=x_axis, fontsize=fontsize, rotation=-50)
 
     return_data["rects1"] = rects1
     return_data["rects2"] = rects2
     return_data["ax1"] = ax1
     return_data["ax3"] = ax3
-
+    return_data["fontsize"] = fontsize
     return return_data
 
 
@@ -83,17 +101,15 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     """This function is responsible for drawing iops/latency bars for a
     particular iodepth."""
     dataset_types = shared.get_dataset_types(dataset)
-    #pprint.pprint(dataset)
     data = shared.get_record_set(settings, dataset, dataset_types)
-    # pprint.pprint(data)
     fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={"height_ratios": [7, 1]})
     ax3 = ax1.twinx()
     fig.set_size_inches(10, 6)
-
+    plt.margins(x=0.01)
     #
     # Puts in the credit source (often a name or url)
     supporting.plot_source(settings, plt, ax1)
-    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax1)
+    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax2)
 
     ax2.axis("off")
 
@@ -103,6 +119,7 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     rects2 = return_data["rects2"]
     ax1 = return_data["ax1"]
     ax3 = return_data["ax3"]
+    fontsize = return_data["fontsize"]
 
     #
     # Set title
@@ -128,16 +145,19 @@ def chart_2dbarchart_jsonlogdata(settings, dataset):
     shared.autolabel(rects2, ax3)
     #
     # Draw the standard deviation table
-    tables.create_stddev_table(settings, data, ax2)
+    if settings["show_data"]:
+        tables.create_values_table(settings, data, ax2, fontsize)
+    else:
+        tables.create_stddev_table(settings, data, ax2, fontsize)
+    
     #
     # Draw the cpu usage table if requested
     # pprint.pprint(data)
-
     if settings["show_cpu"] and not settings["show_ss"]:
-        tables.create_cpu_table(settings, data, ax2)
+        tables.create_cpu_table(settings, data, ax2, fontsize)
 
     if settings["show_ss"] and not settings["show_cpu"]:
-        tables.create_steadystate_table(settings, data, ax2)
+        tables.create_steadystate_table(settings, data, ax2, fontsize)
 
     #
     # Create legend
@@ -163,11 +183,12 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={"height_ratios": [7, 1]})
     ax3 = ax1.twinx()
     fig.set_size_inches(10, 6)
+    plt.margins(x=0.01)
 
     #
     # Puts in the credit source (often a name or url)
     supporting.plot_source(settings, plt, ax1)
-    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax1)
+    supporting.plot_fio_version(settings, data["fio_version"][0], plt, ax2)
 
     ax2.axis("off")
 
@@ -189,14 +210,18 @@ def compchart_2dbarchart_jsonlogdata(settings, dataset):
     # Labeling the top of the bars with their value
     shared.autolabel(rects1, ax1)
     shared.autolabel(rects2, ax3)
+    fontsize = calculate_font_size(settings, data["x_axis"])
 
-    tables.create_stddev_table(settings, data, ax2)
+    if settings["show_data"]:
+        tables.create_values_table(settings, data, ax2, fontsize)
+    else:
+        tables.create_stddev_table(settings, data, ax2, fontsize)
 
     if settings["show_cpu"] and not settings["show_ss"]:
-        tables.create_cpu_table(settings, data, ax2)
+        tables.create_cpu_table(settings, data, ax2, fontsize)
 
     if settings["show_ss"] and not settings["show_cpu"]:
-        tables.create_steadystate_table(settings, data, ax2)
+        tables.create_steadystate_table(settings, data, ax2, fontsize)
 
     # Create legend
     ax2.legend(
