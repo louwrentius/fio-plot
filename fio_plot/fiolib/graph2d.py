@@ -45,7 +45,7 @@ def chart_2d_log_data(settings, dataset):
     #
     # Create title and subtitle
     #
-    if jsondata:
+    if jsondata[0]["data"]:
         if "job options" in jsondata[0]["data"][0].keys():
             blocksize = jsondata[0]["data"][0]["job options"]["bs"]
         elif "bs" in jsondata[0]["data"][0].keys():
