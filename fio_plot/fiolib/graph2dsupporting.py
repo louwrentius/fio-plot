@@ -118,8 +118,12 @@ def drawline(settings, item, rw, supportdata):
     else:
         marker_value = None
 
-    xvalues = item[rw]["xvalues"]
-    yvalues = item[rw]["yvalues"]
+    if settings["truncate_xaxis"]:
+        xvalues = item[rw]["xvalues"][:settings["truncate_xaxis"]]
+        yvalues = item[rw]["yvalues"][:settings["truncate_xaxis"]]
+    else:
+        xvalues = item[rw]["xvalues"]
+        yvalues = item[rw]["yvalues"]
     
     #
     # Use a moving average as configured by the commandline option

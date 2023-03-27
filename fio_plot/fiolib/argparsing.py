@@ -208,6 +208,15 @@ def set_arguments(settings):
         choices=["read", "write"],
     )
     ag.add_argument(
+        "--truncate-xaxis",
+        help="Force x-axis timeschale to be at most (x) seconds/minutes/hours long (depends on autoscaling). \
+            Sometimes devices may take a much longer time to complete than others and for readability it's \
+            best to truncate the x-axis.",
+        type=int,
+        default=None,
+    )
+
+    ag.add_argument(
         "--xlabel-depth",
         help="\
             Can be used to truncate the most significant folder name from the label. \

@@ -26,22 +26,25 @@ def running_mean(l, N):
     return result
 
 
-def scale_xaxis_time(dataset):
+def scale_xaxis_time(settings, dataset):
     """FIO records log data time stamps in microseconds. To prevent huge numbers
-    on the x-axis, the values are scaled to seconds, minutes or hours basedon the
-    mean value of all data."""
+    on the x-axis, the values are scaled to seconds, minutes or hours based
+    on the mean value of all data."""
     result = {"format": "Time (ms)", "data": dataset}
     mean = statistics.mean(dataset)
 
-    if (mean > 1000) & (mean < 1000000):
-        result["data"] = [x / 1000 for x in dataset]
-        result["format"] = "Time (s)"
-    if mean > 1000000:
-        result["data"] = [x / 60000 for x in dataset]
-        result["format"] = "Time (m)"
-    if mean > 36000000:  # only switch to hours with enough datapoints (+10)
-        result["data"] = [x / 3600000 for x in dataset]
-        result["format"] = "Time (h)"
+    conversions = {
+        1000: "s",
+        1000000: "m",
+        3600000: "h"
+    }
+
+    for conversion, format_str in conversions.items():
+        if mean > conversion:
+            result["data"] = [x / conversion for x in dataset]
+            result["format"] = f"Time ({format_str})"
+            break
+
     return result
 
 
@@ -240,7 +243,7 @@ def process_dataset(settings, dataset):
                     record[rw]["xvalues"] = unpacked[0]
                     record[rw]["yvalues"] = unpacked[1]
 
-                    scaled_xaxis = scale_xaxis_time(record[rw]["xvalues"])
+                    scaled_xaxis = scale_xaxis_time(settings, record[rw]["xvalues"])
                     record["xlabel"] = scaled_xaxis["format"]
                     record[rw]["xvalues"] = scaled_xaxis["data"]
                 
@@ -390,6 +393,9 @@ def create_title_and_sub(
 
     if bs:
         sub_title_items.update({"bs": bs})
+
+    if settings["truncate_xaxis"]:
+        sub_title_items.update({"Truncated": "x-axis"})
 
     if settings["subtitle"]:
         subtitle = settings["subtitle"]
