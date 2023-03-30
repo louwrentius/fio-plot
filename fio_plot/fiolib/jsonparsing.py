@@ -71,9 +71,12 @@ def process_json_record(settings, directory, record, jsonrootpath, globaloptions
             hosts[hostname].append(row)
         else:
             jobs.append(row)
-    just_append = jsonsupport.merge_job_data_if_hostnames(settings, hosts, directory)
+    just_append = jsonsupport.merge_job_data_if_hostnames(hosts, directory)
     if just_append:
         [ directory["data"].append(x) for x in jobs ]
+    else:
+        if jobs:
+            directory["data"].append(jsonsupport.merge_job_data(jobs))
     #for x in hosts.keys():
     #    for y in hosts[x]:
     #        print(y["iodepth"])
@@ -83,7 +86,6 @@ def parse_json_data(settings, dataset):
     This funcion traverses the relevant JSON structure to gather data
     and store it in a flat dictionary. We do this for each imported json file.
     """
-    
     for directory in dataset: # for directory in list of directories
         directory["data"] = []
         for record in directory["rawdata"]: # each record is the raw JSON data of a file in a directory
@@ -93,11 +95,11 @@ def parse_json_data(settings, dataset):
             #    if "job options" in item.keys():
             #        print(item["job options"]["iodepth"])
             process_json_record(settings, directory, record, jsonrootpath, globaloptions)
-
+    #print("================================")
+    #print(directory["data"])
     #for directory in dataset:
     #    for item in directory["data"]:
     #        print(item["iodepth"])
-
     directory["data"] = sort_list_of_dictionaries(directory["data"])
     return dataset
 

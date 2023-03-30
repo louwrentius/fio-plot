@@ -18,7 +18,7 @@ def check_for_valid_hostname(record):
         result = False
     return result
 
-def merge_job_data(hosts):
+def merge_job_data_from_hosts(hosts):
     """
     When we are facing client data with numjobs >1 we need to sum or average values.
     Each job of numjobs creates a separate job entry and if we for instance use iops,
@@ -124,7 +124,7 @@ def check_for_steadystate(record, mode):
     else:
         return False
 
-def merge_job_data_if_hostnames(settings, hosts, directory):
+def merge_job_data_if_hostnames(hosts, directory):
     """
     This function returns a boolean but it operates on the data in the directory
     variable, be aware.
@@ -134,11 +134,43 @@ def merge_job_data_if_hostnames(settings, hosts, directory):
         for host in hosts.keys():
             if len(hosts[host]) > 1 or host == "All clients":
                 #print(host)
-                directory["data"] = merge_job_data(hosts)
+                directory["data"] = merge_job_data_from_hosts(hosts)
             else:
                 just_append = True
     else:
-        just_append = True
+        just_append = False
     return just_append
 
 
+def merge_job_data(jobs):
+
+    iops = []
+    bw = []
+    lat = []
+    cpu_usr = []
+    cpu_sys = []
+    iops_stddev = []
+    lat_stddev = []
+    template = { "type": jobs[0]["type"], "iodepth": jobs[0]["iodepth"], "numjobs": jobs[0]["numjobs"], "fio_version": jobs[0]["fio_version"], \
+                     "rw": jobs[0]["rw"], "bs": jobs[0]["bs"]
+    }    
+    
+    for job in jobs:
+        iops.append(job["iops"])
+        bw.append(job["bw"])
+        lat.append(job["lat"])
+        cpu_usr.append(job["cpu_usr"])
+        cpu_sys.append(job["cpu_sys"])
+        iops_stddev.append(job["iops_stddev"])
+        lat_stddev.append(job["lat_stddev"])
+
+    template["iops"] = sum(iops)
+    template["bw"] = sum(bw)
+    template["lat"] = statistics.mean(lat)
+    template["cpu_usr"] = statistics.mean(cpu_usr)
+    template["cpu_sys"] = statistics.mean(cpu_sys)
+    template["iops_stddev"] = statistics.mean(iops_stddev)
+    template["lat_stddev"] = statistics.mean(lat_stddev)
+    
+
+    return template

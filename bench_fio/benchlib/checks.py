@@ -94,7 +94,7 @@ def check_settings(settings):
         settings["runtime"] = None
         settings["size"] = "100%"
 
-        if settings["type"] is not "device":
+        if settings["type"] != "device":
             print()
             print("Preconditioning only makes sense for (flash) devices, not files or directories.")
             print()
@@ -163,3 +163,9 @@ def check_settings(settings):
     
     if not settings["precondition"]:
         settings["filter_items"].append("precondition_template")
+    
+    if settings["loops"] == 0:
+        print("setting loops to 0 is likely not what you want as no benchmarks would be run\n")
+        print("If you want to change the precondition loop count, edit precondition.fio or supply your own config\n")
+        print("with the parameter --precondition-template")
+        sys.exit(6)

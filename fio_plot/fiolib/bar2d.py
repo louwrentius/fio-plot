@@ -45,7 +45,7 @@ def calculate_font_size(settings, x_axis):
 def create_bars_and_xlabels(settings, data, ax1, ax3):
 
     return_data = {"ax1": None, "ax3": None, "rects1": None, "rects2": None}
-
+    
     iops = data["y1_axis"]["data"]
     latency = np.array(data["y2_axis"]["data"], dtype=float)
     width = 0.9
