@@ -12,7 +12,6 @@ from . import (
     defaultsettings
 )
 
-
 def drop_caches():
     command = ["echo", "3", ">", "/proc/sys/vm/drop_caches"]
     run_raw_command(command)
@@ -118,20 +117,13 @@ def run_precondition_benchmark(settings, device, run):
 def run_benchmarks(settings, benchmarks):
     # pprint.pprint(benchmarks)
     run = 0
-    if not settings["quiet"]:
-        for benchmark in ProgressBar(benchmarks):
-            while run < settings["loops"]:
-                run += 1
-                run_precondition_benchmark(settings, benchmark["target"], run)
-                drop_caches()
-                run_fio(settings, benchmark)
-    else:
-        for benchmark in benchmarks:
-            while run < settings["loops"]:
-                run += 1
-                run_precondition_benchmark(settings, benchmark["target"], run)
-                drop_caches()
-                run_fio(settings, benchmark)
+    progress_benchmarks = ProgressBar(benchmarks) if not settings["quiet"] else benchmarks
+    for benchmark in progress_benchmarks:
+        while run < settings["loops"]:
+            run += 1
+            run_precondition_benchmark(settings, benchmark["target"], run)
+            drop_caches()
+            run_fio(settings, benchmark)
 
 
 def ProgressBar(iterObj):

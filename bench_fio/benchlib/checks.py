@@ -47,43 +47,33 @@ def check_encoding():
         exit(90)
 
 def check_target_type(target, settings):
-    """Validate path and file / directory type.
-    It also returns the appropritate fio command line parameter based on the
-    file type.
-
-    NEEDS OVERHAUL
-    """
+    """Validate path and file/directory type and return fio command line parameter."""
     filetype = settings["type"]
-    keys = ["file", "device", "directory", "rbd"]
+    types = ["file", "device", "directory", "rbd"]
+    path_target = Path(target)
 
-    test = {keys[0]: Path.is_file, keys[1]: Path.is_block_device, keys[2]: Path.is_dir}
-
-    parameter = {keys[0]: "filename", keys[1]: "filename", keys[2]: "directory"}
-
-    if not filetype == "rbd":
-
-        if not os.path.exists(target) and not settings["remote"] and not settings["create"]:
-            print(f"Benchmark target {filetype} {target} does not exist.")
-            sys.exit(10)
-
-        if filetype not in keys:
-            print(f"Error, filetype {filetype} is an unknown option.")
-            exit(123)
-
-        check = test[filetype]
-
-        path_target = Path(target)  # path library needs to operate on path object
-
-        if not settings["remote"] and not settings["create"]:
-            if check(path_target):
-                return parameter[filetype]
-            else:
-                print(f"Target {filetype} {target} is not {filetype}.")
-                sys.exit(10)
-        else:
-            return parameter[filetype]
-    else:
+    if filetype == "rbd":
         return None
+
+    if not filetype in types:
+        print(f"Error, filetype {filetype} is an unknown option.")
+        exit(123)
+
+    if not os.path.exists(target) and not settings["remote"] and not settings["create"]:
+        print(f"Benchmark target {filetype} {target} does not exist.")
+        sys.exit(10)
+
+    check = {"file": Path.is_file, "device": Path.is_block_device, "directory": Path.is_dir}[filetype]
+
+    if not settings["remote"] and not settings["create"]:
+        if check(path_target):
+            return {"file": "filename", "device": "filename", "directory": "directory"}[filetype]
+        else:
+            print(f"Target {filetype} {target} is not {filetype}.")
+            sys.exit(10)
+    else:
+        return {"file": "filename", "device": "filename", "directory": "directory"}[filetype]
+
 
 def check_settings(settings):
     """Some basic error handling."""
@@ -91,19 +81,13 @@ def check_settings(settings):
     check_fio_version()
 
     if settings["entire_device"]:
-        settings["runtime"] = None
-        settings["size"] = "100%"
-
+        settings.update(runtime=None, size="100%")
         if settings["type"] != "device":
-            print()
-            print("Preconditioning only makes sense for (flash) devices, not files or directories.")
-            print()
+            print("\nPreconditioning only makes sense for (flash) devices, not files or directories.\n")
             sys.exit(9)
 
-    if settings["type"] not in ["device", "rbd"] and not settings["size"]:
-        print()
-        print("When the target is a file or directory, --size must be specified.")
-        print()
+    if settings["type"] in ["device", "rbd"] and not settings["size"]:
+        print("\nWhen the target is a file or directory, --size must be specified.\n")
         sys.exit(4)
 
     if settings["type"] == "directory" and not settings["remote"] and not settings["create"]:
@@ -112,58 +96,44 @@ def check_settings(settings):
                 print(f"\nThe target directory ({item}) doesn't seem to exist.\n")
                 sys.exit(5)
 
-    if settings["type"] == "rbd":
-        if not settings["ceph_pool"]:
-            print(
-                "\nCeph pool (--ceph-pool) must be specified when target type is rbd.\n"
-            )
-            sys.exit(6)
+    if settings["type"] == "rbd" and not settings["ceph_pool"]:
+        print("\nCeph pool (--ceph-pool) must be specified when target type is rbd.\n")
+        sys.exit(6)
 
-    if settings["type"] == "rbd" and settings["ceph_pool"]:
-        if not settings["engine"] == "rbd":
-            print(
-                f"\nPlease specify engine 'rbd' when benchmarking Ceph, not {settings['engine']}\n"
-            )
-            sys.exit(7)
+    if settings["type"] == "rbd" and settings["ceph_pool"] and settings["engine"] != "rbd":
+        print(f"\nPlease specify engine 'rbd' when benchmarking Ceph, not {settings['engine']}\n")
+        sys.exit(7)
 
     if not settings["output"]:
-        print()
-        print("Must specify mandatory --output parameter (name of benchmark output folder)")
-        print()
+        print("\nMust specify mandatory --output parameter (name of benchmark output folder)\n")
         sys.exit(9)
 
-    mixed_count = 0
+    writemodes = ['write', 'randwrite', 'rw', 'readwrite', 'trimwrite']
     for mode in settings["mode"]:
-        writemodes = ['write', 'randwrite', 'rw', 'readwrite', 'trimwrite']
         if mode in writemodes and not settings["destructive"]:
             print(f"\n Mode {mode} will overwrite data on {settings['target']} but destructive flag not set.\n")
             sys.exit(1)
-        if mode in settings["mixed"]:
-            mixed_count+=1
-            if not settings["rwmixread"]:
-                print(
-                    "\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n"
-                )
-                sys.exit(8)
-        if mixed_count > 0:
-            settings["loop_items"].append("rwmixread")
-   
+        if mode in settings["mixed"] and not settings["rwmixread"]:
+            print("\nIf a mixed (read/write) mode is specified, please specify --rwmixread\n")
+            sys.exit(8)
+
+    if settings["mixed"]:
+        settings["loop_items"].append("rwmixread")
+
     if settings["remote"]:
         hostlist = os.path.expanduser(settings["remote"])
         settings["remote"] = hostlist
-
         if not os.path.exists(hostlist):
-                print(f"The list of remote hosts ({hostlist}) doesn't seem to exist.\n")
-                sys.exit(5)
-            
-    if settings["precondition_template"]:
-        if not os.path.exists(settings["precondition_template"]):
-            print(f"Precondition template ({settings['precondition_template']}) doesn't seem to exist.\n")
-            sys.exit(5)    
-    
+            print(f"The list of remote hosts ({hostlist}) doesn't seem to exist.\n")
+            sys.exit(5)
+
+    if settings["precondition_template"] and not os.path.exists(settings["precondition_template"]):
+        print(f"Precondition template ({settings['precondition_template']}) doesn't seem to exist.\n")
+        sys.exit(5)
+
     if not settings["precondition"]:
         settings["filter_items"].append("precondition_template")
-    
+
     if settings["loops"] == 0:
         print("setting loops to 0 is likely not what you want as no benchmarks would be run\n")
         print("If you want to change the precondition loop count, edit precondition.fio or supply your own config\n")

@@ -1,3 +1,4 @@
+import sys
 from . import (
     jsonparsing_support as jsonsupport
 )
@@ -44,7 +45,6 @@ def sort_list_of_dictionaries(data):
 
 def process_json_record(settings, directory, record, jsonrootpath, globaloptions):
     joboptions = None
-    just_append = False
     hosts = {}
     jobs = []
     for job in record[jsonrootpath]:
@@ -71,16 +71,10 @@ def process_json_record(settings, directory, record, jsonrootpath, globaloptions
             hosts[hostname].append(row)
         else:
             jobs.append(row)
-    just_append = jsonsupport.merge_job_data_if_hostnames(hosts, directory)
-    if just_append:
-        [ directory["data"].append(x) for x in jobs ]
-    else:
-        if jobs:
-            directory["data"].append(jsonsupport.merge_job_data(jobs))
-    #for x in hosts.keys():
-    #    for y in hosts[x]:
-    #        print(y["iodepth"])
+          
+    directory["data"].extend(jsonsupport.merge_job_data_hosts_jobs(hosts, jobs))
 
+    
 def parse_json_data(settings, dataset):
     """
     This funcion traverses the relevant JSON structure to gather data
