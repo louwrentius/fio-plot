@@ -10,6 +10,7 @@ def generate_test_list(settings):
     This creates a full list of all possible benchmark permutations that
     need to be run.
     """
+
     loop_items = settings["loop_items"]
     dataset = []
 
