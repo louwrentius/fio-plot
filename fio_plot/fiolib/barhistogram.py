@@ -67,11 +67,11 @@ def chart_latency_histogram(settings, dataset):
     (a bar chart)."""
 
     record_set = shared.get_record_set_histogram(settings, dataset)
-
     # We have to sort the data / axis from low to high
-    sorted_result_ms = sort_latency_data(record_set["data"]["latency_ms"])
-    sorted_result_us = sort_latency_data(record_set["data"]["latency_us"])
-    sorted_result_ns = sort_latency_data(record_set["data"]["latency_ns"])
+    
+    sorted_result_ms = sort_latency_data(record_set["data"]["latency_ms"][0])
+    sorted_result_us = sort_latency_data(record_set["data"]["latency_us"][0])
+    sorted_result_ns = sort_latency_data(record_set["data"]["latency_ns"][0])
 
     # This is just to use easier to understand variable names
     x_series = sorted_result_ms["keys"]

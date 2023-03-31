@@ -128,7 +128,6 @@ def merge_job_data_hosts_jobs(hosts, jobs):
 
 
 def merge_job_data(jobs):
-
     iops = []
     bw = []
     lat = []
@@ -136,6 +135,10 @@ def merge_job_data(jobs):
     cpu_sys = []
     iops_stddev = []
     lat_stddev = []
+    latency_ms = []
+    latency_us = []
+    latency_ns = []
+
     template = { "type": jobs[0]["type"], "iodepth": jobs[0]["iodepth"], "numjobs": jobs[0]["numjobs"], "fio_version": jobs[0]["fio_version"], \
                      "rw": jobs[0]["rw"], "bs": jobs[0]["bs"]
     }    
@@ -148,6 +151,10 @@ def merge_job_data(jobs):
         cpu_sys.append(job["cpu_sys"])
         iops_stddev.append(job["iops_stddev"])
         lat_stddev.append(job["lat_stddev"])
+        latency_ms.append(job["latency_ms"]),
+        latency_us.append(job["latency_us"]),
+        latency_ns.append(job["latency_ns"]),
+
 
     template["iops"] = sum(iops)
     template["bw"] = sum(bw)
@@ -156,6 +163,8 @@ def merge_job_data(jobs):
     template["cpu_sys"] = statistics.mean(cpu_sys)
     template["iops_stddev"] = statistics.mean(iops_stddev)
     template["lat_stddev"] = statistics.mean(lat_stddev)
-    
+    template["latency_ms"] = latency_ms
+    template["latency_us"] = latency_us
+    template["latency_ns"] = latency_ns
 
     return template
