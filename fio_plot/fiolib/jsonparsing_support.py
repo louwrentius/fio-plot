@@ -134,7 +134,7 @@ def merge_job_data_if_hostnames(hosts, directory):
         for host in hosts.keys():
             if len(hosts[host]) > 1 or host == "All clients":
                 #print(host)
-                directory["data"] = merge_job_data_from_hosts(hosts)
+                directory["data"].extend(merge_job_data_from_hosts(hosts))
             else:
                 just_append = True
     else:
