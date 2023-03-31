@@ -47,43 +47,33 @@ def check_encoding():
         exit(90)
 
 def check_target_type(target, settings):
-    """Validate path and file / directory type.
-    It also returns the appropritate fio command line parameter based on the
-    file type.
-
-    NEEDS OVERHAUL
-    """
+    """Validate path and file/directory type and return fio command line parameter."""
     filetype = settings["type"]
-    keys = ["file", "device", "directory", "rbd"]
+    types = ["file", "device", "directory", "rbd"]
+    path_target = Path(target)
 
-    test = {keys[0]: Path.is_file, keys[1]: Path.is_block_device, keys[2]: Path.is_dir}
-
-    parameter = {keys[0]: "filename", keys[1]: "filename", keys[2]: "directory"}
-
-    if not filetype == "rbd":
-
-        if not os.path.exists(target) and not settings["remote"] and not settings["create"]:
-            print(f"Benchmark target {filetype} {target} does not exist.")
-            sys.exit(10)
-
-        if filetype not in keys:
-            print(f"Error, filetype {filetype} is an unknown option.")
-            exit(123)
-
-        check = test[filetype]
-
-        path_target = Path(target)  # path library needs to operate on path object
-
-        if not settings["remote"] and not settings["create"]:
-            if check(path_target):
-                return parameter[filetype]
-            else:
-                print(f"Target {filetype} {target} is not {filetype}.")
-                sys.exit(10)
-        else:
-            return parameter[filetype]
-    else:
+    if filetype == "rbd":
         return None
+
+    if not filetype in types:
+        print(f"Error, filetype {filetype} is an unknown option.")
+        exit(123)
+
+    if not os.path.exists(target) and not settings["remote"] and not settings["create"]:
+        print(f"Benchmark target {filetype} {target} does not exist.")
+        sys.exit(10)
+
+    check = {"file": Path.is_file, "device": Path.is_block_device, "directory": Path.is_dir}[filetype]
+
+    if not settings["remote"] and not settings["create"]:
+        if check(path_target):
+            return {"file": "filename", "device": "filename", "directory": "directory"}[filetype]
+        else:
+            print(f"Target {filetype} {target} is not {filetype}.")
+            sys.exit(10)
+    else:
+        return {"file": "filename", "device": "filename", "directory": "directory"}[filetype]
+
 
 def check_settings(settings):
     """Some basic error handling."""
@@ -164,6 +154,13 @@ def check_settings(settings):
     if not settings["precondition"]:
         settings["filter_items"].append("precondition_template")
     
+    if settings["loops"] == 0:
+        print("setting loops to 0 is likely not what you want as no benchmarks would be run\n")
+        print("If you want to change the precondition loop count, edit precondition.fio or supply your own config\n")
+        print("with the parameter --precondition-template")
+        sys.exit(6)
+
+
     if settings["loops"] == 0:
         print("setting loops to 0 is likely not what you want as no benchmarks would be run\n")
         print("If you want to change the precondition loop count, edit precondition.fio or supply your own config\n")

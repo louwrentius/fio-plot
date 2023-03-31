@@ -12,35 +12,37 @@ def process_options(config):
     inttypes  = ['loops','runtime']
     returndict = {}
     for x in config["benchfio"]:
-                if x == "output":       
-                    # Argparse seems to auto-expand paths, if we import through INI we do it ourselves
-                    returndict[x] = os.path.expanduser(config["benchfio"][x])
-                elif x in listtypes:
-                    returndict[x] = config.getlist('benchfio', x)
-                elif x in booltypes:
-                    returndict[x] = config.getboolean('benchfio', x)
-                elif x in inttypes:
-                    returndict[x] = config.getint('benchfio', x)     
-                else:
-                    returndict[x] = config["benchfio"][x]
-    
+        if x == "output":       
+            # Argparse seems to auto-expand paths, if we import through INI we do it ourselves
+            returndict[x] = os.path.expanduser(config["benchfio"][x])
+        elif x in listtypes:
+            returndict[x] = config.getlist('benchfio', x)
+        elif x in booltypes:
+            returndict[x] = config.getboolean('benchfio', x)
+        elif x in inttypes:
+            returndict[x] = config.getint('benchfio', x)     
+        else:
+            returndict[x] = config["benchfio"][x]
     return returndict
 
 def read_ini_data(args, config):
-    if len(args) == 2:
-        filename = args[1]
-        if os.path.isfile(filename):
-            try:
-                config.read(filename)
-                return True
-            except configparser.DuplicateOptionError as e:
-                print(f"{e}\n")
-                sys.exit(1)
-        else:
-            print(f"Config file {filename} not found.")
-            sys.exit(1)
-    else:
+    if len(args) != 2:
         return False
+    
+    filename = args[1]
+    
+    if not os.path.isfile(filename):
+        print(f"Config file {filename} not found.")
+        sys.exit(1)
+    
+    try:
+        config.read(filename)
+    except configparser.DuplicateOptionError as e:
+        print(f"{e}\n")
+        sys.exit(1)
+    
+    return True
+
 
 def get_settings_from_ini(args):
     config = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})

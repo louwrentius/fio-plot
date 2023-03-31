@@ -133,13 +133,13 @@ def get_arguments(settings):
     )
     ag.add_argument(
         "--rwmixread",
-        help=f"If a mix of read/writes is specified \
-        with --testmode, the ratio of reads vs. writes can be specified with this option.\
-            the parameter is an integer and represents the percentage of reads.\
-             A read/write mix of 75%%/25%%  is specified as '75' (default: {settings['rwmixread']}).\
-                Multiple values can be specified and separate output directories will be created.\
-                    This argument is only used if the benchmark is of type randrw. Otherwise \
-                        this option is ignored.",
+        help=f"If a mix of read/writes is specified with --testmode, the ratio of\n\
+        reads vs. writes can be specified with this option. The parameter is an\n\
+        integer and represents the percentage of reads. A read/write mix of 75%%/25%%\n\
+        is specified as '75' (default: {settings['rwmixread']}). Multiple values can\n\
+        be specified and separate output directories will be created. This argument\n\
+        is only used if the benchmark is of type randrw. Otherwise this option is\n\
+        ignored.",
         nargs="+",
         type=int,
         default=settings["rwmixread"],

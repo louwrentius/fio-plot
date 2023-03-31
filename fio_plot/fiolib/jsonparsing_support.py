@@ -19,18 +19,8 @@ def check_for_valid_hostname(record):
     return result
 
 def merge_job_data_from_hosts(hosts):
-    """
-    When we are facing client data with numjobs >1 we need to sum or average values.
-    Each job of numjobs creates a separate job entry and if we for instance use iops,
-    we need to summ all job records for that particular hosts to get the total iops
-    for that host. 
 
-    This function is a comrpomise, as I only deal with iops, bw and lat. Any other
-    data is discarted and this is why the standard deviation data and cpu data is not copied over.
-    Frankly, I would not know how to deal with that data anyway, so it's left out.
-    """
-    processed = []
-
+    result = []
     for host in hosts.keys():
         iops = []
         bw = []
@@ -47,9 +37,9 @@ def merge_job_data_from_hosts(hosts):
         template["iops"] = sum(iops)
         template["bw"] = sum(bw)
         template["lat"] = statistics.mean(lat)
-        processed.append(template)
+        result.append(template)
 
-    return processed
+    return result
 
 
 def return_data_row(settings, record):
@@ -124,26 +114,20 @@ def check_for_steadystate(record, mode):
     else:
         return False
 
-def merge_job_data_if_hostnames(hosts, directory):
+def merge_job_data_hosts_jobs(hosts, jobs):
     """
-    This function returns a boolean but it operates on the data in the directory
-    variable, be aware.
+    Helper function to forward host data to host function
+    and job data to job function.
     """
-    just_append = False
     if hosts:
-        for host in hosts.keys():
-            if len(hosts[host]) > 1 or host == "All clients":
-                #print(host)
-                directory["data"] = merge_job_data_from_hosts(hosts)
-            else:
-                just_append = True
-    else:
-        just_append = False
-    return just_append
+        returndata = merge_job_data_from_hosts(hosts)
+    elif jobs:
+        returndata = [merge_job_data(jobs)]
+    return returndata
+        
 
 
 def merge_job_data(jobs):
-
     iops = []
     bw = []
     lat = []
@@ -151,6 +135,10 @@ def merge_job_data(jobs):
     cpu_sys = []
     iops_stddev = []
     lat_stddev = []
+    latency_ms = []
+    latency_us = []
+    latency_ns = []
+
     template = { "type": jobs[0]["type"], "iodepth": jobs[0]["iodepth"], "numjobs": jobs[0]["numjobs"], "fio_version": jobs[0]["fio_version"], \
                      "rw": jobs[0]["rw"], "bs": jobs[0]["bs"]
     }    
@@ -163,6 +151,10 @@ def merge_job_data(jobs):
         cpu_sys.append(job["cpu_sys"])
         iops_stddev.append(job["iops_stddev"])
         lat_stddev.append(job["lat_stddev"])
+        latency_ms.append(job["latency_ms"]),
+        latency_us.append(job["latency_us"]),
+        latency_ns.append(job["latency_ns"]),
+
 
     template["iops"] = sum(iops)
     template["bw"] = sum(bw)
@@ -171,6 +163,8 @@ def merge_job_data(jobs):
     template["cpu_sys"] = statistics.mean(cpu_sys)
     template["iops_stddev"] = statistics.mean(iops_stddev)
     template["lat_stddev"] = statistics.mean(lat_stddev)
-    
+    template["latency_ms"] = latency_ms
+    template["latency_us"] = latency_us
+    template["latency_ns"] = latency_ns
 
     return template
