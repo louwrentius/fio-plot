@@ -119,8 +119,10 @@ def run_benchmarks(settings, benchmarks):
     run = 0
     progress_benchmarks = ProgressBar(benchmarks) if not settings["quiet"] else benchmarks
     for benchmark in progress_benchmarks:
-        while run < settings["loops"]:
+        loops = 0
+        while loops < settings["loops"]:
             run += 1
+            loops += 1
             run_precondition_benchmark(settings, benchmark["target"], run)
             drop_caches()
             run_fio(settings, benchmark)
