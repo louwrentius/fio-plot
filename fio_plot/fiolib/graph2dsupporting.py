@@ -23,7 +23,7 @@ def get_json_data(settings):
 
 def create_label(item):
     if item["hostname"]:
-        mydir = item["hostname"]
+        mydir = item["hostname"] + "/" + f"{item['directory']}"
     else:
         mydir = f"{item['directory']}"
     return mydir
