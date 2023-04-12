@@ -2,6 +2,8 @@ import sys
 
 def get_default_settings():
     settings = {}
+    settings["min_lat"] = 0
+    settings["min_iops"] = 0
     settings["filter"] = ['read','write']
     settings["type"] = []
     settings["dpi"] = 200

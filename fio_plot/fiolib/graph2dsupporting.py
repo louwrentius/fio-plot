@@ -56,21 +56,13 @@ def get_padding(label, maxlabelsize):
 
 def scale_2dgraph_yaxis(settings, item, rw, maximum):
     factordict = {"iops": 1.05, "lat": 1.25, "bw": 1.5, "slat": 1.25, "clat": 1.25 }
-    min_y = 0
-    if settings["min_y"] == "None":
-        min_y = None
-    else:
-        try:
-            min_y = int(settings["min_y"])
-        except ValueError:
-            print("Min_y value is invalid (not None or integer).")
 
     max_y = maximum["total"][item["type"]] * factordict[item["type"]]
 
     if settings[f"max_{item['type']}"]:
         max_y = settings[f"max_{item['type']}"]
 
-    return (min_y, max_y)
+    return (0, max_y)
 
 
 def validate_colors(colors):

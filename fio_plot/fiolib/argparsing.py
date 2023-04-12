@@ -182,12 +182,18 @@ def set_arguments(settings):
                                        setting may smooth out issues you may want to be aware of.",
     )
     ag.add_argument(
-        "-x",
-        "--min-y",
-        help="Optional minimal value for y-axis. Use 'None' to disable.",
-        type=str,
+        "--min-iops",
+        help=f"Optional minimal value for iops axis, default is {settings['min_iops']}",
+        type=int,
         default=0,
     )
+    ag.add_argument(
+        "--min-lat",
+        help=f"Optional minimal value for lat axis, default is {settings['min_lat']}",
+        type=int,
+        default=0,
+    )
+
     ag.add_argument(
         "-t",
         "--type",

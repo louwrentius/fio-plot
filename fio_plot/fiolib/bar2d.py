@@ -26,10 +26,10 @@ def set_max_yaxis(settings, axes):
     for ax in axes:
         if ax.get_ylabel() == "IOPS":
             if settings["max_iops"]:
-                ax.set_ylim(0,settings["max_iops"])
+                ax.set_ylim(settings["min_iops"],settings["max_iops"])
         if "Latency" in ax.get_ylabel():
             if settings["max_lat"]:
-                ax.set_ylim(0,settings["max_lat"])
+                ax.set_ylim(settings["min_lat"],settings["max_lat"])
 
 def calculate_font_size(settings, x_axis):
     max_label_width = max(ts.get_max_width([x_axis], len(x_axis)))
