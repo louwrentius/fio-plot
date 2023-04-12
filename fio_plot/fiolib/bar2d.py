@@ -22,6 +22,15 @@ def format_hostname_labels(settings, data):
             counter += 1
     return labels
 
+def set_max_yaxis(settings, axes):
+    for ax in axes:
+        if ax.get_ylabel() == "IOPS":
+            if settings["max_iops"]:
+                ax.set_ylim(0,settings["max_iops"])
+        if "Latency" in ax.get_ylabel():
+            if settings["max_lat"]:
+                ax.set_ylim(0,settings["max_lat"])
+
 def calculate_font_size(settings, x_axis):
     max_label_width = max(ts.get_max_width([x_axis], len(x_axis)))
     #print(max_label_width)
@@ -79,6 +88,8 @@ def create_bars_and_xlabels(settings, data, ax1, ax3):
     ax3.set_ylabel(data["y2_axis"]["format"])
     ax1.set_xlabel(settings["label"])
     ax1.set_xticks(ltest)
+
+    set_max_yaxis(settings, [ax1, ax3])
     
     fontsize = calculate_font_size(settings, x_axis)
     #print(fontsize)
