@@ -1,4 +1,5 @@
 import statistics
+import sys
 
 def check_for_hostname(record):
     keys = record.keys()
@@ -18,26 +19,47 @@ def check_for_valid_hostname(record):
         result = False
     return result
 
-def merge_job_data_from_hosts(hosts):
+def merge_job_data_from_hosts(settings, hosts):
 
     result = []
+    included = settings["include_hosts"]
+    excluded = settings["exclude_hosts"]
+    
+    if settings["compare_graph"]:
+        if not included and not excluded:
+            print("""
+Please specify an --include-hosts parameter with either 'All clients' 
+or a hostname as argument (only a single host can be compared). 
+--include-hosts 'All clients' is likely what you want\n""")
+            sys.exit(1)
+
     for host in hosts.keys():
-        iops = []
-        bw = []
-        lat = []
-        template = { "type": hosts[host][0]["type"], "iodepth": hosts[host][0]["iodepth"], "numjobs": hosts[host][0]["numjobs"], "hostname": host, "fio_version": hosts[host][0]["fio_version"], \
-                     "rw": hosts[host][0]["rw"], "bs": hosts[host][0]["bs"]
-                    }    
+        status = False
+        if included:
+            if host in included:
+                status = True
+        elif excluded:
+            if host not in excluded:
+                status = True
+        if status:
+            iops = []
+            bw = []
+            lat = []
 
-        for job in hosts[host]:
-            iops.append(job["iops"])
-            bw.append(job["bw"])
-            lat.append(job["lat"])
+            template = { "type": hosts[host][0]["type"], "iodepth": hosts[host][0]["iodepth"], "numjobs": hosts[host][0]["numjobs"], "hostname": host, "fio_version": hosts[host][0]["fio_version"], \
+                        "rw": hosts[host][0]["rw"], "bs": hosts[host][0]["bs"], "iops_stddev": hosts[host][0]["iops_stddev"],\
+                        "lat_stddev": hosts[host][0]["lat_stddev"], "cpu_sys": hosts[host][0]["cpu_sys"], "cpu_usr": hosts[host][0]["cpu_usr"]
+                        }    
 
-        template["iops"] = sum(iops)
-        template["bw"] = sum(bw)
-        template["lat"] = statistics.mean(lat)
-        result.append(template)
+            for job in hosts[host]:
+                iops.append(job["iops"])
+                bw.append(job["bw"])
+                lat.append(job["lat"])
+
+            template["iops"] = sum(iops)
+            template["bw"] = sum(bw)
+            template["lat"] = statistics.mean(lat)
+            result.append(template)
 
     return result
 
@@ -114,13 +136,13 @@ def check_for_steadystate(record, mode):
     else:
         return False
 
-def merge_job_data_hosts_jobs(hosts, jobs):
+def merge_job_data_hosts_jobs(settings, hosts, jobs):
     """
     Helper function to forward host data to host function
     and job data to job function.
     """
     if hosts:
-        returndata = merge_job_data_from_hosts(hosts)
+        returndata = merge_job_data_from_hosts(settings, hosts)
     elif jobs:
         returndata = [merge_job_data(jobs)]
     return returndata

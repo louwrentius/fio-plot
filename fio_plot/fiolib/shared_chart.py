@@ -149,7 +149,7 @@ def get_record_set_improved(settings, dataset, dataset_types):
                 #pprint.pprint(record.keys())
                 #pprint.pprint(f"-> {record['type']}")
                 #print(f"{depth} - {record['iodepth']} + {numjobs} - {record['numjobs']} + {record['rw']} + {record['type']}")
-                #print(f"{settings['filter']}") 
+                #print(f"{settings['filter']}")
                 if (
                     (int(record["iodepth"]) == int(depth))
                     and int(record["numjobs"]) == int(numjobs)
