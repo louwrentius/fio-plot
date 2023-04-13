@@ -27,7 +27,7 @@ def create_label(settings, item):
     multiple source folders, the labels may not be unique by default.
     """
     if item["hostname"]:
-        if len(settings["input_directory"]) and \
+        if len(settings["input_directory"]) > 1 and \
         (settings["xlabel_parent"] == 1 and settings["xlabel_depth"] == 0):
             print("WARNING: legend labels are not unique per input directory, use --xlabel-parent and --xlabel-depth to ajust.")
 
