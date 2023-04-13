@@ -22,7 +22,7 @@ def get_settings_from_ini(args):
     listinttypes = ['iodepth','numjobs']
     integers = ['maxdepth','maxjobs','dpi','max_z','max_lat','max_iops','min_lat','min_iops','max_bw','xlabel_depth','xlabel_parent','xlabel_segment_size','line_width','source_fontsize','subtitle_fontsize','title_fontsize']
     floats = ['percentile']
-    booltypes = ['show_cpu','show_ss','table_lines','disable_grid','enable_markers','disable_fio_version','moving_average', 'use_folder_names']
+    booltypes = ['show_cpu','show_ss','table_lines','disable_grid','enable_markers','disable_fio_version','moving_average']
     returndict = {}
     if len(args) > 1:
         if not "-" in args[1][0]:

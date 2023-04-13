@@ -22,7 +22,7 @@ def get_json_data(settings):
 
 
 def create_label(settings, item):
-    if item["hostname"] and not settings["use_folder_names"]:
+    if item["hostname"]:
         mydir = item["hostname"]
     else:
         mydir = f"{item['directory']}"
