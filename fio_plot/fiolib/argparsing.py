@@ -249,6 +249,10 @@ def set_arguments(settings):
         default=1000,
     )
     ag.add_argument(
+        "--use-folder-names",
+        help="When creating an -g graph based on client/server data, use folder names as labels instead of hostnames",
+        action="store_true")
+    ag.add_argument(
         "-w",
         "--line-width",
         help="Line width for line graphs. Can be a floating-point value. Used with -g.",

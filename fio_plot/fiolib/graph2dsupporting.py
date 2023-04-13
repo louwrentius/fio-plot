@@ -21,8 +21,8 @@ def get_json_data(settings):
         return None
 
 
-def create_label(item):
-    if item["hostname"]:
+def create_label(settings, item):
+    if item["hostname"] and not settings["use_folder_names"]:
         mydir = item["hostname"]
     else:
         mydir = f"{item['directory']}"
@@ -34,7 +34,7 @@ def get_max_label_size(settings, data):
     for item in data["dataset"]:
         for rw in settings["filter"]:
             if rw in item.keys():
-                label = create_label(item)
+                label = create_label(settings, item)
                 labels.append(label)
 
     maxlabelsize = 0
@@ -158,7 +158,7 @@ def drawline(settings, item, rw, supportdata):
 
 def create_single_label(settings, item, rw, supportdata):
     # print(maxlabelsize)
-    mylabel = create_label(item)
+    mylabel = create_label(settings, item)
     mylabel = get_padding(mylabel, supportdata["maxlabelsize"])
     labelset = {
         "name": mylabel,
