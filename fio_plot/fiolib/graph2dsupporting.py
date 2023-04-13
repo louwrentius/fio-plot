@@ -22,8 +22,21 @@ def get_json_data(settings):
 
 
 def create_label(settings, item):
+    """
+    The label must be unique. With client/server data, when using
+    multiple source folders, the labels may not be unique by default.
+    """
     if item["hostname"]:
-        mydir = item["hostname"]
+        if len(settings["input_directory"]) and \
+        (settings["xlabel_parent"] == 1 and settings["xlabel_depth"] == 0):
+            print("WARNING: legend labels are not unique per input directory, use --xlabel-parent and --xlabel-depth to ajust.")
+
+        if len(settings["input_directory"]) > 1 and \
+            (settings["xlabel_parent"] != 1 \
+            or settings["xlabel_depth"] != 0):
+            mydir = f"{item['directory']}-{item['hostname']}"
+        else:
+            mydir = item["hostname"]
     else:
         mydir = f"{item['directory']}"
     return mydir
