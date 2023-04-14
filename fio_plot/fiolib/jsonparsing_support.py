@@ -19,12 +19,9 @@ def check_for_valid_hostname(record):
         result = False
     return result
 
-def merge_job_data_from_hosts(settings, hosts):
-
-    result = []
-    included = settings["include_hosts"]
-    excluded = settings["exclude_hosts"]
-    
+def merge_job_filter_hosts(settings, hosts):
+    included = set(settings.get("include_hosts", []) or [])
+    excluded = set(settings.get("exclude_hosts", []) or [])
     if settings["compare_graph"]:
         if not included and not excluded:
             print("""
@@ -32,35 +29,36 @@ Please specify an --include-hosts parameter with either 'All clients'
 or a hostname as argument (only a single host can be compared). 
 --include-hosts 'All clients' is likely what you want\n""")
             sys.exit(1)
+    hostlist = included.intersection(hosts) if included else set(hosts)
+    hostlist -= excluded
+    return list(hostlist)
 
-    for host in hosts.keys():
-        status = False
-        if included:
-            if host in included:
-                status = True
-        elif excluded:
-            if host not in excluded:
-                status = True
-        if status:
-            iops = []
-            bw = []
-            lat = []
+def merge_job_data_from_hosts(settings, hosts):
 
-            template = { "type": hosts[host][0]["type"], "iodepth": hosts[host][0]["iodepth"], "numjobs": hosts[host][0]["numjobs"], "hostname": host, "fio_version": hosts[host][0]["fio_version"], \
-                        "rw": hosts[host][0]["rw"], "bs": hosts[host][0]["bs"], "iops_stddev": hosts[host][0]["iops_stddev"],\
-                        "lat_stddev": hosts[host][0]["lat_stddev"], "cpu_sys": hosts[host][0]["cpu_sys"], "cpu_usr": hosts[host][0]["cpu_usr"]
-                        }    
+    result = []
 
-            for job in hosts[host]:
-                iops.append(job["iops"])
-                bw.append(job["bw"])
-                lat.append(job["lat"])
+    hostlist = merge_job_filter_hosts(settings, hosts)
+    
+    for host in hostlist:
 
-            template["iops"] = sum(iops)
-            template["bw"] = sum(bw)
-            template["lat"] = statistics.mean(lat)
-            result.append(template)
+        iops = []
+        bw = []
+        lat = []
 
+        template = { "type": hosts[host][0]["type"], "iodepth": hosts[host][0]["iodepth"], "numjobs": hosts[host][0]["numjobs"], "hostname": host, "fio_version": hosts[host][0]["fio_version"], \
+                    "rw": hosts[host][0]["rw"], "bs": hosts[host][0]["bs"], "iops_stddev": hosts[host][0]["iops_stddev"],\
+                    "lat_stddev": hosts[host][0]["lat_stddev"], "cpu_sys": hosts[host][0]["cpu_sys"], "cpu_usr": hosts[host][0]["cpu_usr"]
+                    }    
+
+        for job in hosts[host]:
+            iops.append(job["iops"])
+            bw.append(job["bw"])
+            lat.append(job["lat"])
+
+        template["iops"] = sum(iops)
+        template["bw"] = sum(bw)
+        template["lat"] = statistics.mean(lat)
+        result.append(template)
     return result
 
 
