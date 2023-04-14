@@ -72,7 +72,7 @@ def process_json_record(settings, directory, record, jsonrootpath, globaloptions
         else:
             jobs.append(row)
           
-    directory["data"].extend(jsonsupport.merge_job_data_hosts_jobs(hosts, jobs))
+    directory["data"].extend(jsonsupport.merge_job_data_hosts_jobs(settings, hosts, jobs))
 
     
 def parse_json_data(settings, dataset):

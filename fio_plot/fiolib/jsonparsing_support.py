@@ -1,4 +1,5 @@
 import statistics
+import sys
 
 def check_for_hostname(record):
     keys = record.keys()
@@ -18,15 +19,38 @@ def check_for_valid_hostname(record):
         result = False
     return result
 
-def merge_job_data_from_hosts(hosts):
+def merge_job_filter_hosts(settings, hosts):
+    """
+    The code below is optimized by GPT-4.
+    """
+    included = set(settings.get("include_hosts", []) or [])
+    excluded = set(settings.get("exclude_hosts", []) or [])
+    if settings["compare_graph"]:
+        if not included and not excluded:
+            print("""
+Please specify an --include-hosts parameter with either 'All clients' 
+or a hostname as argument (only a single host can be compared). 
+--include-hosts 'All clients' is likely what you want\n""")
+            sys.exit(1)
+    hostlist = included.intersection(hosts) if included else set(hosts)
+    hostlist -= excluded
+    return list(hostlist)
+
+def merge_job_data_from_hosts(settings, hosts):
 
     result = []
-    for host in hosts.keys():
+
+    hostlist = merge_job_filter_hosts(settings, hosts)
+    
+    for host in hostlist:
+
         iops = []
         bw = []
         lat = []
+
         template = { "type": hosts[host][0]["type"], "iodepth": hosts[host][0]["iodepth"], "numjobs": hosts[host][0]["numjobs"], "hostname": host, "fio_version": hosts[host][0]["fio_version"], \
-                     "rw": hosts[host][0]["rw"], "bs": hosts[host][0]["bs"]
+                    "rw": hosts[host][0]["rw"], "bs": hosts[host][0]["bs"], "iops_stddev": hosts[host][0]["iops_stddev"],\
+                    "lat_stddev": hosts[host][0]["lat_stddev"], "cpu_sys": hosts[host][0]["cpu_sys"], "cpu_usr": hosts[host][0]["cpu_usr"]
                     }    
 
         for job in hosts[host]:
@@ -38,7 +62,6 @@ def merge_job_data_from_hosts(hosts):
         template["bw"] = sum(bw)
         template["lat"] = statistics.mean(lat)
         result.append(template)
-
     return result
 
 
@@ -114,13 +137,13 @@ def check_for_steadystate(record, mode):
     else:
         return False
 
-def merge_job_data_hosts_jobs(hosts, jobs):
+def merge_job_data_hosts_jobs(settings, hosts, jobs):
     """
     Helper function to forward host data to host function
     and job data to job function.
     """
     if hosts:
-        returndata = merge_job_data_from_hosts(hosts)
+        returndata = merge_job_data_from_hosts(settings, hosts)
     elif jobs:
         returndata = [merge_job_data(jobs)]
     return returndata
