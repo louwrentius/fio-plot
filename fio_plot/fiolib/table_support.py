@@ -49,7 +49,7 @@ def scale_iops(data):
     return scaled
 
 
-def alternate_cell_height(number=2,stepsize=1):
+def alternate_cell_height(number=2,stepsize=2):
     start = 5
     stop = start + (number * stepsize)
     while True:
@@ -100,7 +100,7 @@ def tablelines(settings):
 def get_alternator_value(matrix):
     if max(matrix) <= 10:
         alternator = alternate_cell_height()
-    elif max(matrix) > 10:
+    if max(matrix) > 10:
         alternator = alternate_cell_height(3,14)
     else:
         alternator = alternate_cell_height(1,10)
