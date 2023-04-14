@@ -49,7 +49,7 @@ def scale_iops(data):
     return scaled
 
 
-def alternate_cell_height(number=2,stepsize=14):
+def alternate_cell_height(number=2,stepsize=1):
     start = 5
     stop = start + (number * stepsize)
     while True:

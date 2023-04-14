@@ -20,6 +20,9 @@ def check_for_valid_hostname(record):
     return result
 
 def merge_job_filter_hosts(settings, hosts):
+    """
+    The code below is optimized by GPT-4.
+    """
     included = set(settings.get("include_hosts", []) or [])
     excluded = set(settings.get("exclude_hosts", []) or [])
     if settings["compare_graph"]:
