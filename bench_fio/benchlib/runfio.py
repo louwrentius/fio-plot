@@ -5,6 +5,9 @@ import os
 import copy
 from numpy import linspace
 import time
+from operator import itemgetter
+from itertools import groupby
+from threading import Thread
 
 from . import ( 
     supporting,
@@ -42,9 +45,10 @@ def run_raw_command(command, outputfile = None):
 
 
 def run_fio(settings, benchmark):
+    tmpjobfile = f"/tmp/{os.path.basename(benchmark['target'])}-tmpjobfile.fio"
     output_directory = supporting.generate_output_directory(settings, benchmark)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
-    generatefio.generate_fio_job_file(settings, benchmark, output_directory)
+    generatefio.generate_fio_job_file(settings, benchmark, output_directory, tmpjobfile)
     
     ### We build up the fio command line here
     command = [
@@ -57,7 +61,7 @@ def run_fio(settings, benchmark):
     if settings["remote"]:
         command.append(f"--client={settings['remote']}")
 
-    command.append(settings["tmpjobfile"])
+    command.append(tmpjobfile)
     # End of command line creation
     
     if not settings["dry_run"]:
@@ -114,8 +118,7 @@ def run_precondition_benchmark(settings, device, run):
         sys.exit(1)
 
 
-def run_benchmarks(settings, benchmarks):
-    # pprint.pprint(benchmarks)
+def worker(benchmarks, settings):
     run = 0
     progress_benchmarks = ProgressBar(benchmarks) if not settings["quiet"] else benchmarks
     for benchmark in progress_benchmarks:
@@ -126,6 +129,24 @@ def run_benchmarks(settings, benchmarks):
             run_precondition_benchmark(settings, benchmark["target"], run)
             drop_caches()
             run_fio(settings, benchmark)
+
+
+def run_benchmarks(settings, benchmarks):
+    # pprint.pprint(benchmarks)
+    group_benchmarks = []
+    for _, items in groupby(benchmarks, key=itemgetter("target")):
+        group_benchmarks.append(list(items))
+    thread_list = []
+    for target in range(len(group_benchmarks)):
+        t = Thread(target=worker, args=(group_benchmarks[target], settings))
+        thread_list.append(t)
+  
+    for t in thread_list:
+        t.setDaemon(True)
+        t.start()
+
+    for t in thread_list:
+        t.join()
 
 
 def ProgressBar(iterObj):
