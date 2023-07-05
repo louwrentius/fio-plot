@@ -133,20 +133,23 @@ def worker(benchmarks, settings):
 
 def run_benchmarks(settings, benchmarks):
     # pprint.pprint(benchmarks)
-    group_benchmarks = []
-    for _, items in groupby(benchmarks, key=itemgetter("target")):
-        group_benchmarks.append(list(items))
-    thread_list = []
-    for target in range(len(group_benchmarks)):
-        t = Thread(target=worker, args=(group_benchmarks[target], settings))
-        thread_list.append(t)
-  
-    for t in thread_list:
-        t.setDaemon(True)
-        t.start()
+    if not settings["parallel"]:
+        worker(benchmarks, settings)
+    else:
+        group_benchmarks = []
+        for _, items in groupby(benchmarks, key=itemgetter("target")):
+            group_benchmarks.append(list(items))
+        thread_list = []
+        for target in range(len(group_benchmarks)):
+            t = Thread(target=worker, args=(group_benchmarks[target], settings))
+            thread_list.append(t)
+    
+        for t in thread_list:
+            t.setDaemon(True)
+            t.start()
 
-    for t in thread_list:
-        t.join()
+        for t in thread_list:
+            t.join()
 
 
 def ProgressBar(iterObj):

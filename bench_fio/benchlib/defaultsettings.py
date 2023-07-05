@@ -39,6 +39,7 @@ def get_default_settings():
     settings["remote_checks"] = False
     settings["remote_timeout"] = 2
     settings["create"] = False
+    settings["parallel"] = False
     settings["loop_items"] = [
         "target",
         "mode",
@@ -75,7 +76,8 @@ def get_default_settings():
         "destructive",
         "precondition",
         "template",
-        "create"
+        "create",
+        "parallel"
     ]
     settings["basename_list"] = [
         "precondition_template"
