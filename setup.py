@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
         name="fio-plot",
-        version="1.1.6",
+        version="1.1.7777777",
         author="louwrentius",
         description="Create charts from FIO storage benchmark tool output",
         long_description=long_description,
