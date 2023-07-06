@@ -2,12 +2,12 @@
 import configparser
 from . import (defaultsettings, checks)
 
-def write_fio_job_file(settings, parser):
+def write_fio_job_file(tmpjobfile, parser):
     try:
-        with open(f"{settings['tmpjobfile']}", 'w') as configfile:
+        with open(tmpjobfile, 'w') as configfile:
             parser.write(configfile, space_around_delimiters=False)
     except IOError:
-        print(f"Failed to write temporary Fio job file at {settings['tmpjobfile']}")
+        print(f"Failed to write temporary Fio job file at tmpjobfile")
 
 def filter_options(settings, config, mapping, benchmark, output_directory):
     boolean = {"True": 1, "False": 0}
@@ -37,10 +37,10 @@ def filter_options(settings, config, mapping, benchmark, output_directory):
     config['FIOJOB']["write_iops_log"] = f"{output_directory}/{benchmark['mode']}-iodepth-{benchmark['iodepth']}-numjobs-{benchmark['numjobs']}"
     return config
 
-def generate_fio_job_file(settings, benchmark, output_directory):
+def generate_fio_job_file(settings, benchmark, output_directory, tmpjobfile):
     config = configparser.ConfigParser()
     mapping = defaultsettings.map_settings_to_fio()
     config = filter_options(settings, config, mapping, benchmark, output_directory)
-    write_fio_job_file(settings, config)
+    write_fio_job_file(tmpjobfile, config)
 
 

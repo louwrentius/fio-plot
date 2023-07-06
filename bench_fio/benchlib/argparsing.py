@@ -277,6 +277,12 @@ def get_arguments(settings):
         action="store_true",
         default=False,
     )
+    ag.add_argument(
+        "--parallel",
+        help="Testing devices in parallel. The default for testing devices in sequential",
+        action="store_true",
+        default=False,
+    )
     return parser
 
 def get_argument_description():
@@ -312,6 +318,7 @@ def get_argument_description():
         "remote":"Use remote server",
         "remote_checks": "Check remote for open TCP port",
         "remote_timeout": "Check remote timeout (s)",
-        "create": "Create if target doesn't exist"
+        "create": "Create if target doesn't exist",
+        "parallel": "Testing devices in parallel"
     }
     return descriptions

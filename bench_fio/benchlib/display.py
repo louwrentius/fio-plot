@@ -26,6 +26,8 @@ def parse_settings_for_display(settings):
 
 def calculate_duration(settings, tests):
     number_of_tests = len(tests) * settings["loops"]
+    if settings["parallel"]:
+        number_of_tests = number_of_tests/len(settings["target"])
     time_per_test = settings["runtime"]
     if time_per_test:
         duration_in_seconds = number_of_tests * time_per_test
