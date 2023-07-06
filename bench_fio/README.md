@@ -102,6 +102,15 @@ a regular fio job file, one per line.
 You can put any valid fio option in the bench-fio INI file and those will be passed as-is to fio. Such parameters are
 marked with an asterix(*) when running bench-fio.
 
+### Benchmarking multiple devices in parallel
+
+By default, a test run will benchmark one device at a time, sequentially. The --parallel option allows multiple devices
+to be tested in parallel. This has two benefits, it speeds up testing and it also simulates a particular load on the system.
+It could be that benchmarking devices in parallel causes so much CPU impact that this impacts the benchmark results.
+Depending on your intentions, this may actually be an interesting outcome or spoil the benchmark results, so keep this in mind.
+
+Thanks @Zhucan for building this feature.
+
 ### Fio Client/Server support
 
 The Fio tool supports a [client-server][clientserver] model where one host can issue a benchmark on just one remote host
