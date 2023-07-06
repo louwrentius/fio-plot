@@ -174,14 +174,18 @@ Pure read/write/trim workloads will appear in the *device* folder.
 
 ### Usage
 
-	usage: bench_fio [-h] -d TARGET [TARGET ...] -t {device,file,directory,rbd} [-P CEPH_POOL] [-s SIZE] -o OUTPUT [-j TEMPLATE] [-b BLOCK_SIZE [BLOCK_SIZE ...]]
-                 [--iodepth IODEPTH [IODEPTH ...]] [--numjobs NUMJOBS [NUMJOBS ...]] [--runtime RUNTIME] [-p] [--precondition-repeat] [--precondition-template PRECONDITION_TEMPLATE]
-                 [-m MODE [MODE ...]] [--rwmixread RWMIXREAD [RWMIXREAD ...]] [-e ENGINE] [--direct DIRECT] [--loops LOOPS] [--time-based] [--entire-device] [--ss SS]
-                 [--ss-dur SS_DUR] [--ss-ramp SS_RAMP] [--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]] [--invalidate INVALIDATE] [--quiet] [--loginterval LOGINTERVAL] [--dry-run]
+	usage: bench-fio [-h] -d TARGET [TARGET ...] -t {device,file,directory,rbd} [-P CEPH_POOL] [-s SIZE] -o OUTPUT
+                 [-b BLOCK_SIZE [BLOCK_SIZE ...]] [--iodepth IODEPTH [IODEPTH ...]] [--numjobs NUMJOBS [NUMJOBS ...]]
+                 [--runtime RUNTIME] [-p] [--precondition-repeat] [--precondition-template PRECONDITION_TEMPLATE]
+                 [-m MODE [MODE ...]] [--rwmixread RWMIXREAD [RWMIXREAD ...]] [-e ENGINE] [--direct DIRECT]
+                 [--loops LOOPS] [--time-based] [--entire-device] [--ss SS] [--ss-dur SS_DUR] [--ss-ramp SS_RAMP]
+                 [--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]] [--invalidate INVALIDATE] [--quiet]
+                 [--loginterval LOGINTERVAL] [--dry-run] [--destructive] [--remote REMOTE] [--remote-checks]
+                 [--remote-timeout REMOTE_TIMEOUT] [--create] [--parallel]
 
 	Automates FIO benchmarking. It can run benchmarks with different iodepths, jobs or other properties.
 
-	optional arguments:
+	options:
 	-h, --help            show this help message and exit
 
 	Generic Settings:
@@ -191,50 +195,74 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							Target type, device, file, directory or rbd (Ceph)
 	-P CEPH_POOL, --ceph-pool CEPH_POOL
 							Specify the Ceph pool in wich the target rbd image resides.
-	-s SIZE, --size SIZE  File size if target is a file. If target is a directory, a file of the specified size is created per job
+	-s SIZE, --size SIZE  File size if target is a file. The value is passed straight to the fio --size parameter. See
+							the Fio man page for supported syntax. If target is a directory, a file of the specified size
+							is created per job
 	-o OUTPUT, --output OUTPUT
-							Output directory for .json and .log output. If a read/write mix is specified, separate directories for each mix will be created.
-	-j TEMPLATE, --template TEMPLATE
-							Fio job file in INI format. A file is already included and this parameter is only required if you create your own custom Fio job. (Default: ./fio-job-
-							template.fio)
+							Output directory for .json and .log output. If a read/write mix is specified, separate
+							directories for each mix will be created.
 	-b BLOCK_SIZE [BLOCK_SIZE ...], --block-size BLOCK_SIZE [BLOCK_SIZE ...]
 							Specify block size(s). (Default: ['4k']
 	--iodepth IODEPTH [IODEPTH ...]
-							Override default iodepth test series ([1, 2, 4, 8, 16, 32, 64]). Usage example: --iodepth 1 8 16
+							Override default iodepth test series ([1, 2, 4, 8, 16, 32, 64]). Usage example: --iodepth 1 8
+							16
 	--numjobs NUMJOBS [NUMJOBS ...]
-							Override default number of jobs test series ([1, 2, 4, 8, 16, 32, 64]). Usage example: --numjobs 1 8 16
+							Override default number of jobs test series ([1, 2, 4, 8, 16, 32, 64]). Usage example:
+							--numjobs 1 8 16
 	--runtime RUNTIME     Override the default test runtime per benchmark(default: 60)
-	-p, --precondition    With this option you can specify an SSD precondition workload prior to performing actualbenchmarks. If you don't precondition SSDs before running a benchmark,
-							results may notreflect actual real-life performance under sustained load. (default: False).
+	-p, --precondition    With this option you can specify an SSD precondition workload prior to performing
+							actualbenchmarks. If you don't precondition SSDs before running a benchmark, results may
+							notreflect actual real-life performance under sustained load. (default: False).
 	--precondition-repeat
-							After every individual benchmark, the preconditioning run is executed (again). (Default: False).
+							After every individual benchmark, the preconditioning run is executed (again). (Default:
+							False).
 	--precondition-template PRECONDITION_TEMPLATE
-							The Fio job template containing the precondition workload(default=precondition.fio
+							The Fio job template containing the precondition
+							workload(default=/usr/local/lib/python3.10/dist-
+							packages/fio_plot-1.1.7-py3.10.egg/bench_fio/benchlib/../templates/precondition.fio
 	-m MODE [MODE ...], --mode MODE [MODE ...]
-							List of I/O load tests to run (default: ['randread', 'randwrite'])
+							List of I/O load tests to run (default: ['randread'])
 	--rwmixread RWMIXREAD [RWMIXREAD ...]
-							If a mix of read/writes is specified with --testmode, the ratio of reads vs. writes can be specified with this option. the parameter is an integer and
-							represents the percentage of reads. A read/write mix of 75%/25% is specified as '75' (default: None). Multiple values can be specified and separate output
-							directories will be created. This argument is only used if the benchmark is of type randrw. Otherwise this option is ignored.
+							If a mix of read/writes is specified with --testmode, the ratio of reads vs. writes can be
+							specified with this option. The parameter is an integer and represents the percentage of
+							reads. A read/write mix of 75%/25% is specified as '75' (default: None). Multiple values can
+							be specified and separate output directories will be created. This argument is only used if
+							the benchmark is of type randrw. Otherwise this option is ignored.
 	-e ENGINE, --engine ENGINE
-							Select the ioengine to use, see fio --enghelp for an overview of supported engines. (Default: libaio).
+							Select the ioengine to use, see fio --enghelp for an overview of supported engines. (Default:
+							libaio).
 	--direct DIRECT       Use DIRECT I/O (default: 1)
 	--loops LOOPS         Each individual benchmark is repeated x times (default: 1)
-	--time-based          All benchmarks are time based, even if a test size is specifiedLookt at the Fio time based option for more information.(default: False).
-	--entire-device       The benchmark will keep running until all sectors are read or written to.(default: False).
-	--ss SS               Detect and exit on achieving steady state (spefial Fio feature, 'man fio' for more detials) (default: False)
+	--time-based          All benchmarks are time based, even if a test size is specifiedLookt at the Fio time based
+							option for more information.(default: False).
+	--entire-device       The benchmark will keep running until all sectors are read or written to. Overrides runtime
+							setting.(default: False).
+	--ss SS               Detect and exit on achieving steady state (spefial Fio feature, 'man fio' for more detials)
+							(default: False)
 	--ss-dur SS_DUR       Steady state window (default: None)
 	--ss-ramp SS_RAMP     Steady state ramp time (default: None)
 	--extra-opts EXTRA_OPTS [EXTRA_OPTS ...]
-							Allows you to add extra options, for example, options that are specific to the selected ioengine. It can be any other Fio option. Example: --extra-opts
-							norandommap=1 invalidate=0 You may also choose to add those options to the fio_template.fio file.
+							Allows you to add extra options, for example, options that are specific to the selected
+							ioengine. It can be any other Fio option. Example: --extra-opts norandommap=1 invalidate=0
+							this can also be specified in the bench-fio ini file
 	--invalidate INVALIDATE
 							From the Fio manual: Invalidate buffer-cache for the file prior to starting I/O.(Default: 1)
 	--quiet               The progresbar will be supressed.
 	--loginterval LOGINTERVAL
-							Interval that specifies how often stats are logged to the .log files. (Default: 1000)
+							Interval that specifies how often stats are logged to the .log files. (Default: 1000
 	--dry-run             Simulates a benchmark, does everything except running Fio.
-	--destructive         Enables benchmarks that write towards the device|file|directory (Default: False)
+	--destructive         Enables benchmarks that write towards the device|file|directory
+	--remote REMOTE       Uses Fio client/server mechanism. Argument requires file with name host.list containing one
+							host per line. (False). Usage example: --remote host.list
+	--remote-checks       When Fio client/server is used, we run a preflight check if all hosts are up using a TCP port
+							check before we run the benchmark. Otherwise some hosts start benchmarking until a down host
+							times out, which may be undesirable. (False).
+	--remote-timeout REMOTE_TIMEOUT
+							When Fio client/server is used, we run a preflight check if all hosts are up using a TCP port
+							check before we run the benchmark. Otherwise some hosts start benchmarking until a down host
+							times out, which may be undesirable. (False).
+	--create              Create target files if they don't exist. This is the default for fio but not for bench_fio
+	--parallel            Testing devices in parallel. The default for testing devices in sequential
 
 ### SSD Preconditioning
 
