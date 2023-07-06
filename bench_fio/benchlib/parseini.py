@@ -28,8 +28,10 @@ def process_options(config):
 def read_ini_data(args, config):
     if len(args) != 2:
         return False
-    
-    filename = args[1]
+    if args[1] == "-h" or args[1] == "--help":
+        return False
+    else:
+        filename = args[1]
     
     if not os.path.isfile(filename):
         print(f"Config file {filename} not found.")
@@ -49,3 +51,5 @@ def get_settings_from_ini(args):
     if read_ini_data(args, config):
         returndict = process_options(config)
         return returndict
+    else:
+        return None
