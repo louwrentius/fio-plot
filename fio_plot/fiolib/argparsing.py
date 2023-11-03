@@ -76,19 +76,21 @@ def set_arguments(settings):
         action="store_true",
         help="\
             Disables the dotted grid in the output graph.",
+        default=settings["disable_grid"],
     )
     ag.add_argument(
         "--enable-markers",
         action="store_true",
         help="\
             Enable markers for the plot lines when graphing log data.",
+        default=settings["enable_markers"],            
     )
     ag.add_argument(
         "--subtitle",
         help="\
             Specify your own subtitle or leave it blank with double quotes.",
         type=str,
-        default=None,
+        default=settings["subtitle"],
     )
     ag.add_argument(
         "-d",
@@ -113,7 +115,7 @@ def set_arguments(settings):
         "-M",
         "--maxdepth",
         nargs="?",
-        default=64,
+        default=settings["maxdepth"],
         type=int,
         help="\
             Maximum queue depth to graph in 3D graph.",
@@ -124,7 +126,7 @@ def set_arguments(settings):
         help="\
             Maximum number of jobs to graph in 3D graph.",
         nargs="?",
-        default=64,
+        default=settings["maxjob"],
         type=int,
     )
     ag.add_argument(
@@ -134,7 +136,7 @@ def set_arguments(settings):
             The chart will be saved with this DPI setting. Higher means larger\
                      image.",
         nargs="?",
-        default=200,
+        default=settings["dpi"],
         type=int,
     )
     ag.add_argument(
@@ -143,7 +145,7 @@ def set_arguments(settings):
         help="\
             Calculate the percentile, default 99.99th.",
         nargs="?",
-        default=99.99,
+        default=settings["percentile"],
         type=float,
     )
     ag.add_argument(
@@ -167,14 +169,14 @@ def set_arguments(settings):
     ag.add_argument(
         "-m",
         "--max-z",
-        default=None,
+        default=settings["max_z"],
         type=int,
         help="Optional maximum value for Z-axis in 3D graph.",
     )
     ag.add_argument(
         "-e",
         "--moving-average",
-        default=None,
+        default=settings["moving_average"],
         type=int,
         help="The moving average helps to smooth out graphs,\
                          the argument is the size of the moving window\
@@ -185,13 +187,13 @@ def set_arguments(settings):
         "--min-iops",
         help=f"Optional minimal value for iops axis, default is {settings['min_iops']}",
         type=int,
-        default=0,
+        default=settings["min_iops"],
     )
     ag.add_argument(
         "--min-lat",
         help=f"Optional minimal value for lat axis, default is {settings['min_lat']}",
         type=int,
-        default=0,
+        default=settings["min_lat"],
     )
 
     ag.add_argument(
@@ -219,7 +221,7 @@ def set_arguments(settings):
             Sometimes devices may take a much longer time to complete than others and for readability it's \
             best to truncate the x-axis.",
         type=int,
-        default=None,
+        default=settings["truncate_xaxis"],
     )
 
     ag.add_argument(
@@ -228,7 +230,7 @@ def set_arguments(settings):
             Can be used to truncate the most significant folder name from the label. \
                 Often used to strip off folders generated with benchfio (e.g. 4k)",
         type=int,
-        default=0,
+        default=settings["xlabel_depth"],
     )
     ag.add_argument(
         "--xlabel-parent",
@@ -237,7 +239,7 @@ def set_arguments(settings):
                  represents how many folders up should be included. Default is 1. Use a value of \
                      0 to remove parent folder name.",
         type=int,
-        default=1,
+        default=settings["xlabel_parent"],
     )
     ag.add_argument(
         "--xlabel-segment-size",
@@ -246,40 +248,46 @@ def set_arguments(settings):
                 The number represents how many characters per \
                     segment are preserved. Used with -g.",
         type=int,
-        default=1000,
+        default=settings["xlabel_segment_size"],
     )
     ag.add_argument(
         "-w",
         "--line-width",
         help="Line width for line graphs. Can be a floating-point value. Used with -g.",
         type=float,
-        default=1,
+        default=settings["line_width"],
     ),
     ag.add_argument(
         "--group-bars",
         help="When using -l or -C, bars are grouped together by iops/lat type.",
         action="store_true",
+        default=settings["group_bars"],
     )
     ag.add_argument(
         "--show-cpu",
         help="When using the -C or -l option, a table is added with cpu_usr and cpu_sys data.",
         action="store_true",
+        default=settings["show_cpu"]
     )
     ag.add_argument(
         "--show-data",
         help="When using the -C -l or -N option, iops/lat data is also shown in table format. It replaces \
         the standard deviation table",
         action="store_true",
+        default=settings["show_data"]
     )
     ag.add_argument(
         "--show-ss",
         help="When using the -C or -l option, a table is added with steadystate data.",
         action="store_true",
+        default=settings["show_ss"]
+
     )
     ag.add_argument(
         "--table-lines",
         help="Draw the lines within a table (cpu/stdev)",
         action="store_true",
+        default=settings["table_lines"]
     )
     ag.add_argument(
         "--max-lat", help="Maximum latency value on y-axis", type=int, default=None
@@ -300,6 +308,7 @@ def set_arguments(settings):
         "--draw-total",
         help="Draw sum of read + write data in -g chart. Requires randrw benchmark, -f read write option.",
         action="store_true",
+        default=settings["draw_total"]
     )
     ag.add_argument(
         "--colors",
@@ -308,12 +317,13 @@ def set_arguments(settings):
         "(example list: tab:red teal violet yellow). You need as many colors as lines.",
         type=str,
         nargs="+",
-        default=None,
+        default=settings["colors"],
     )
     ag.add_argument(
         "--disable-fio-version",
         help="Don't display the fio version in the graph. It will also disable the fio-plot credit.",
         action="store_true",
+        default=settings["disable_fio_version"]
     )
     ag.add_argument(
         "--title-fontsize", help="Title font size", type=int,  default=settings["title_fontsize"]

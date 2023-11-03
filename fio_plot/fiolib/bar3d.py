@@ -124,8 +124,8 @@ def plot_3d(settings, dataset):
                 cutoff_values.append(settings["max_z"])
         dz = np.array(cutoff_values)
         if warning:
-            print("Warning: z-axis values above ")
             warning_text = f"WARNING: values above {settings['max_z']} have been cutoff"
+            print(warning_text)
             fig.text(0.55, 0.85, warning_text)
 
     # Create the 3D chart with positioning and colors

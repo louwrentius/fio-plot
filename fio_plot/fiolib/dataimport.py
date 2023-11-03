@@ -50,14 +50,14 @@ def limit_path_part_size(path, length):
 def return_folder_name(filename, settings, override=False):
     segment_size = settings["xlabel_segment_size"]
     parent = settings["xlabel_parent"]
-    child = settings["xlabel_depth"]
+    xlabeldepth = settings["xlabel_depth"]
     raw_path = Path(filename).resolve()
-
+    #print(settings)
     if override:
         raw_path = raw_path.parent
 
-    if child > 0:
-        raw_path = raw_path.parents[child - 1]
+    if xlabeldepth > 0:
+        raw_path = raw_path.parents[xlabeldepth - 1]
 
     upperpath = raw_path.parents[parent]
 
@@ -131,7 +131,7 @@ def mergeSingleDataSet(data, datatype):
     #print("==============")
     #for x in data: 
     #    print(f"Merge single dataset - {x['hostname']} - {x['filename']} - {type(x['data'])}")
-    mergedSet = []
+    merged_set = []
     hostdatamerged = {}
     regulardatamerged = []
 
@@ -141,20 +141,20 @@ def mergeSingleDataSet(data, datatype):
                 hostdatamerged[record["hostname"]] = []
             hostdatamerged[record["hostname"]].append(record)
         else:
-            result = regulardatamerged.append(record)
+            regulardatamerged.append(record)
 
 
     if hostdatamerged:
         for host in hostdatamerged.keys():
             result = ds.newMergeLogDataSet(hostdatamerged[host], datatype, host)
-            mergedSet.append(result)
+            merged_set.append(result)
     elif regulardatamerged:
-        mergedSet.append(ds.newMergeLogDataSet(regulardatamerged,datatype))
+        merged_set.append(ds.newMergeLogDataSet(regulardatamerged,datatype))
     else:
         print("ERROR")
         sys.exit(1)
-    #mergedSet = ds.mergeLogDataSet(data, datatype, hostlist)
-    return mergedSet
+    #merged_set = ds.mergeLogDataSet(data, datatype, hostlist)
+    return merged_set
 
 
 def get_unique_directories(dataset):
@@ -173,7 +173,7 @@ def mergeDataSet(settings, dataset):
     We also take into account if multiple folders are specified to compare
     benchmarks results across different runs.
     """
-    mergedSets = []
+    merged_sets = []
     filterstrings = return_filename_filter_string(settings)
     directories = get_unique_directories(dataset)
 
@@ -197,8 +197,8 @@ def mergeDataSet(settings, dataset):
             newdata = mergeSingleDataSet(data, filterstring["type"]) # read write hostname
             #print(newdata["hostname"])
             record["data"] = newdata
-            mergedSets.append(record)
-    return mergedSets
+            merged_sets.append(record)
+    return merged_sets
 
 
 def parse_raw_cvs_data(settings, dataset):

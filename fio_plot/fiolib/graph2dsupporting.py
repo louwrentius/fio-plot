@@ -92,7 +92,6 @@ def validate_colors(colors):
             )
             sys.exit(1)
 
-
 def get_color(settings, supportdata):
     try:
         color = supportdata["colors"].pop(0)

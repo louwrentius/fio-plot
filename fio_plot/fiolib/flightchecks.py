@@ -1,9 +1,13 @@
+"""
+Provides many different checks before image is generated.
+Checks mostly conflicting or missing settings.
+"""
 import sys
 import os
 import matplotlib
 
-def check_matplotlib_version(requiredversion):
 
+def check_matplotlib_version(requiredversion):
     matplotlibversion = matplotlib.__version__
     from pkg_resources import parse_version as V  # nice
 
@@ -36,9 +40,12 @@ def run_preflight_checks(settings):
             "\nIf -g is specified, you must specify the type of data with -t (see help)\n"
         )
         sys.exit(1)
-    try: 
+    try:
         if settings["type"][0]:
-            if not settings["graphtype"] == "loggraph" and not settings["graphtype"] =="bargraph3d":
+            if (
+                not settings["graphtype"] == "loggraph"
+                and not settings["graphtype"] == "bargraph3d"
+            ):
                 print("\n The -t parameter only works with -g or -L style graphs\n")
                 sys.exit(1)
     except TypeError:
@@ -92,7 +99,7 @@ def run_preflight_checks(settings):
                 Use the 3D graph type (-L) to plot both iodepth and numjobs for either iops or latency.\n"
                 )
                 sys.exit(1)
-                
+
     if settings["graphtype"] == "bargraph2d_nj":
         if len(settings["input_directory"]) > 1:
             print("\nIf -l is specified, only one input directory can be used.\n")
@@ -118,7 +125,10 @@ def run_preflight_checks(settings):
         sys.exit(1)
 
     if (
-        not (settings["graphtype"] == "bargraph2d_qd" or settings["graphtype"] == "bargraph2d_nj")
+        not (
+            settings["graphtype"] == "bargraph2d_qd"
+            or settings["graphtype"] == "bargraph2d_nj"
+        )
         and settings["show_ss"]
     ):
         print(
@@ -132,13 +142,19 @@ def run_preflight_checks(settings):
     except TypeError:
         pass
 
-    if settings["rw"] == "rw" and len(settings["filter"]) > 1 and not settings["loggraph"]:
+    if (
+        settings["rw"] == "rw"
+        and len(settings["filter"]) > 1
+        and not settings["loggraph"]
+    ):
         print("\n if -r rw is specified, please specify a filter -f read or -f write\n")
         sys.exit(1)
 
     if settings["rw"] == "randrw":
         if not settings["filter"][0]:
-            print("When processing randrw data, a -f filter (read/write) must also be specified.")
+            print(
+                "When processing randrw data, a -f filter (read/write) must also be specified."
+            )
             sys.exit(1)
 
     if not settings["filter"][0]:
@@ -146,9 +162,11 @@ def run_preflight_checks(settings):
         sys.exit(1)
 
     if not len(settings["filter"]) == 2 and settings["draw_total"]:
-        print(f"\n When --draw-total is specified, \"-f read write\" (default) must be specified. \n")
+        print(
+            f'\n When --draw-total is specified, "-f read write" (default) must be specified. \n'
+        )
         sys.exit(1)
-        
+
 
 def post_flight_check(parser, option_found):
     if not option_found:

@@ -60,6 +60,7 @@ def chart_2d_log_data(settings, dataset):
     # The extra offsets are requred depending on the size of the legend, which
     # in turn depends on the number of legend items.
     #
+
     if settings["colors"]:
         support2d.validate_colors(settings["colors"])
 
