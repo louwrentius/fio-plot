@@ -32,7 +32,14 @@ def cleanup_dictionary(returndict):
 def remove_none_values_from_dict(returndict):
     cleaned_dict = {}    
     for k,v in returndict.items():
-        if v:
+        validated = True
+        if v is None:
+            validated = False
+        else:
+            if isinstance(v, str):
+                if len(v) == 0:
+                    validated = False
+        if validated:
             cleaned_dict[k] = returndict[k]
     return cleaned_dict
 

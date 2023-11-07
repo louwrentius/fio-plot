@@ -244,7 +244,7 @@ def set_arguments(settings):
     ag.add_argument(
         "--xlabel-segment-size",
         help="\
-            Truncate folder names to make labels fit the graph. Disabled by default. \
+            Truncate label names to make labels fit the graph. Disabled by default. \
                 The number represents how many characters per \
                     segment are preserved. Used with -g.",
         type=int,
