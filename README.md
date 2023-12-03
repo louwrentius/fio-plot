@@ -222,9 +222,22 @@ The --include-hosts and --exclude-hosts parameters allow filtering to only displ
 A benchmark script is provided alongside fio-plot, that automates the process of running multiple benchmarks with different parameters. For example, it allows
 you to gather data for different queue depths and/or number of simultaneous jobs. The benchmark script shows progress in real-time.
 
-![bench-fio][benchfio]
+	████████████████████████████████████████████████████
+			+++ Fio Benchmark Script +++
 
-[benchfio]: https://louwrentius.com/static/images/fio-plot/fioplot0020.png
+	Job template:                  fio-job-template.fio
+	I/O Engine:                    libaio
+	Number of benchmarks:          98
+	Estimated duration:            1:38:00
+	Devices to be tested:          /dev/md0
+	Test mode (read/write):        randrw
+	IOdepth to be tested:          1 2 4 8 16 32 64
+	NumJobs to be tested:          1 2 4 8 16 32 64
+	Blocksize(s) to be tested:     4k
+	Mixed workload (% Read):       75 90
+
+	████████████████████████████████████████████████████
+	4% |█                        | - [0:04:02, 1:35:00]-]
 
 This particular example benchmark was run with these parameters:
 
