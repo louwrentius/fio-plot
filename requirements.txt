@@ -3,3 +3,4 @@ Pillow
 pyparsing
 matplotlib
 pyan3
+rich

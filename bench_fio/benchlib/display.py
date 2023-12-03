@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import datetime
 import os
+from rich.style import Style
+from rich.table import Table
+from rich.console import Console
 from . import argparsing as argp
-
 
 def parse_settings_for_display(settings):
     """
@@ -36,16 +38,13 @@ def calculate_duration(settings, tests):
         duration = None
     return duration
 
-def print_header(settings, ds):
-    print(f"{ds['blockchar']}" * (ds['fl'] + ds['width']))
-    print((" " * int(ds['width'] / 2)) + ds['header'])
-    print(f"-" * (ds['fl'] + ds['width']))
+def print_header(settings):
     if settings["dry_run"]:
         print()
         print(" ====---> WARNING - DRY RUN <---==== ")
         print()
 
-def print_duration(settings, tests, ds):
+def print_duration(settings, tests):
     fl = ds["fl"]
     duration = calculate_duration(settings, tests)
     if duration:
@@ -54,46 +53,30 @@ def print_duration(settings, tests, ds):
     else:
         print(f"Unable to estimate runtime (not an error)")
 
-def print_options(settings, ds):
-    data = ds["data"]
-    fl = ds["fl"]
+def print_options(settings, table):
     descriptions = argp.get_argument_description()
+    data = parse_settings_for_display(settings)
     for item in settings.keys():
         if item not in settings["filter_items"]: # filter items are internal options that aren't relevant
             if item not in descriptions.keys(): 
                 customitem = item + "*"  # These are custom fio options so we mark them as such
-                print(f"{customitem:<{fl}}: {data[item]:<}")
+                #print(f"{customitem:<{fl}}: {data[item]:<}")
+                table.add_row(customitem, data[item])
             else:
                 description = descriptions[item]
                 if item in data.keys():
-                    print(f"{description:<{fl}}: {data[item]:<}")
+                    table.add_row(description, data[item])
                 else:
                     if settings[item]:
-                        print(f"{description}:<{fl}: {settings[item]:<}")
+                        table.add_row(description, data[item])
 
-def get_display_settings(settings, tests):
-    data = parse_settings_for_display(settings)
-    header = "+++ FIO BENCHMARK SCRIPT +++"
-    fl = 30
-    length = data["length"]
-    displaysettings = {
-        "header": header,
-        "blockchar": "\u2588",
-        "data": data,
-        "fl": fl,  # Width of left column of text
-        "length": length,
-        "width": length + fl - len(header) 
-    }
-    return displaysettings
-
-def print_footer(ds):
-    print(f"-" * (ds['fl'] + ds['width']))
-    print(f"{ds['blockchar']}" * (ds['fl'] + ds['width']))
 
 def display_header(settings, tests):
-    ds = get_display_settings(settings, tests)
-    print_header(settings, ds)
-    print_duration(settings, tests, ds)
-    print_options(settings, ds)
-    print_footer(ds)
-    
+    duration = calculate_duration(settings, tests)
+    table = Table(title="Bench-fio",title_style=Style(bgcolor="dodger_blue2",bold=True))
+    table.add_column(no_wrap=True, header="Setting")
+    table.add_column(no_wrap=True,justify="left", header="value")
+    table.add_row("Estimated Duration",duration)
+    print_options(settings, table)
+    console = Console()
+    console.print(table)    
