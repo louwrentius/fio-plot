@@ -4,6 +4,7 @@ import os
 from rich.style import Style
 from rich.table import Table
 from rich.console import Console
+from rich.text import Text
 from . import argparsing as argp
 
 def parse_settings_for_display(settings):
@@ -38,20 +39,17 @@ def calculate_duration(settings, tests):
         duration = None
     return duration
 
-def print_header(settings):
-    if settings["dry_run"]:
-        print()
-        print(" ====---> WARNING - DRY RUN <---==== ")
-        print()
+def print_dryrun(settings, table):
 
-def print_duration(settings, tests):
-    fl = ds["fl"]
+    if settings["dry_run"]:
+        table.add_row("Dry Run","True", style="bold green")
+
+def get_duration(settings, tests):
     duration = calculate_duration(settings, tests)
+    returnvalue = "Unable to estimate (not an error)"
     if duration:
-        estimated = "Estimated duration"
-        print(f"{estimated:<{fl}}: {duration:<}")
-    else:
-        print(f"Unable to estimate runtime (not an error)")
+        returnvalue = duration
+    return returnvalue
 
 def print_options(settings, table):
     descriptions = argp.get_argument_description()
@@ -72,10 +70,12 @@ def print_options(settings, table):
 
 
 def display_header(settings, tests):
+    
     duration = calculate_duration(settings, tests)
     table = Table(title="Bench-fio",title_style=Style(bgcolor="dodger_blue2",bold=True))
     table.add_column(no_wrap=True, header="Setting")
     table.add_column(no_wrap=True,justify="left", header="value")
+    print_dryrun(settings, table)
     table.add_row("Estimated Duration",duration)
     print_options(settings, table)
     console = Console()

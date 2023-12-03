@@ -8,6 +8,7 @@ import time
 from operator import itemgetter
 from itertools import groupby
 from threading import Thread
+from rich.progress import track
 
 from . import ( 
     supporting,
@@ -151,43 +152,8 @@ def run_benchmarks(settings, benchmarks):
         for t in thread_list:
             t.join()
 
+def ProgressBar(iterable):
+    for step in track(iterable, description="Benchmarking...", refresh_per_second=0.5):
+        yield(step)
 
-def ProgressBar(iterObj):
-    """https://stackoverflow.com/questions/3160699/python-progress-bar/49234284#49234284"""
 
-    def SecToStr(sec):
-        m, s = divmod(sec, 60)
-        h, m = divmod(m, 60)
-        return "%d:%02d:%02d" % (h, m, s)
-
-    L = len(iterObj)
-    steps = {
-        int(x): y
-        for x, y in zip(
-            linspace(0, L, min(100, L), endpoint=False),
-            linspace(0, 100, min(100, L), endpoint=False),
-        )
-    }
-    # quarter and half block chars
-    qSteps = ["", "\u258E", "\u258C", "\u258A"]
-    startT = time.time()
-    timeStr = "   [0:00:00, -:--:--]"
-    activity = [" -", " \\", " |", " /"]
-    for nn, item in enumerate(iterObj):
-        if nn in steps:
-            done = "\u2588" * int(steps[nn] / 4.0) + qSteps[int(steps[nn] % 4)]
-            todo = " " * (25 - len(done))
-            barStr = "%4d%% |%s%s|" % (steps[nn], done, todo)
-        if nn > 0:
-            endT = time.time()
-            timeStr = " [%s, %s]" % (
-                SecToStr(endT - startT),
-                SecToStr((endT - startT) * (L / float(nn) - 1)),
-            )
-        sys.stdout.write("\r" + barStr + activity[nn % 4] + timeStr)
-        sys.stdout.flush()
-        yield item
-    barStr = "%4d%% |%s|" % (100, "\u2588" * 25)
-    timeStr = "   [%s, 0:00:00]\n" % (SecToStr(time.time() - startT))
-    sys.stdout.write("\r" + barStr + timeStr)
-    sys.stdout.flush()
