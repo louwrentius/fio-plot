@@ -153,7 +153,7 @@ def run_benchmarks(settings, benchmarks):
             t.join()
 
 def ProgressBar(iterable):
-    for step in track(iterable, description="Benchmarking...", refresh_per_second=0.5):
+    for step in track(iterable, description="", refresh_per_second=0.5):
         yield(step)
 
 
