@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 
+
 def get_default_settings():
     path = os.path.abspath(__file__)
     dir_path = os.path.dirname(path)
@@ -23,7 +24,9 @@ def get_default_settings():
     settings["precondition"] = False
     settings["quiet"] = False
     settings["output"] = False
-    settings["precondition_template"] = os.path.join(dir_path, "..", "templates", "precondition.fio") 
+    settings["precondition_template"] = os.path.join(
+        dir_path, "..", "templates", "precondition.fio"
+    )
     settings["precondition_repeat"] = False
     settings["entire_device"] = False
     settings["ss"] = False
@@ -55,7 +58,7 @@ def get_default_settings():
         "quiet",
         "tmpjobfile",
         "exclude_list",
-        "basename_list"
+        "basename_list",
     ]
     ### The exclude list is used when generating temporary fio templates.
     settings["exclude_list"] = [
@@ -77,12 +80,12 @@ def get_default_settings():
         "precondition",
         "template",
         "create",
-        "parallel"
+        "parallel",
+        "quiet",
     ]
-    settings["basename_list"] = [
-        "precondition_template"
-    ]
+    settings["basename_list"] = ["precondition_template"]
     return settings
+
 
 def map_settings_to_fio():
     """
@@ -98,7 +101,6 @@ def map_settings_to_fio():
         "ss_dur": "steadystate_duration",
         "ss_ramp": "steadystate_ramp_time",
         "loginterval": "log_avg_msec",
-        "ceph_pool": "pool"
+        "ceph_pool": "pool",
     }
     return mapping
-    

@@ -8,36 +8,39 @@ import time
 from operator import itemgetter
 from itertools import groupby
 from threading import Thread
-from rich.progress import track
+from rich.progress import Progress
 
-from . import ( 
-    supporting,
-    generatefio,
-    defaultsettings
-)
+from . import supporting, generatefio, defaultsettings
+
 
 def drop_caches():
     command = ["echo", "3", ">", "/proc/sys/vm/drop_caches"]
     run_raw_command(command)
 
+
 def handle_error(outputfile):
-    if outputfile: 
+    if outputfile:
         if os.path.exists(outputfile):
-            with open(f"{outputfile}", 'r') as input:
-                data = input.read().splitlines() 
+            with open(f"{outputfile}", "r") as input:
+                data = input.read().splitlines()
                 for line in data:
                     print(line)
 
-def run_raw_command(command, outputfile = None):
-    try: 
+
+def run_raw_command(command, outputfile=None):
+    try:
         result = subprocess.run(
             command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         if result.returncode > 0 or (len(str(result.stderr)) > 3):
             stdout = result.stdout.decode("UTF-8").strip()
             stderr = result.stderr.decode("UTF-8").strip()
-            print(f"\nAn error occurred: stderr: {stderr} - stdout: {stdout} - returncode: {result.returncode} \n")
-            handle_error(outputfile) # it seems that the JSON output file contains STDERR/STDOUT error data
+            print(
+                f"\nAn error occurred: stderr: {stderr} - stdout: {stdout} - returncode: {result.returncode} \n"
+            )
+            handle_error(
+                outputfile
+            )  # it seems that the JSON output file contains STDERR/STDOUT error data
             sys.exit(result.returncode)
     except KeyboardInterrupt:
         print(f"\n ctrl-c pressed - Aborted by user....\n")
@@ -50,50 +53,48 @@ def run_fio(settings, benchmark):
     output_directory = supporting.generate_output_directory(settings, benchmark)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
     generatefio.generate_fio_job_file(settings, benchmark, output_directory, tmpjobfile)
-    
+
     ### We build up the fio command line here
-    command = [
-        "fio"
-    ]
-    
+    command = ["fio"]
+
     command.append("--output-format=json")
-    command.append(f"--output={output_file}") # fio bug
+    command.append(f"--output={output_file}")  # fio bug
 
     if settings["remote"]:
         command.append(f"--client={settings['remote']}")
 
     command.append(tmpjobfile)
     # End of command line creation
-    
+
     if not settings["dry_run"]:
         supporting.make_directory(output_directory)
         run_raw_command(command, output_file)
         if settings["remote"]:
-            fix_json_file(output_file) # to fix FIO json output bug
+            fix_json_file(output_file)  # to fix FIO json output bug
 
 
 def fix_json_file(outputfile):
-    """ Fix FIO BUG
-        See #731 on github
-        Purely for client server support, proposed solutions don't work
+    """Fix FIO BUG
+    See #731 on github
+    Purely for client server support, proposed solutions don't work
     """
-    with open(f"{outputfile}", 'r') as input:
-         data = input.readlines()
-    
-    with open(f"{outputfile}", 'w') as output:
+    with open(f"{outputfile}", "r") as input:
+        data = input.readlines()
+
+    with open(f"{outputfile}", "w") as output:
         for line in data:
             if not line.startswith("<"):
                 output.write(line)
-         
+
 
 def run_precondition_benchmark(settings, device, run):
     if settings["precondition"] and settings["destructive"]:
         if not settings["precondition_repeat"] and run > 1:
-            pass # only run once if precondition_repeat is not set
+            pass  # only run once if precondition_repeat is not set
         else:
             settings_copy = copy.deepcopy(settings)
             settings_copy["template"] = settings["precondition_template"]
-            settings_copy["runtime"] = None # want to test entire device
+            settings_copy["runtime"] = None  # want to test entire device
             settings_copy["time_based"] = False
             template = supporting.import_fio_template(settings["precondition_template"])
             benchmark = {
@@ -111,18 +112,23 @@ def run_precondition_benchmark(settings, device, run):
                         settings_copy[mapping[x]] = value
                     else:
                         settings_copy[key] = value
-            #print(settings_copy)
+            # print(settings_copy)
             run_fio(settings_copy, benchmark)
 
     elif settings["precondition"] and not settings["destructive"]:
-        print(f"\n When running preconditionning, also enable the destructive flag to be 100% sure.\n")
+        print(
+            f"\n When running preconditionning, also enable the destructive flag to be 100% sure.\n"
+        )
         sys.exit(1)
 
 
-def worker(benchmarks, settings):
+def worker(benchmarks, settings, progress):
     run = 0
-    progress_benchmarks = ProgressBar(benchmarks) if not settings["quiet"] else benchmarks
-    for benchmark in progress_benchmarks:
+    advance = len(benchmarks)
+    advance += settings["loops"] - 1
+    if not settings["quiet"]:
+        task = progress.add_task(description=benchmarks[0]["target"], total=advance)
+    for benchmark in benchmarks:
         loops = 0
         while loops < settings["loops"]:
             run += 1
@@ -130,30 +136,28 @@ def worker(benchmarks, settings):
             run_precondition_benchmark(settings, benchmark["target"], run)
             drop_caches()
             run_fio(settings, benchmark)
+            if not settings["quiet"]:
+                progress.update(task, advance=1)
 
 
 def run_benchmarks(settings, benchmarks):
-    # pprint.pprint(benchmarks)
-    if not settings["parallel"]:
-        worker(benchmarks, settings)
-    else:
-        group_benchmarks = []
-        for _, items in groupby(benchmarks, key=itemgetter("target")):
-            group_benchmarks.append(list(items))
-        thread_list = []
-        for target in range(len(group_benchmarks)):
-            t = Thread(target=worker, args=(group_benchmarks[target], settings))
-            thread_list.append(t)
-    
-        for t in thread_list:
-            t.setDaemon(True)
-            t.start()
+    with Progress() as progress:
+        if not settings["parallel"]:
+            worker(benchmarks, settings, progress)
+        else:
+            group_benchmarks = []
+            for _, items in groupby(benchmarks, key=itemgetter("target")):
+                group_benchmarks.append(list(items))
+            thread_list = []
+            for target in range(len(group_benchmarks)):
+                t = Thread(
+                    target=worker, args=(group_benchmarks[target], settings, progress)
+                )
+                thread_list.append(t)
 
-        for t in thread_list:
-            t.join()
+            for t in thread_list:
+                t.setDaemon(True)
+                t.start()
 
-def ProgressBar(iterable):
-    for step in track(iterable, description="", refresh_per_second=0.5):
-        yield(step)
-
-
+            for t in thread_list:
+                t.join()

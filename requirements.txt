@@ -1,6 +1,6 @@
 numpy
 Pillow
 pyparsing
-matplotlib
+matplotlib<=3.8
 pyan3
 rich
