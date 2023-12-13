@@ -214,7 +214,6 @@ def raw_stddev_to_percent(values, stddev_series):
 
 
 def process_dataset(settings, dataset):
-
     datatypes = []
     new_list = []
     new_structure = {"datatypes": None, "dataset": None}
@@ -258,20 +257,20 @@ def process_dataset(settings, dataset):
                         if x == "bw":
                             scale_factors_bw.append(get_scale_factor_bw(record[rw]["yvalues"]))
                     #print(item["hostname"])
-                    if settings["draw_total"] and len(settings["filter"]) == 2:
-                        readdata = record["read"]["yvalues"]
-                        writedata = record["write"]["yvalues"]
-                        record["total"] = {}
-                        record["total"]["yvalues"] = [x + y for x, y in zip(readdata, writedata)]
-                        record["total"]["xvalues"] = record["read"]["xvalues"] # hack
-                        if item["type"] in ["lat", "clat", "slat"]:
-                            scale_factors_lat.append(get_scale_factor_lat(record["total"]["yvalues"]))
-                        if "bw" in item["type"]:
-                            scale_factors_bw.append(get_scale_factor_bw(record["total"]["yvalues"]))
+            if settings["draw_total"] and len(settings["filter"]) == 2:
+                readdata = record["read"]["yvalues"]
+                writedata = record["write"]["yvalues"]
+                record["total"] = {}
+                record["total"]["yvalues"] = [x + y for x, y in zip(readdata, writedata)]
+                record["total"]["xvalues"] = record["read"]["xvalues"] # hack
+                if item["type"] in ["lat", "clat", "slat"]:
+                    scale_factors_lat.append(get_scale_factor_lat(record["total"]["yvalues"]))
+                if "bw" in item["type"]:
+                    scale_factors_bw.append(get_scale_factor_bw(record["total"]["yvalues"]))
                     #print(item["hostname"])
-                    new_list.append(record)
+            new_list.append(record)
     item.pop("data")
-    
+
     """
     This second loop assures that all data is scaled with the same factor
     """
