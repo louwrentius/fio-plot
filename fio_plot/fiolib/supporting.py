@@ -1,5 +1,6 @@
 import pprint as pprint
 import sys
+import os
 import statistics
 import numpy as np
 from datetime import datetime
@@ -33,11 +34,7 @@ def scale_xaxis_time(settings, dataset):
     result = {"format": "Time (ms)", "data": dataset}
     mean = statistics.mean(dataset)
 
-    conversions = {
-        1000: "s",
-        1000000: "m",
-        3600000: "h"
-    }
+    conversions = {1000: "s", 1000000: "m", 3600000: "h"}
 
     for conversion, format_str in conversions.items():
         if mean > conversion:
@@ -58,7 +55,7 @@ def get_scale_factor_lat(dataset):
     except statistics.StatisticsError as e:
         print(f"\n Long story short, something went wrong: {e}\n")
         sys.exit(1)
-        
+
     scale_factors = [
         {"scale": 1000000, "label": "Latency (ms)"},
         {"scale": 1000, "label": "Latency (\u03BCs)"},
@@ -70,7 +67,7 @@ def get_scale_factor_lat(dataset):
         if mean > item["scale"] * 5:
             return item
 
-    # Fallback case when latency is very small 
+    # Fallback case when latency is very small
     return scale_factors[-1]
 
 
@@ -102,7 +99,7 @@ def get_scale_factor_iops(dataset):
         if mean > item["scale"] * 5:
             return item
 
-    # Fallback case when IOPS is very small 
+    # Fallback case when IOPS is very small
     return scale_factors[-1]
 
 
@@ -118,7 +115,7 @@ def get_scale_factor_bw(dataset):
         if mean > item["scale"] * 5:
             return item
 
-    # Fallback case when BW is very small 
+    # Fallback case when BW is very small
     return scale_factors[-1]
 
 
@@ -135,12 +132,11 @@ def get_scale_factor_bw_ss(dataset):
         if mean > item["scale"] * 5:
             return item
 
-    # Fallback case when BW (steady-state) is very small 
+    # Fallback case when BW (steady-state) is very small
     return scale_factors[-1]
 
 
 def lookupTable(metric):
-
     lookup = {
         "iops": {"ylabel": "IOPS", "label_pos": 5, "label_rot": "vertical"},
         "bw": {"ylabel": "Througput (KB/s)", "label_pos": 5, "label_rot": "vertical"},
@@ -160,7 +156,6 @@ def lookupTable(metric):
 
 
 def generate_axes(ax, datatypes):
-
     axes = {}
     metrics = ["iops", "bw", "lat", "clat", "slat"]
     tkw = dict(size=4, width=1.5)
@@ -185,7 +180,6 @@ def generate_axes(ax, datatypes):
 
 
 def round_metric(value):
-
     if value > 1:
         value = round(value, 2)
     if value <= 1:
@@ -214,7 +208,6 @@ def raw_stddev_to_percent(values, stddev_series):
 
 
 def process_dataset(settings, dataset):
-
     datatypes = []
     new_list = []
     new_structure = {"datatypes": None, "dataset": None}
@@ -225,20 +218,20 @@ def process_dataset(settings, dataset):
     """
     This first loop is to unpack the data in series and add scale the xaxis
     """
-    
+
     for item in dataset:
         for record in item["data"]:
             for rw in settings["filter"]:
-                #print(f"========================{record}")
+                # print(f"========================{record}")
                 if len(record[rw]) > 0:
                     datatypes.append(item["type"])
-                    #pprint.pprint(item['data'][rw])
+                    # pprint.pprint(item['data'][rw])
                     unpacked = list(zip(*record[rw]))
                     record["type"] = item["type"]
                     record["iodepth"] = item["iodepth"]
                     record["numjobs"] = item["numjobs"]
                     record["directory"] = item["directory"]
-                    record[rw] = { }
+                    record[rw] = {}
 
                     record[rw]["xvalues"] = unpacked[0]
                     record[rw]["yvalues"] = unpacked[1]
@@ -246,7 +239,7 @@ def process_dataset(settings, dataset):
                     scaled_xaxis = scale_xaxis_time(settings, record[rw]["xvalues"])
                     record["xlabel"] = scaled_xaxis["format"]
                     record[rw]["xvalues"] = scaled_xaxis["data"]
-                
+
                     itemtype = []
                     if isinstance(item["type"], str):
                         itemtype.append(item["type"])
@@ -254,24 +247,34 @@ def process_dataset(settings, dataset):
                         itemtype = item["type"]
                     for x in itemtype:
                         if x in ["lat", "clat", "slat"]:
-                            scale_factors_lat.append(get_scale_factor_lat(record[rw]["yvalues"]))
+                            scale_factors_lat.append(
+                                get_scale_factor_lat(record[rw]["yvalues"])
+                            )
                         if x == "bw":
-                            scale_factors_bw.append(get_scale_factor_bw(record[rw]["yvalues"]))
-                    #print(item["hostname"])
+                            scale_factors_bw.append(
+                                get_scale_factor_bw(record[rw]["yvalues"])
+                            )
+                    # print(item["hostname"])
                     if settings["draw_total"] and len(settings["filter"]) == 2:
                         readdata = record["read"]["yvalues"]
                         writedata = record["write"]["yvalues"]
                         record["total"] = {}
-                        record["total"]["yvalues"] = [x + y for x, y in zip(readdata, writedata)]
-                        record["total"]["xvalues"] = record["read"]["xvalues"] # hack
+                        record["total"]["yvalues"] = [
+                            x + y for x, y in zip(readdata, writedata)
+                        ]
+                        record["total"]["xvalues"] = record["read"]["xvalues"]  # hack
                         if item["type"] in ["lat", "clat", "slat"]:
-                            scale_factors_lat.append(get_scale_factor_lat(record["total"]["yvalues"]))
+                            scale_factors_lat.append(
+                                get_scale_factor_lat(record["total"]["yvalues"])
+                            )
                         if "bw" in item["type"]:
-                            scale_factors_bw.append(get_scale_factor_bw(record["total"]["yvalues"]))
-                    #print(item["hostname"])
+                            scale_factors_bw.append(
+                                get_scale_factor_bw(record["total"]["yvalues"])
+                            )
+                    # print(item["hostname"])
                     new_list.append(record)
     item.pop("data")
-    
+
     """
     This second loop assures that all data is scaled with the same factor
     """
@@ -330,7 +333,7 @@ def process_dataset(settings, dataset):
 
     new_structure["datatypes"] = list(set(datatypes))
     new_structure["dataset"] = final_list
-                    
+
     return new_structure
 
 
@@ -338,7 +341,7 @@ def get_highest_maximum(settings, data):
     highest_max = {
         "read": {"iops": 0, "lat": 0, "bw": 0, "clat": 0, "slat": 0},
         "write": {"iops": 0, "lat": 0, "bw": 0, "clat": 0, "slat": 0},
-        "total": {"iops": 0, "lat": 0, "bw": 0, "clat": 0, "slat": 0}
+        "total": {"iops": 0, "lat": 0, "bw": 0, "clat": 0, "slat": 0},
     }
     for item in data["dataset"]:
         for rw in settings["filter"]:
@@ -346,11 +349,11 @@ def get_highest_maximum(settings, data):
                 if isinstance(item[rw], dict):
                     if item[rw]["max"] > highest_max[rw][item["type"]]:
                         highest_max[rw][item["type"]] = item[rw]["max"]
-    
+
     for rw in settings["filter"]:
         for metric in highest_max[rw].keys():
             if highest_max[rw][metric] > highest_max["total"][metric]:
-                highest_max["total"][metric] = highest_max[rw][metric] 
+                highest_max["total"][metric] = highest_max[rw][metric]
 
     return highest_max
 
@@ -376,7 +379,7 @@ def create_title_and_sub(
     #
     # plt.subtitle sets title and plt.title sets subtitle ....
     #
-    plt.suptitle(settings["title"],fontsize=settings["title_fontsize"])
+    plt.suptitle(settings["title"], fontsize=settings["title_fontsize"])
     subtitle = None
     if bs:
         str(bs).strip("[]")
@@ -408,7 +411,11 @@ def create_title_and_sub(
         subtitle = temporary_string
 
     plt.title(
-        subtitle, fontsize=settings["subtitle_fontsize"], horizontalalignment="center", x=x_offset, y=y_offset
+        subtitle,
+        fontsize=settings["subtitle_fontsize"],
+        horizontalalignment="center",
+        x=x_offset,
+        y=y_offset,
     )
 
 
@@ -429,7 +436,13 @@ def plot_source(settings, plt, ax1, vertical=-0.14):
         horizontal = 1 - calculation
         align = "left"
         plot_text_line(
-            settings["source"], plt, ax1, horizontal, align, vertical, fontsize=settings["source_fontsize"]
+            settings["source"],
+            plt,
+            ax1,
+            horizontal,
+            align,
+            vertical,
+            fontsize=settings["source_fontsize"],
         )
 
 
@@ -441,7 +454,15 @@ def plot_fio_version(settings, value, plt, ax1, vertical=1.05):
             text = f"Fio version: {value}\nGraph generated with fio-plot"
         else:
             text = "Data generated by Fio\ngraph generated with Fio-plot"
-        plot_text_line(text, plt, ax1, horizontal, align, vertical, fontsize=(int(settings["credit_fontsize"])-3))
+        plot_text_line(
+            text,
+            plt,
+            ax1,
+            horizontal,
+            align,
+            vertical,
+            fontsize=(int(settings["credit_fontsize"]) - 3),
+        )
 
 
 def plot_text_line(value, plt, ax1, horizontal, align, vertical, fontsize=10):
@@ -454,6 +475,7 @@ def plot_text_line(value, plt, ax1, horizontal, align, vertical, fontsize=10):
         transform=ax1.transAxes,
         fontsize=fontsize,
     )
+
 
 def random_char(y):
     return "".join(random.choice(string.ascii_letters) for x in range(y))
@@ -469,15 +491,27 @@ def save_png(settings, plt, fig):
         savename = f"{title}_{now}_{random}.png"
     else:
         savename = settings["output_filename"]
-    print(f"\n Saving to file {savename}\n")
+    if os.path.isdir(savename):
+        print(f"Output file {savename} is a directory, please specify a file path.")
+        sys.exit(1)
+    else:
+        print(f"\n Saving to file {savename}\n")
+
     fig.savefig(savename, dpi=settings["dpi"])
-    write_png_metadata(savename, settings)
+    try:
+        write_png_metadata(savename, settings)
+    except FileNotFoundError:
+        print(f"Error writing metadata to file {savename}?")
+        sys.exit(1)
+    except IsADirectoryError:
+        print(f"Error writing metadata to image {savename}, image is a directory ")
+        sys.exit(1)
 
 
 def write_png_metadata(filename, settings):
     targetImage = PngImageFile(filename)
     metadata = PngInfo()
-    for (k, v) in settings.items():
+    for k, v in settings.items():
         if type(v) == list:
             value = ""
             for item in v:
@@ -490,6 +524,7 @@ def write_png_metadata(filename, settings):
         else:
             metadata.add_text(k, str(v))
     targetImage.save(filename, pnginfo=metadata)
+
 
 def filter_hosts(settings, item):
     outcome = None
@@ -505,5 +540,5 @@ def filter_hosts(settings, item):
         else:
             outcome = True
     else:
-        outcome = True   
+        outcome = True
     return outcome

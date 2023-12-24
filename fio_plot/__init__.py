@@ -10,8 +10,9 @@ from .fiolib import (
     flightchecks as checks,
     getdata,
     iniparsing,
-    defaultsettings
+    defaultsettings,
 )
+
 
 def get_settings():
     settings = defaultsettings.get_default_settings()
@@ -20,12 +21,13 @@ def get_settings():
     if not settingsfromini:
         parser = argparsing.set_arguments(settings)
         parsersettings = vars(argparsing.get_command_line_arguments(parser))
-        settings = {**settings, **parsersettings }
+        settings = {**settings, **parsersettings}
         settings["graphtype"] = defaultsettings.get_graphtype(settings)
     else:
-        settings = {**settings, **settingsfromini }
+        settings = {**settings, **settingsfromini}
     checks.run_preflight_checks(settings)
     return [parser, settings]
+
 
 def main():
     option_found = False
