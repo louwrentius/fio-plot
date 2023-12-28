@@ -136,7 +136,7 @@ This is the command-line used to generate this graph:
 ## Line chart based on FIO log data
 
 Fio records a 'performance trace' of various metrics, such as IOPs and latency over time in plain-text .log 
-files. If you use the benchmark tool included with fio-plot, this data is logged every 0.5 seconds.
+files. If you use the benchmark tool included with fio-plot, this data is logged every 1 second.
 
 This data can be parsed and graphed over time. In this example, we plot the data for four different solid state drives in one chart. 
 
