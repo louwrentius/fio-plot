@@ -91,13 +91,13 @@ If you use the bench-fio comand line, extra options can be specified with the --
 
 Example:
 
-    --extra-opts norandommap=1 norefillbuffers=1
+    --extra-opts norandommap=1 refill_buffers=1
 
 If the INI file is  used to perform bench-fio benchmarks, those extra options can just be added to the file like
 a regular fio job file, one per line. 
 
 	norandommap = 1
-	norefillbuffers = 1
+	refill_buffers = 1
 
 You can put any valid fio option in the bench-fio INI file and those will be passed as-is to fio. Such parameters are
 marked with an asterix(*) when running bench-fio.
