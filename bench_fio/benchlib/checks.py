@@ -53,7 +53,7 @@ def check_target_type(target, settings):
     path_target = Path(target)
 
     if filetype == "rbd":
-        return None
+        return "rbdname"
 
     if not filetype in types:
         print(f"Error, filetype {filetype} is an unknown option.")
