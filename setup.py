@@ -12,7 +12,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/louwrentius/fio-plot/",
     packages=setuptools.find_packages(),
-    install_requires=["numpy", "matplotlib", "Pillow", "pyan3", "pyparsing"],
+    install_requires=["numpy", "matplotlib", "Pillow", "pyan3", "pyparsing", "rich"],
     include_package_data=True,
     package_data={"bench_fio": ["templates/*.fio", "scripts/*.sh"]},
     entry_points={
