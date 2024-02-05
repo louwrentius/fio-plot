@@ -224,7 +224,7 @@ def generate_labelset(settings, supportdata):
     values.insert(0, header)
 
     ncol = 1
-    if len(values) > 3:
+    if len(values) > 3 and not settings["xlabel_single_column"]:
         ncol = 2
         number = len(values)
         position = int(number / 2) + 1

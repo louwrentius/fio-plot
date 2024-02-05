@@ -19,6 +19,7 @@ def get_default_settings():
     settings["xlabel_depth"] = 0
     settings["xlabel_parent"] = 1
     settings["xlabel_segment_size"] = 1000
+    settings["xlabel_single_column"] = False
     settings["line_width"] = 1
     settings["group_bars"] = False
     settings["show_cpu"] = False
