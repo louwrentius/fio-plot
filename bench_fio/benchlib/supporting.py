@@ -42,11 +42,11 @@ def generate_output_directory(settings, benchmark):
     settings["output"] = os.path.expanduser(settings["output"])
     if benchmark["mode"] in settings["mixed"]:
         directory = (
-            f"{settings['output']}/{os.path.basename(benchmark['target'])}/"
+            f"{settings['output']}/{os.path.basename(benchmark['target_base'])}/"
             f"{benchmark['mode']}{benchmark['rwmixread']}/{benchmark['block_size']}"
         )
     else:
-        directory = f"{settings['output']}/{os.path.basename(benchmark['target'])}/{benchmark['block_size']}"
+        directory = f"{settings['output']}/{os.path.basename(benchmark['target_base'])}/{benchmark['block_size']}"
 
     if "run" in benchmark.keys():
         directory = directory + f"/run-{benchmark['run']}"

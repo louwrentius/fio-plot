@@ -190,7 +190,10 @@ Pure read/write/trim workloads will appear in the *device* folder.
 
 	Generic Settings:
 	-d TARGET [TARGET ...], --target TARGET [TARGET ...]
-							Storage device / directory / file / rbd image (Ceph) to be tested.
+
+							Storage device / directory / file / rbd image (Ceph) to be tested. When the path contains
+							a colon (:), it must be escaped with a backslash (\).
+							Usage example: --target '/dev/disk/by-id/drive-0\:0'
 	-t {device,file,directory,rbd}, --type {device,file,directory,rbd}
 							Target type, device, file, directory or rbd (Ceph)
 	-P CEPH_POOL, --ceph-pool CEPH_POOL
@@ -295,4 +298,3 @@ Bench_fio requires Python3. The 'numpy' python module is required.
 
 You can also use apt/yum to satisfy this requirement.
 
-   

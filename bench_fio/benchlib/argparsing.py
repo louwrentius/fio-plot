@@ -28,7 +28,12 @@ def get_arguments(settings):
     ag.add_argument(
         "-d",
         "--target",
-        help="Storage device / directory / file / rbd image (Ceph) to be tested.",
+        help=(
+            "Storage device / directory / file / rbd image (Ceph) to be "
+            "tested. When the path contains a colon (:), it must be escaped "
+            "with a backslash (\\). "
+            "Usage example: --target '/dev/disk/by-id/drive-0\\:0'"
+        ),
         required=True,
         nargs="+",
         type=str,

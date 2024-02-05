@@ -49,7 +49,13 @@ def run_raw_command(command, outputfile=None):
 
 
 def run_fio(settings, benchmark):
-    tmpjobfile = f"/tmp/{os.path.basename(benchmark['target'])}-tmpjobfile.fio"
+    # The target may contains a colon (:) in the path and it's escaped
+    # with a backslash (\) as per the fio manual. The backslash must be
+    # passed to fio's filename but should be removed when checking the
+    # existance of the path, or when writing a job file or log file in
+    # the filesystem.
+    benchmark.update({"target_base": benchmark['target'].replace("\\", "")})
+    tmpjobfile = f"/tmp/{os.path.basename(benchmark['target_base'])}-tmpjobfile.fio"
     output_directory = supporting.generate_output_directory(settings, benchmark)
     output_file = f"{output_directory}/{benchmark['mode']}-{benchmark['iodepth']}-{benchmark['numjobs']}.json"
     generatefio.generate_fio_job_file(settings, benchmark, output_directory, tmpjobfile)

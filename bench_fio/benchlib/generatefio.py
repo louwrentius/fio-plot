@@ -28,7 +28,7 @@ def filter_options(settings, config, mapping, benchmark, output_directory):
         if isinstance(value, bool):
             value = boolean[str(value)]
         if key == "type":  # we check if we target a file directory or block device
-            devicetype = checks.check_target_type(benchmark["target"], settings)
+            devicetype = checks.check_target_type(benchmark["target_base"], settings)
             config["FIOJOB"][devicetype] = benchmark["target"]
         if (
             value
