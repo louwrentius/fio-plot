@@ -75,7 +75,7 @@ def check_target_type(target, settings):
         return {"file": "filename", "device": "filename", "directory": "directory"}[filetype]
 
 
-def check_settings(settings):
+def check_settings(settings, defaultsettings):
     """Some basic error handling."""
 
     check_fio_version()
@@ -89,6 +89,11 @@ def check_settings(settings):
             print("Preconditioning only makes sense for (flash) devices, not files or directories.")
             print()
             sys.exit(9)
+
+    if not settings["runtime"] and not settings["size"]:
+        # if there is no explicit runtime nor size supplied, fallback to
+        # the default runtime
+        settings["runtime"] = defaultsettings["runtime"]
 
     if settings["type"] not in ["device", "rbd"] and not settings["size"]:
         print()
