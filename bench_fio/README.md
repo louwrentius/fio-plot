@@ -14,7 +14,7 @@ This benchmark script supports running configure SSD preconditioning jobs that a
 
 An example with output:
 
-	./bench_fio --target /dev/md0 --type device --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --rwmixread 75 90 
+	./bench_fio --target /dev/md0 --type device --iodepth 1 8 16 --numjobs 8 --mode randrw --output RAID_ARRAY --rwmixread 75 90
 
 	████████████████████████████████████████████████████
 			+++ Fio Benchmark Script +++
@@ -38,7 +38,7 @@ in a 'screen' session.
 
 ### Example usage
 
-We benchmark two devices with a randread/randrwite workload. 
+We benchmark two devices with a randread/randrwite workload.
 
     ./bench_fio --target /dev/md0 /dev/md1 --type device --mode randread randwrite --output RAID_ARRAY --destructive
 
@@ -46,7 +46,7 @@ We benchmark one device with a custom set of iodepths and numjobs:
 
     ./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --iodepth 1 8 16 --numjobs 8 --destructive
 
-We benchmark one device and pass extra custom parameters. 
+We benchmark one device and pass extra custom parameters.
 
 	./bench_fio --target /dev/md0 --type device --mode randread randwrite --output RAID_ARRAY --extra-opts norandommap=1 refill_buffers=1 --destructive
 
@@ -76,11 +76,11 @@ An example configuration file is included in the templates folder called benchma
 	engine = libaio
 	precondition = False
 	precondition_repeat = False
-	extra_opts = norandommap=1,refill_buffers=1 
+	extra_opts = norandommap=1,refill_buffers=1
 	runtime = 60
 	destructive = False
 
-Please notice that on the command line, multiple arguments are separated by spaces. However, within the INI file, 
+Please notice that on the command line, multiple arguments are separated by spaces. However, within the INI file,
 multiple arguments are separated by a comma.
 
 ### Extra (custom) Fio parameters
@@ -94,7 +94,7 @@ Example:
     --extra-opts norandommap=1 refill_buffers=1
 
 If the INI file is  used to perform bench-fio benchmarks, those extra options can just be added to the file like
-a regular fio job file, one per line. 
+a regular fio job file, one per line.
 
 	norandommap = 1
 	refill_buffers = 1
@@ -114,11 +114,11 @@ Thanks @Zhucan for building this feature.
 ### Fio Client/Server support
 
 The Fio tool supports a [client-server][clientserver] model where one host can issue a benchmark on just one remote host
-up to hundreds of remote hosts. Bench-fio supports this feature with the --remote and --remote-checks options. 
+up to hundreds of remote hosts. Bench-fio supports this feature with the --remote and --remote-checks options.
 
 [clientserver]: https://fio.readthedocs.io/en/latest/fio_doc.html#client-server
 
-The --remote argument requires a file containing one host per line as required by Fio. 
+The --remote argument requires a file containing one host per line as required by Fio.
 
 	host01
 	host02
@@ -129,16 +129,16 @@ So it would look like:
 
 	--remote /some/path/to/file.txt
 
-The --remote-checks parameter makes bench-fio check if all hosts are up before starting the benchmark. 
+The --remote-checks parameter makes bench-fio check if all hosts are up before starting the benchmark.
 Specifically, it checks if TCP port 8765 is open on a host.
 
-If one of the host fails this check bench-fio will never start actual benchmarks. By default, Fio will start benchmarking 
-hosts that are network-accessible, but then abort when one or more host are found to be unreachable. 
+If one of the host fails this check bench-fio will never start actual benchmarks. By default, Fio will start benchmarking
+hosts that are network-accessible, but then abort when one or more host are found to be unreachable.
 As this may be undesirable, the --remote-checks parameter can avoid this scenario.
 
 ### Output
 
-The benchmark data consists of two typtes of data. 
+The benchmark data consists of two typtes of data.
 
 1. Fio .json output
 2. Fio .log output
@@ -148,7 +148,7 @@ The folder 'RAID_ARRAY' is the folder specified in --output.
 
 	RAID_ARRAY/ <-- folder as specified wit --output
 	└── md0 <-- device
-		├── randrw75 <-- mixed load with % read 
+		├── randrw75 <-- mixed load with % read
 		│   ├── 4k <-- Block size
 		│   │   ├── randrw-16-8.json
 		│   │   ├── randrw-1-8.json
@@ -167,7 +167,7 @@ The folder 'RAID_ARRAY' is the folder specified in --output.
 				├── randrw-1-8.json
 				├── randrw-8-8.json
 
-The .log files are ommitted. 
+The .log files are ommitted.
 
 Please note that mixed workloads will get their own folder to prevent files being overwritten.
 Pure read/write/trim workloads will appear in the *device* folder.
@@ -190,7 +190,11 @@ Pure read/write/trim workloads will appear in the *device* folder.
 
 	Generic Settings:
 	-d TARGET [TARGET ...], --target TARGET [TARGET ...]
-							Storage device / directory / file / rbd image (Ceph) to be tested.
+
+							Storage device / directory / file / rbd image (Ceph) to be tested. When the path contains
+							a colon (:), it must be escaped with a double backslash (\\) or single backslash when
+							you use single quotes around the path.
+							Usage example: --target /dev/disk/by-path/pci-0000\\:00\\:1f.2-ata-4.0
 	-t {device,file,directory,rbd}, --type {device,file,directory,rbd}
 							Target type, device, file, directory or rbd (Ceph)
 	-P CEPH_POOL, --ceph-pool CEPH_POOL
@@ -267,7 +271,7 @@ Pure read/write/trim workloads will appear in the *device* folder.
 ### SSD Preconditioning
 
 In order to obtain performance numbers that will actually represent production, it is very important to precondition SSDs.
-SSDs perform all kinds of strategies to improve write performance. Under a sustained write load, performance may dramatically deteriorate. To find out how much performance decreases, it's important to test with the SSD completely written over, multiple times. 
+SSDs perform all kinds of strategies to improve write performance. Under a sustained write load, performance may dramatically deteriorate. To find out how much performance decreases, it's important to test with the SSD completely written over, multiple times.
 
 The included preconditioning step in this benchmark script overwrites the device twice, to make sure all flash storage is written to.
 
@@ -278,21 +282,19 @@ More background information about SSD preconditioning [can be found here][snia].
 ### Notes on IO queue depth and number of jobs
 
 As discussed in issue #41 each job has its own I/O queue. If qd=1 and nj=5, you will have 5 IOs in flight.
-If you have qd=4 and nj=4 you will have 4 x 4 = 16 IOs in flight. 
+If you have qd=4 and nj=4 you will have 4 x 4 = 16 IOs in flight.
 
 ### Benchmarking Ceph RBD images
 
-If you need to benchmark a Ceph RBD image, some tips: 
+If you need to benchmark a Ceph RBD image, some tips:
 
-The --target should be the RBD image to benchmark 
-The --ceph-pool parameter should specify the pool 
+The --target should be the RBD image to benchmark
+The --ceph-pool parameter should specify the pool
 
 ### Requirements
 
 Bench_fio requires Python3. The 'numpy' python module is required.
 
-   pip3 install -r requirements.txt 
+   pip3 install -r requirements.txt
 
 You can also use apt/yum to satisfy this requirement.
-
-   
