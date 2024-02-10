@@ -135,8 +135,8 @@ def check_settings(settings):
 
     if settings["type"] == "device" and settings["size"] and settings["runtime"] == 60:
         print(
-            "\n Warning: You've specified the --size parameter with a device target\n\
-               --> you may want to set --runtime either to 0 or specify a desired runtime \n"
+            "Warning: You've specified the --size parameter with a device target\n\
+            --> you may want to set --runtime either to 0 or specify a desired runtime \n"
         )
 
     if not settings["output"]:
