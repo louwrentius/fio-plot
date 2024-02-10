@@ -291,6 +291,11 @@ If you need to benchmark a Ceph RBD image, some tips:
 The --target should be the RBD image to benchmark
 The --ceph-pool parameter should specify the pool
 
+### Benchmarking a device with --size option
+By default, bench_fio uses a --runtime of 60 seconds unless --entire-device is specified. If you use the --size option with
+--type device, you must specify --runtime 0 if you want the --size parameter to be honoured. You can also specify a large
+--runtime value as an upper bound to to the benchmark duration.
+
 ### Requirements
 
 Bench_fio requires Python3. The 'numpy' python module is required.
