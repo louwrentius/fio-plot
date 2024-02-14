@@ -251,6 +251,14 @@ def set_arguments(settings):
         default=settings["xlabel_segment_size"],
     )
     ag.add_argument(
+        "--xlabel-single-column",
+        help="\
+            Whether to force a single-column layout in the label table \
+                when the number of labels is more than 3.",
+        action="store_true",
+        default=settings["xlabel_single_column"],
+    )
+    ag.add_argument(
         "-w",
         "--line-width",
         help="Line width for line graphs. Can be a floating-point value. Used with -g.",
