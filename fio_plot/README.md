@@ -1,14 +1,18 @@
 ```
-usage: fio-plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] [-o OUTPUT_FILENAME] -T TITLE [-s SOURCE] (-L | -l | -N | -H | -g | -C) [--disable-grid] [--enable-markers] [--subtitle SUBTITLE] [-d IODEPTH [IODEPTH ...]] [-n NUMJOBS [NUMJOBS ...]]
-                [-M [MAXDEPTH]] [-J [MAXJOBS]] [-D [DPI]] [-p [PERCENTILE]] -r {read,write,randread,randwrite,randrw,trim,rw,readwrite,randtrim,trimwrite} [-m MAX_Z] [-e MOVING_AVERAGE] [-x MIN_Y]
-                [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]] [-f {read,write} [{read,write} ...]] [--xlabel-depth XLABEL_DEPTH] [--xlabel-parent XLABEL_PARENT] [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [-w LINE_WIDTH]
-                [--group-bars] [--show-cpu] [--show-ss] [--table-lines] [--max-lat MAX_LAT] [--max-iops MAX_IOPS] [--max-bw MAX_BW] [--colors COLORS [COLORS ...]] [--disable-fio-version] [--title-fontsize TITLE_FONTSIZE]
-                [--subtitle-fontsize SUBTITLE_FONTSIZE] [--source-fontsize SOURCE_FONTSIZE] [--credit-fontsize CREDIT_FONTSIZE] [--table-fontsize TABLE_FONTSIZE]
+usage: fio-plot [-h] -i INPUT_DIRECTORY [INPUT_DIRECTORY ...] [-o OUTPUT_FILENAME] -T TITLE [-s SOURCE] (-L | -l | -N | -H | -g | -C) [--disable-grid] [--enable-markers] [--subtitle SUBTITLE] [-d IODEPTH [IODEPTH ...]] [-n NUMJOBS [NUMJOBS ...]] [-M [MAXDEPTH]] [-J [MAXJOBS]]
+                [-D [DPI]] [-p [PERCENTILE]] -r {read,write,randread,randwrite,randrw,trim,rw,readwrite,randtrim,trimwrite} [-m MAX_Z] [-e MOVING_AVERAGE] [--min-iops MIN_IOPS] [--min-lat MIN_LAT] [-t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]]
+                [-f {read,write} [{read,write} ...]] [--truncate-xaxis TRUNCATE_XAXIS] [--xlabel-depth XLABEL_DEPTH] [--xlabel-parent XLABEL_PARENT] [--xlabel-segment-size XLABEL_SEGMENT_SIZE] [--xlabel-single-column] [-w LINE_WIDTH] [--group-bars] [--show-cpu] [--show-data]
+                [--show-ss] [--table-lines] [--max-lat MAX_LAT] [--max-clat MAX_CLAT] [--max-slat MAX_SLAT] [--max-iops MAX_IOPS] [--max-bw MAX_BW] [--draw-total] [--colors COLORS [COLORS ...]] [--disable-fio-version] [--title-fontsize TITLE_FONTSIZE]
+                [--subtitle-fontsize SUBTITLE_FONTSIZE] [--source-fontsize SOURCE_FONTSIZE] [--credit-fontsize CREDIT_FONTSIZE] [--table-fontsize TABLE_FONTSIZE] [--include-hosts INCLUDE_HOSTS [INCLUDE_HOSTS ...] | --exclude-hosts EXCLUDE_HOSTS [EXCLUDE_HOSTS ...]]
 
 Generates charts/graphs from FIO JSON output or logdata.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
+  --include-hosts INCLUDE_HOSTS [INCLUDE_HOSTS ...]
+                        Only create graphs for these hosts (when parsing client-server benchmark data)
+  --exclude-hosts EXCLUDE_HOSTS [EXCLUDE_HOSTS ...]
+                        Graph all hosts except for those listed (when parsing client-server benchmark data)
 
 Generic Settings:
   -i INPUT_DIRECTORY [INPUT_DIRECTORY ...], --input-directory INPUT_DIRECTORY [INPUT_DIRECTORY ...]
@@ -46,31 +50,37 @@ Generic Settings:
                         Optional maximum value for Z-axis in 3D graph.
   -e MOVING_AVERAGE, --moving-average MOVING_AVERAGE
                         The moving average helps to smooth out graphs, the argument is the size of the moving window (default is None to disable). Be carefull as this setting may smooth out issues you may want to be aware of.
-  -x MIN_Y, --min-y MIN_Y
-                        Optional minimal value for y-axis. Use 'None' to disable.
+  --min-iops MIN_IOPS   Optional minimal value for iops axis, default is 0
+  --min-lat MIN_LAT     Optional minimal value for lat axis, default is 0
   -t {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...], --type {bw,iops,lat,slat,clat} [{bw,iops,lat,slat,clat} ...]
                         This setting specifies which kind of metric you want to graph.
   -f {read,write} [{read,write} ...], --filter {read,write} [{read,write} ...]
                         filter should be read/write.
+  --truncate-xaxis TRUNCATE_XAXIS
+                        Force x-axis timeschale to be at most (x) seconds/minutes/hours long (depends on autoscaling). Sometimes devices may take a much longer time to complete than others and for readability it's best to truncate the x-axis.
   --xlabel-depth XLABEL_DEPTH
                         Can be used to truncate the most significant folder name from the label. Often used to strip off folders generated with benchfio (e.g. 4k)
   --xlabel-parent XLABEL_PARENT
                         use the parent folder(s) to make the label unique. The number represents how many folders up should be included. Default is 1. Use a value of 0 to remove parent folder name.
   --xlabel-segment-size XLABEL_SEGMENT_SIZE
-                        Truncate folder names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used with -g.
+                        Truncate label names to make labels fit the graph. Disabled by default. The number represents how many characters per segment are preserved. Used with -g.
+  --xlabel-single-column
+                        Whether to force a single-column layout in the label table when the number of labels is more than 3.
   -w LINE_WIDTH, --line-width LINE_WIDTH
                         Line width for line graphs. Can be a floating-point value. Used with -g.
   --group-bars          When using -l or -C, bars are grouped together by iops/lat type.
   --show-cpu            When using the -C or -l option, a table is added with cpu_usr and cpu_sys data.
+  --show-data           When using the -C -l or -N option, iops/lat data is also shown in table format. It replaces the standard deviation table
   --show-ss             When using the -C or -l option, a table is added with steadystate data.
   --table-lines         Draw the lines within a table (cpu/stdev)
   --max-lat MAX_LAT     Maximum latency value on y-axis
+  --max-clat MAX_CLAT   Maximum completion latency value on y-axis
+  --max-slat MAX_SLAT   Maximum submission latency value on y-axis
   --max-iops MAX_IOPS   Maximum IOPs value on y-axis
   --max-bw MAX_BW       Maximum bandwidth on y-axis
   --draw-total          Draw sum of read + write data in -g chart. Requires randrw benchmark, -f read write option.
   --colors COLORS [COLORS ...]
-                        Space separated list of colors (only used with -g). Color names can be found at this page: https://matplotlib.org/3.3.3/gallery/color/named_colors.html(example list: tab:red teal violet yellow). You need as many colors as
-                        lines.
+                        Space separated list of colors (only used with -g). Color names can be found at this page: https://matplotlib.org/3.3.3/gallery/color/named_colors.html(example list: tab:red teal violet yellow). You need as many colors as lines.
   --disable-fio-version
                         Don't display the fio version in the graph. It will also disable the fio-plot credit.
   --title-fontsize TITLE_FONTSIZE
