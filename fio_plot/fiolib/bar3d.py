@@ -143,10 +143,10 @@ def plot_3d(settings, dataset):
     # Set tics for x/y axis
     float_x = [float(x) for x in (xpos_orig)]
 
-    ax1.w_xaxis.set_ticks(float_x)
-    ax1.w_yaxis.set_ticks(ypos_orig)
-    ax1.w_xaxis.set_ticklabels(iodepth)
-    ax1.w_yaxis.set_ticklabels(numjobs)
+    ax1.xaxis.set_ticks(float_x)
+    ax1.yaxis.set_ticks(ypos_orig)
+    ax1.xaxis.set_ticklabels(iodepth)
+    ax1.yaxis.set_ticklabels(numjobs)
 
     # axis labels
     fontsize = 16
@@ -161,14 +161,14 @@ def plot_3d(settings, dataset):
 
     tick_label_font_size = 16
     for t in ax1.xaxis.get_major_ticks():
-        t.label.set_fontsize(tick_label_font_size)
+        t.label1.set_fontsize(tick_label_font_size)
 
     for t in ax1.yaxis.get_major_ticks():
-        t.label.set_fontsize(tick_label_font_size)
+        t.label1.set_fontsize(tick_label_font_size)
 
     ax1.zaxis.set_tick_params(pad=10)
     for t in ax1.zaxis.get_major_ticks():
-        t.label.set_fontsize(tick_label_font_size)
+        t.label1.set_fontsize(tick_label_font_size)
 
     # title
     supporting.create_title_and_sub(
