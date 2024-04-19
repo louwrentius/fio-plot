@@ -172,6 +172,43 @@ The .log files are ommitted.
 Please note that mixed workloads will get their own folder to prevent files being overwritten.
 Pure read/write/trim workloads will appear in the *device* folder.
 
+### SSD Preconditioning
+
+In order to obtain performance numbers that will actually represent production, it is very important to precondition SSDs.
+SSDs perform all kinds of strategies to improve write performance. Under a sustained write load, performance may dramatically deteriorate. To find out how much performance decreases, it's important to test with the SSD completely written over, multiple times.
+
+The included preconditioning step in this benchmark script overwrites the device twice, to make sure all flash storage is written to.
+
+More background information about SSD preconditioning [can be found here][snia].
+
+[snia]: https://www.snia.org/sites/default/education/tutorials/2011/fall/SolidState/EstherSpanjer_The_Why_How_SSD_Performance_Benchmarking.pdf
+
+### Notes on IO queue depth and number of jobs
+
+As discussed in issue #41 each job has its own I/O queue. If qd=1 and nj=5, you will have 5 IOs in flight.
+If you have qd=4 and nj=4 you will have 4 x 4 = 16 IOs in flight.
+
+### Benchmarking Ceph RBD images
+
+If you need to benchmark a Ceph RBD image, some tips:
+
+The --target should be the RBD image to benchmark
+The --ceph-pool parameter should specify the pool
+
+### Benchmarking a device using --size instead of --runtime as the benchmark duration
+By default, bench_fio uses a --runtime of 60 seconds unless --entire-device is specified or you specify a higher --runtime.
+
+If you use the --size option with --type device, you must specify --runtime 0 if you want the --size parameter to be honoured.
+You can also specify a large --runtime value as an upper bound to to the benchmark duration as fio stops benchmarking when the --size limit is reached.
+
+### Installation requirements
+
+Bench_fio requires Python3. The 'numpy' python module is required.
+
+   pip3 install -r requirements.txt
+
+You can also use apt/yum to satisfy this requirement.
+
 ### Usage
 
 	usage: bench-fio [-h] -d TARGET [TARGET ...] -t {device,file,directory,rbd} [-P CEPH_POOL] [-s SIZE] -o OUTPUT
@@ -267,39 +304,3 @@ Pure read/write/trim workloads will appear in the *device* folder.
 							times out, which may be undesirable. (False).
 	--create              Create target files if they don't exist. This is the default for fio but not for bench_fio
 	--parallel            Testing devices in parallel. The default for testing devices in sequential
-
-### SSD Preconditioning
-
-In order to obtain performance numbers that will actually represent production, it is very important to precondition SSDs.
-SSDs perform all kinds of strategies to improve write performance. Under a sustained write load, performance may dramatically deteriorate. To find out how much performance decreases, it's important to test with the SSD completely written over, multiple times.
-
-The included preconditioning step in this benchmark script overwrites the device twice, to make sure all flash storage is written to.
-
-More background information about SSD preconditioning [can be found here][snia].
-
-[snia]: https://www.snia.org/sites/default/education/tutorials/2011/fall/SolidState/EstherSpanjer_The_Why_How_SSD_Performance_Benchmarking.pdf
-
-### Notes on IO queue depth and number of jobs
-
-As discussed in issue #41 each job has its own I/O queue. If qd=1 and nj=5, you will have 5 IOs in flight.
-If you have qd=4 and nj=4 you will have 4 x 4 = 16 IOs in flight.
-
-### Benchmarking Ceph RBD images
-
-If you need to benchmark a Ceph RBD image, some tips:
-
-The --target should be the RBD image to benchmark
-The --ceph-pool parameter should specify the pool
-
-### Benchmarking a device with --size option
-By default, bench_fio uses a --runtime of 60 seconds unless --entire-device is specified. If you use the --size option with
---type device, you must specify --runtime 0 if you want the --size parameter to be honoured. You can also specify a large
---runtime value as an upper bound to to the benchmark duration.
-
-### Requirements
-
-Bench_fio requires Python3. The 'numpy' python module is required.
-
-   pip3 install -r requirements.txt
-
-You can also use apt/yum to satisfy this requirement.
