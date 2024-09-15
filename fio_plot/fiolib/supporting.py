@@ -272,7 +272,7 @@ def process_dataset(settings, dataset):
                                 get_scale_factor_bw(record["total"]["yvalues"])
                             )
                     # print(item["hostname"])
-                    new_list.append(record)
+            new_list.append(record)
     item.pop("data")
 
     """
