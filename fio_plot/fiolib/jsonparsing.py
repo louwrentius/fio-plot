@@ -34,7 +34,10 @@ def get_json_root_path(record):
 def get_json_global_options(record):
     options = {}
     if "global options" in record.keys():
-        options = record["global options"]
+        if isinstance(record["global options"], list):
+            options = record["global options"][0]
+        else:
+            options = record["global options"]
     return options
 
 
@@ -52,7 +55,10 @@ def process_json_record(settings, directory, record, jsonrootpath, globaloptions
         # client / server JSON output
         #
         if job["jobname"] != "All clients":
-            job["job options"] = {**job["job options"], **globaloptions}
+            if "job options" in job.keys():
+                job["job options"] = {**job["job options"], **globaloptions}
+            else:
+                job["job options"] = {**globaloptions}
             if not joboptions:               
                 joboptions = job["job options"]
         else:
