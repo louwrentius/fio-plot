@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+version = "1.1.16"
+name = "fio-plot"
+
+dependencies = [
+  "numpy",
+  "matplotlib",
+  "pillow",
+  "pyan3",
+  "rich",
+]
+
+[project.gui-scripts]
+fio-plot = "fio_plot:main"
+bench_fio = "bench_fio:main"
+
+[tool.setuptools.packages.find]
+exclude = ["bench_fio.scripts"]
