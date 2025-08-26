@@ -18,12 +18,12 @@ class TestFunctions(unittest.TestCase):
         self.settings["output"] = "output_directory"
 
     def test_generate_benchmarks(self):
-        self.assertEqual(len(supporting.generate_test_list(self.settings)), 98)
+        self.assertEqual(len(supporting.generate_test_list(self.settings)), 49)
 
     def test_generate_benchmarks_big(self):
         self.settings["target"] = ["filea", "fileb", "filec", "filed"]
         self.settings["block_size"] = ["4k", "8k", "16k", "32k"]
-        self.assertEqual(len(supporting.generate_test_list(self.settings)), 1568)
+        self.assertEqual(len(supporting.generate_test_list(self.settings)), 784)
 
     def test_are_loop_items_lists(self):
         for item in self.settings["loop_items"]:
@@ -32,7 +32,7 @@ class TestFunctions(unittest.TestCase):
 
     def test_calculate_duration(self):
         self.assertEqual(
-            display.calculate_duration(self.settings, self.tests), "1:38:00"
+            display.calculate_duration(self.settings, self.tests), "0:49:00"
         )
 
     def test_generate_output_directory_regular(self):

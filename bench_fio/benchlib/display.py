@@ -33,7 +33,7 @@ def calculate_duration(settings, tests):
         number_of_tests = number_of_tests/len(settings["target"])
     time_per_test = settings["runtime"]
     if time_per_test:
-        duration_in_seconds = number_of_tests * time_per_test
+        duration_in_seconds = int(number_of_tests * time_per_test)
         duration = str(datetime.timedelta(seconds=duration_in_seconds))
     else:
         duration = None
@@ -56,7 +56,7 @@ def print_options(settings, table):
     data = parse_settings_for_display(settings)
     for item in settings.keys():
         if item not in settings["filter_items"]: # filter items are internal options that aren't relevant
-            if item not in descriptions.keys(): 
+            if item not in descriptions.keys():
                 customitem = item + "*"  # These are custom fio options so we mark them as such
                 #print(f"{customitem:<{fl}}: {data[item]:<}")
                 table.add_row(customitem, data[item])
@@ -70,7 +70,6 @@ def print_options(settings, table):
 
 
 def display_header(settings, tests):
-    
     duration = calculate_duration(settings, tests)
     table = Table(title="Bench-fio",title_style=Style(bgcolor="dodger_blue2",bold=True))
     table.add_column(no_wrap=True, header="Setting")
@@ -79,4 +78,4 @@ def display_header(settings, tests):
     table.add_row("Estimated Duration",duration)
     print_options(settings, table)
     console = Console()
-    console.print(table)    
+    console.print(table)
