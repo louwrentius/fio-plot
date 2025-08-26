@@ -97,7 +97,7 @@ def get_arguments(settings):
 
     ag.add_argument(
         "--runtime",
-        help=f"Override the default test runtime per benchmark"
+        help=f"Override the default test runtime per benchmark (seconds)"
         f"(default: {settings['runtime']})",
         type=int,
         default=settings["runtime"],
