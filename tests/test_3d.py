@@ -9,6 +9,8 @@ class Test3D(unittest.TestCase):
             "rw": "read",
             "source": "test",
             "title": "test",
+            "title_fontsize": 12,
+            "subtitle_fontsize": 20,
             "subtitle": "",
             "filter": ["read", "write"],
             # intentionally using prime numbers
@@ -16,10 +18,12 @@ class Test3D(unittest.TestCase):
             "numjobs": [5, 11],
             "maxjobs": 32,
             "maxdepth": 32,
-            "max": None,
+            "max_z": None,
             "dpi": 200,
             "disable_fio_version": 2.0,
-            "output_filename": "/tmp/test.png"
+            "output_filename": "/tmp/test.png",
+            "truncate_xaxis": False,
+            "source_fontsize": 12,
         }
 
         dataset = [{"data": []}]
