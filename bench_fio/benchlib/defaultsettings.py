@@ -8,6 +8,7 @@ def get_default_settings():
     settings = {}
     settings["benchmarks"] = None
     settings["target"] = []
+    settings["template"] = "benchmark.ini"
     settings["type"] = None
     settings["engine"] = "libaio"
     settings["mode"] = ["randread"]

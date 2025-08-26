@@ -33,7 +33,7 @@ def calculate_duration(settings, tests):
         number_of_tests = number_of_tests/len(settings["target"])
     time_per_test = settings["runtime"]
     if time_per_test:
-        duration_in_seconds = number_of_tests * time_per_test
+        duration_in_seconds = int(number_of_tests * time_per_test)
         duration = str(datetime.timedelta(seconds=duration_in_seconds))
     else:
         duration = None

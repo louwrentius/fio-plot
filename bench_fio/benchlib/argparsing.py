@@ -39,6 +39,11 @@ def get_arguments(settings):
         type=str,
     )
     ag.add_argument(
+        "--template",
+        help="Benchmark template to use",
+        default="benchmark.ini",
+    )
+    ag.add_argument(
         "-t",
         "--type",
         help="Target type, device, file, directory or rbd (Ceph)",
@@ -230,7 +235,7 @@ def get_arguments(settings):
         default=settings["invalidate"],
     )
     ag.add_argument(
-        "--quiet", help="The progresbar will be supressed.", action="store_true"
+        "--quiet", help="The progress bar will be supressed.", action="store_true"
     )
     ag.add_argument(
         "--loginterval",
