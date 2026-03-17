@@ -3,11 +3,9 @@ import sys
 import json
 import logging
 
-logger = logging.getLogger(__name__)
-
 def validate_json_file(settings, jsondata):
     valid = False
-    keysfound = 0 
+    keysfound = 0
     minimumkeys = 2
     validkeys = ["fio version", "global options", "client_stats", "jobs"]
     for key in validkeys:
@@ -61,7 +59,7 @@ def filter_json_files(settings, filename):
                         iodepth = int(job_options["iodepth"])
                         numjobs = int(job_options["numjobs"])
             else:
-                logger.debug(f"{filename} does not appear to be a valid fio json output file, skipping")
+                print(f"{filename} does not appear to be a valid fio json output file, skipping")
         except Exception as e:
             logger.error(f"Filename: {filename}")
             logger.error(f"Error: {repr(e)}")
