@@ -3,11 +3,9 @@ import sys
 import json
 import logging
 
-logger = logging.getLogger(__name__)
-
 def validate_json_file(settings, jsondata):
     valid = False
-    keysfound = 0 
+    keysfound = 0
     minimumkeys = 2
     validkeys = ["fio version", "global options", "client_stats", "jobs"]
     for key in validkeys:
@@ -16,6 +14,21 @@ def validate_json_file(settings, jsondata):
     if keysfound >= minimumkeys:
         valid = True
     return valid
+
+def get_global_options(candidate_json):
+    """Return global options as a dictionary.
+
+    fio may emit "global options" either as a dict or as a one-item list.
+    """
+    options = candidate_json.get("global options", {})
+    if isinstance(options, dict):
+        return options
+    if isinstance(options, list):
+        if options and isinstance(options[0], dict):
+            return options[0]
+        return {}
+    return {}
+
 
 def filter_json_files(settings, filename):
     """A bit of a slow process, but guarantees that we get legal
@@ -26,22 +39,31 @@ def filter_json_files(settings, filename):
         try:
             candidate_json = json.load(candidate_file)
             if validate_json_file(settings, candidate_json):
+                global_options = get_global_options(candidate_json)
+
                 if "client_stats" in candidate_json.keys():
-                    job_options = candidate_json["client_stats"][0]["job options"]
+                    # For client/server JSON we expect workload options under
+                    # "global options".
+                    job_options = global_options
+                    if not job_options and candidate_json["client_stats"]:
+                        # Fallback for odd files missing global options.
+                        job_options = candidate_json["client_stats"][0].get("job options", {})
                 elif "global options" in candidate_json.keys():
-                    job_options = candidate_json["jobs"][0]["job options"] 
-                    job_options.update(candidate_json["global options"])
+                    job_options = candidate_json["jobs"][0]["job options"]
+                    job_options.update(global_options)
                 else:
                     job_options = candidate_json["jobs"][0]["job options"]
-                if job_options["rw"] == settings["rw"]:
-                    iodepth = int(job_options["iodepth"])
-                    numjobs = int(job_options["numjobs"])
+
+                if all(k in job_options for k in ["rw", "iodepth", "numjobs"]):
+                    if job_options["rw"] == settings["rw"]:
+                        iodepth = int(job_options["iodepth"])
+                        numjobs = int(job_options["numjobs"])
             else:
-                logger.debug(f"{filename} does not appear to be a valid fio json output file, skipping")
+                print(f"{filename} does not appear to be a valid fio json output file, skipping")
         except Exception as e:
-            print(f"\n\nFilename: {filename}")
-            print(f"Error: {repr(e)}\n") 
-            print("First, open the file and check for errors at the top.\nYou can remove the error lines and the JSON will likely parse\nbut results may not be trustworthy.\nIf there are no error linkes at the top, please report this as a bug\nand please include the JSON file if possible.\n\n")
+            logger.error(f"Filename: {filename}")
+            logger.error(f"Error: {repr(e)}")
+            logger.error("First, open the file and check for errors at the top.\nYou can remove the error lines and the JSON will likely parse\nbut results may not be trustworthy.\nIf there are no error linkes at the top, please report this as a bug\nand please include the JSON file if possible.")
             sys.exit(1)
     if iodepth in settings["iodepth"] and numjobs in settings["numjobs"]:
         return filename
@@ -85,7 +107,7 @@ def import_json_data(filename):
         try:
             d = json.load(json_data)
         except json.decoder.JSONDecodeError:
-            print(f"Failed to JSON parse {filename}")
+            logger.error(f"Failed to JSON parse {filename}")
             sys.exit(1)
     return d
 
