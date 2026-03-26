@@ -9,7 +9,7 @@ import matplotlib
 
 def check_matplotlib_version(requiredversion):
     matplotlibversion = matplotlib.__version__
-    from pkg_resources import parse_version as V  # nice
+    from packaging.version import parse as V
 
     if V(matplotlibversion) < V(requiredversion):
         print(
