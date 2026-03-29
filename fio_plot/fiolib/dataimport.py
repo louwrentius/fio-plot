@@ -6,6 +6,7 @@ import re
 import statistics
 from pathlib import Path
 from . import dataimport_support as ds
+from . import supporting
 
 def get_hostname_from_filename(f):
     split = f.split(".")
@@ -129,7 +130,7 @@ def mergeSingleDataSet(data, datatype):
     dataset containing the summed/averaged data.
     """
     #print("==============")
-    #for x in data: 
+    #for x in data:
     #    print(f"Merge single dataset - {x['hostname']} - {x['filename']} - {type(x['data'])}")
     merged_set = []
     hostdatamerged = {}
@@ -142,7 +143,6 @@ def mergeSingleDataSet(data, datatype):
             hostdatamerged[record["hostname"]].append(record)
         else:
             regulardatamerged.append(record)
-
 
     if hostdatamerged:
         for host in hostdatamerged.keys():
@@ -184,7 +184,7 @@ def mergeDataSet(settings, dataset):
                 "iodepth": filterstring["iodepth"],
                 "numjobs": filterstring["numjobs"],
                 "directory": directory,
-                
+
             }
             data = []
             for item in dataset:
@@ -193,7 +193,7 @@ def mergeDataSet(settings, dataset):
                     and item["directory"] == directory
                 ):
                     data.append(item)
-            
+
             newdata = mergeSingleDataSet(data, filterstring["type"]) # read write hostname
             #print(newdata["hostname"])
             record["data"] = newdata
@@ -201,7 +201,7 @@ def mergeDataSet(settings, dataset):
     return merged_sets
 
 
-def parse_raw_cvs_data(settings, dataset):
+def parse_raw_csv_data(settings, dataset):
     """This function exists mostly because I tried to test the performance
     of a 1.44MB floppy drive. The device is so slow that it can't keep up.
     This results in records that span multiple seconds, skewing the graphs.
@@ -223,32 +223,33 @@ def parse_raw_cvs_data(settings, dataset):
         sys.exit(1)
 
     if mean > 1000:
-        #print(
-        #    f"\n{supporting.bcolors.WARNING}Warning: > 1000msec log interval found\n"
-        #    f"{supporting.bcolors.ENDC}"
-        #    "\nIf the log_avg_msec parameter used to generate the log data is < 1000 msec\n"
-        #    "it is stronly advised to cross-verify the output of the graph with the\n"
-        #    "appropriate values found in the .json output if available.\n\n"
-        #    "It may be advised to rerun your benchmarks with log_avg_msec = 1000 or higher\n"
-        #    "to achieve correct results.\n\n"
-        #)
-
+        print(
+            f"{supporting.bcolors.WARNING}WARNING: Average raw log record interval > 1000ms"
+            f"{supporting.bcolors.ENDC}"
+            "\nRaw log data record interval > 1000ms indicates performance issue, graph data is unreliable\n"
+            "Resulting log graph cannot be trusted."
+        )
         # log data with a log_avg_msec higher than 1000 msec should be converted back
         # to values per 1000 msec
         for index, item in enumerate(dataset):
             if index == 0:
                 average_value = int(item["value"]) / int(item["timestamp"]) * 1000
-
             else:
                 previous_timestamp = int(dataset[index - 1]["timestamp"])
                 distance = int(item["timestamp"]) - previous_timestamp
                 number_of_seconds = int(distance / 1000)
+                #
+                # Required if log interval is > 1000ms, result is unreliable
+                #
+                if number_of_seconds == 0:
+                    number_of_seconds = 1
+                if distance == 0:
+                    distance = 1
+                #
                 try:
-                    average_value = int(item["value"]) / distance * mean
+                    average_value = int(item["value"]) / (distance * mean)
                 except ZeroDivisionError as e:
                     print(e)
-                    print(f"{item['value']} - {distance} - {mean}")
-                    continue
                 for x in range(number_of_seconds):
                     temp_dict = dict(item)
                     temp_dict["value"] = average_value
@@ -276,7 +277,7 @@ def readLogData(settings, inputfile):
             )
             for item in csv_reader:
                 dataset.append(item)
-    dataset = parse_raw_cvs_data(settings, dataset)
+    dataset = parse_raw_csv_data(settings, dataset)
     return dataset
 
 
