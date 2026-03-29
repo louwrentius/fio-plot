@@ -33,10 +33,10 @@ def get_log_data(settings):
     logfiles = logdata.filterLogFiles(settings, benchmarkfiles)
     #pprint.pprint(logfiles)
     rawdata = logdata.readLogDataFromFiles(settings, logfiles)
-    #pprint.pprint(rawdata)
+    # pprint.pprint(rawdata)
     merged = logdata.mergeDataSet(settings, rawdata)
     #[ print(merged[x]["data"]["hostname"]) for x in range(len(merged))]
-    #print(merged)
+    # print(merged)
     #print(len(merged))
     return merged
 
