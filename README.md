@@ -252,7 +252,7 @@ For more examples, please consult the separate [README.md][rm]
 
 [rm]: https://github.com/louwrentius/fio-plot/tree/master/bench_fio#readme
 
-## Dependancies
+## Dependencies
 
 Fio-plot requires 'matplotlib' and 'numpy' to be installed.
 
